@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Sandbox
 {
+    /// <summary>
+    /// Represents a mechanism which can consume C# source and emit language tokens.
+    /// </summary>
     public class Tokenizer
     {
         private static readonly Func<Character, Action>[,] table;
@@ -11,7 +14,11 @@ namespace Sandbox
 
         static Tokenizer()
         {
+            /* we use a 2D map of functions indexed by state and character just read */
+
             table = new Func<Character, Action>[50, 50];
+
+            // these are the initializations of the table
 
             Add(States.INITIAL, Kind.CR, (a) => { return new Action(Step.DiscardResume, States.INITIAL); });
             Add(States.INITIAL, Kind.LF, (a) => { return new Action(Step.DiscardResume, States.INITIAL); });
@@ -107,6 +114,11 @@ namespace Sandbox
                 for (int I = 0; I < source.Chars.Count; I++)
                 {
                     var character = source.Chars[I];
+
+                    // given the current state and the character just read 
+                    // locate and call a handler function. That will return
+                    // information that describes what to do, whether we've recognized
+                    // a complete token and what state to enter next.
 
                     var action = this[state, character.Kind](character);
 
