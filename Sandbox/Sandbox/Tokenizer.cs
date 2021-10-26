@@ -74,11 +74,6 @@ namespace Sandbox
 
             Add(States.SLASH_STAR, Kind.Symbol, (a) =>
             {
-                return new Action(Step.AppendResume, States.SLASH_STAR);
-            });
-
-            Add(States.SLASH_STAR, Kind.Symbol, (a) =>
-            {
                 if (a.Char == '*')
                     return new Action(Step.AppendResume, States.SLASH_STAR_STAR);
 
@@ -95,7 +90,15 @@ namespace Sandbox
                 if (a.Char == '/')
                     return new Action(Step.AppendHalt, States.INITIAL, TokenType.BlockComment);
 
-                return new Action(Step.AppendResume, States.SLASH_STAR_STAR);
+                if (a.Char == '*')
+                    return new Action(Step.AppendResume, States.SLASH_STAR_STAR);
+
+                return new Action(Step.AppendResume, States.SLASH_STAR);
+            });
+
+            Add(States.SLASH_STAR_STAR, Kind.Parenthesis, (a) =>
+            {
+                return new Action(Step.AppendResume, States.SLASH_STAR);
             });
 
         }

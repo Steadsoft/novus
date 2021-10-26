@@ -9,7 +9,7 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
-            var source = SourceFile.Create(@"..\..\..\Tokenizer.cs");
+            var source = SourceFile.Create(@"..\..\..\TestFiles\test1.nov");
 
             /* this is just a test */        int unused;      
 
