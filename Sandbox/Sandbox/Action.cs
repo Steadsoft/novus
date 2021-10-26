@@ -9,9 +9,9 @@ namespace Sandbox
     public class Action
     {
         public Step Step { get; private set; }
-        public int State { get; private set; }
+        public States State { get; private set; }
 
-        public Action (Step Step, int State)
+        public Action (Step Step, States State)
         {
             this.Step = Step;
             this.State = State;
