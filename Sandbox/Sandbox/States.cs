@@ -11,7 +11,7 @@ namespace Sandbox
         INITIAL = 0,
         IDENTIFIER = 1,
         INTEGER = 2,
-        COMMENT_1 = 3,
-        COMMENT_2 = 4
+        SLASH_1 = 3,
+        SLASH_2 = 4
     }
 }

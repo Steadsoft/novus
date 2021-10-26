@@ -6,8 +6,8 @@ namespace Sandbox
 {
     public class Tokenizer
     {
-        private static Func<Character, Action>[,] table;
-        private SourceFile source;
+        private static readonly Func<Character, Action>[,] table;
+        private readonly SourceFile source;
 
         static Tokenizer()
         {
@@ -25,7 +25,7 @@ namespace Sandbox
             Add(States.INITIAL, Kind.Symbol, (a) =>
             {
                 if (a.Char == '/')
-                    return new Action(Step.AppendResume, States.COMMENT_1);
+                    return new Action(Step.AppendResume, States.SLASH_1);
                 return new Action(Step.AppendHalt, 0);
 
             });
@@ -36,33 +36,33 @@ namespace Sandbox
 
             Add(States.IDENTIFIER, Kind.Letter, (a) => { return new Action(Step.AppendResume, States.IDENTIFIER); });
             Add(States.IDENTIFIER, Kind.Digit, (a) => { return new Action(Step.AppendResume, States.IDENTIFIER); });
-            Add(States.IDENTIFIER, Kind.AnythingElse, (a) => { return new Action(Step.RestoreHalt, States.INITIAL); });
+            Add(States.IDENTIFIER, Kind.AnythingElse, (a) => { return new Action(Step.RestoreHalt, States.INITIAL, TokenType.Identifier); });
 
             // Assume its an integer
 
             Add(States.INTEGER, Kind.Digit, (a) => { return new Action(Step.AppendResume, States.INTEGER); });
-            Add(States.INTEGER, Kind.AnythingElse, (a) => { return new Action(Step.RestoreHalt, States.INITIAL); });
+            Add(States.INTEGER, Kind.AnythingElse, (a) => { return new Action(Step.RestoreHalt, States.INITIAL, TokenType.Integer); });
 
-            // Assume its start of a comment
+            // a token with 1st char a slash
 
-            Add(States.COMMENT_1, Kind.Symbol, (a) =>
+            Add(States.SLASH_1, Kind.Symbol, (a) =>
             {
                 if (a.Char == '/')
-                    return new Action(Step.AppendResume, States.COMMENT_2);
+                    return new Action(Step.AppendResume, States.SLASH_2);
                 return new Action(Step.AppendHalt, 0);
 
             });
 
-            // It is a comment
+            // a token with 2nd char a slash
 
-            Add(States.COMMENT_2, Kind.LF, (a) =>
+            Add(States.SLASH_2, Kind.LF, (a) =>
             {
-                return new Action(Step.AppendHalt, States.INITIAL);
+                return new Action(Step.AppendHalt, States.INITIAL, TokenType.Comment);
             });
 
-            Add(States.COMMENT_2, Kind.AnythingElse, (a) =>
+            Add(States.SLASH_2, Kind.AnythingElse, (a) =>
             {
-                return new Action(Step.AppendResume, States.COMMENT_2);
+                return new Action(Step.AppendResume, States.SLASH_2);
             });
 
 
@@ -76,16 +76,16 @@ namespace Sandbox
         {
             get
             {
-                StringBuilder lexeme = new StringBuilder();
+                StringBuilder lexeme = new();
                 States state = States.INITIAL;
 
                 for (int I = 0; I < source.Chars.Count; I++)
                 {
                     var character = source.Chars[I];
 
-                    var act = this[state, character.Kind](character);
+                    var action = this[state, character.Kind](character);
 
-                    switch (act.Step)
+                    switch (action.Step)
                     {
                         case Step.AppendResume:
                             {
@@ -95,14 +95,14 @@ namespace Sandbox
                         case Step.AppendHalt:
                             {
                                 lexeme.Append(character.Char);
-                                yield return new Token(TokenType.Identifier, lexeme.ToString(), character.Line, character.Col);
+                                yield return new Token(action.TokenType, lexeme.ToString(), character.Line, character.Col);
                                 lexeme.Clear();
                                 break;
                             }
                         case Step.RestoreHalt:
                             {
                                 I--;
-                                yield return new Token(TokenType.Identifier, lexeme.ToString(), character.Line, character.Col);
+                                yield return new Token(action.TokenType, lexeme.ToString(), character.Line, character.Col);
                                 lexeme.Clear();
                                 break;
                             }
@@ -114,7 +114,7 @@ namespace Sandbox
                             throw new InvalidOperationException("really?");
                     }
 
-                    state = act.State;
+                    state = action.State;
                 }
             }
         }
@@ -127,11 +127,8 @@ namespace Sandbox
         {
             get
             {
-                return table[(int)State, (int)Kind] == null ? table[(int)State, (int)Kind.AnythingElse] : table[(int)State, (int)Kind];
+                return table[(int)State, (int)Kind] ?? table[(int)State, (int)Kind.AnythingElse];
             }
         }
     }
-
-
-
 }

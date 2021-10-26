@@ -10,11 +10,12 @@ namespace Sandbox
     {
         public Step Step { get; private set; }
         public States State { get; private set; }
-
-        public Action (Step Step, States State)
+        public TokenType TokenType { get; private set; }
+        public Action (Step Step, States State, TokenType TokenType = TokenType.Undecided)
         {
             this.Step = Step;
             this.State = State;
+            this.TokenType = TokenType;
         }
     }
 }

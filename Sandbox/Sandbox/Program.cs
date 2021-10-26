@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Sandbox
 {
+    // Just a sandbox for a lexer
     internal partial class Program
     {
         static void Main(string[] args)
