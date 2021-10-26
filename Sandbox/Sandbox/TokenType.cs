@@ -4,7 +4,8 @@
     {
         Undecided,
         Identifier,
-        Comment,
+        LineComment,
+        BlockComment,
         Integer
     }
 }

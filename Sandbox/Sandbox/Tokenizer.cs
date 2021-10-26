@@ -25,7 +25,7 @@ namespace Sandbox
             Add(States.INITIAL, Kind.Symbol, (a) =>
             {
                 if (a.Char == '/')
-                    return new Action(Step.AppendResume, States.SLASH_1);
+                    return new Action(Step.AppendResume, States.SLASH);
                 return new Action(Step.AppendHalt, 0);
 
             });
@@ -45,26 +45,51 @@ namespace Sandbox
 
             // a token with 1st char a slash
 
-            Add(States.SLASH_1, Kind.Symbol, (a) =>
+            Add(States.SLASH, Kind.Symbol, (a) =>
             {
                 if (a.Char == '/')
-                    return new Action(Step.AppendResume, States.SLASH_2);
+                    return new Action(Step.AppendResume, States.SLASH_SLASH);
+                if (a.Char == '*')
+                    return new Action(Step.AppendResume, States.SLASH_STAR);
                 return new Action(Step.AppendHalt, 0);
 
             });
 
-            // a token with 2nd char a slash
-
-            Add(States.SLASH_2, Kind.LF, (a) =>
+            Add(States.SLASH_SLASH, Kind.LF, (a) =>
             {
-                return new Action(Step.AppendHalt, States.INITIAL, TokenType.Comment);
+                return new Action(Step.AppendHalt, States.INITIAL, TokenType.LineComment);
             });
 
-            Add(States.SLASH_2, Kind.AnythingElse, (a) =>
+            Add(States.SLASH_SLASH, Kind.AnythingElse, (a) =>
             {
-                return new Action(Step.AppendResume, States.SLASH_2);
+                return new Action(Step.AppendResume, States.SLASH_SLASH);
             });
 
+            Add(States.SLASH_STAR, Kind.Symbol, (a) =>
+            {
+                return new Action(Step.AppendResume, States.SLASH_STAR);
+            });
+
+            Add(States.SLASH_STAR, Kind.Symbol, (a) =>
+            {
+                if (a.Char == '*')
+                    return new Action(Step.AppendResume, States.SLASH_STAR_STAR);
+
+                return new Action(Step.AppendResume, States.SLASH_STAR);
+            });
+
+            Add(States.SLASH_STAR, Kind.AnythingElse, (a) =>
+            {
+                return new Action(Step.AppendResume, States.SLASH_STAR);
+            });
+
+            Add(States.SLASH_STAR_STAR, Kind.Symbol, (a) =>
+            {
+                if (a.Char == '/')
+                    return new Action(Step.AppendHalt, States.INITIAL, TokenType.BlockComment);
+
+                return new Action(Step.AppendResume, States.SLASH_STAR_STAR);
+            });
 
         }
         public Tokenizer(SourceFile File)
