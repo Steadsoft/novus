@@ -151,7 +151,7 @@ namespace Sandbox
                             throw new InvalidOperationException("really?");
                     }
 
-                    state = action.State;
+                    state = action.State; // set our state to whatever the handlder told us.
                 }
             }
         }
