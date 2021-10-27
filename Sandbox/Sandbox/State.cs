@@ -9,14 +9,13 @@
     /// </remarks>
     public enum State
     {
-        INITIAL = 0,
-        IDENTIFIER = 1,
-        INTEGER = 2,
-        SLASH = 3,
-        SLASH_SLASH = 4,
-        SLASH_STAR = 5,
-        STAR = 6,
-        SLASH_STAR_STAR = 7
+        INITIAL,
+        IDENTIFIER,
+        INTEGER,
+        SLASH,
+        SLASH_SLASH,
+        SLASH_STAR,
+        STAR,
+        SLASH_STAR_STAR
     }
-   
 }

@@ -1,6 +1,14 @@
 ﻿
 /* symbolic functions */
 
+i_am_an_ident
+
+and33_so_ami
+
+/* int below */
+
+1234567890
+
 &(x) = get address of x
 *(p) = deref pointer p
 **   = exponentiation

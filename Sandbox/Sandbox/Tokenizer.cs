@@ -29,6 +29,7 @@ namespace Sandbox
             table.Add(State.INITIAL, Alpha, (a) => { return new Action(Step.AppendResume, State.IDENTIFIER); });
             table.Add(State.INITIAL, Digit, (a) => { return new Action(Step.AppendResume, State.INTEGER); });
             table.Add(State.INITIAL, Punct, (a) => { return new Action(Step.AppendHalt, State.INITIAL, TokenType.Punctuator); });
+            table.Add(State.INITIAL, Symbl, (a) => { return new Action(Step.AppendHalt, State.INITIAL, TokenType.Symbol); });
 
             table.Add(State.SLASH, '*', (a) => { return new Action(Step.AppendResume, State.SLASH_STAR); });
 
@@ -36,6 +37,15 @@ namespace Sandbox
             table.Add(State.SLASH_STAR, Any, (a) => { return new Action(Step.AppendResume, State.SLASH_STAR); });
 
             table.Add(State.SLASH_STAR_STAR, '/', (a) => { return new Action(Step.AppendHalt, State.INITIAL, TokenType.BlockComment); });
+
+
+            table.Add(State.IDENTIFIER, '_',   (a) => { return new Action(Step.AppendResume, State.IDENTIFIER); });
+            table.Add(State.IDENTIFIER, Alpha, (a) => { return new Action(Step.AppendResume, State.IDENTIFIER); });
+            table.Add(State.IDENTIFIER, Digit, (a) => { return new Action(Step.AppendResume, State.IDENTIFIER); });
+            table.Add(State.IDENTIFIER, Any,   (a) => { return new Action(Step.RestoreHalt, State.INITIAL, TokenType.Identifier); });
+
+            table.Add(State.INTEGER, Digit, (a) => { return new Action(Step.AppendResume, State.INTEGER); });
+            table.Add(State.INTEGER, Any,   (a) => { return new Action(Step.RestoreHalt, State.INITIAL, TokenType.Integer); });
 
         }
         public Tokenizer(SourceFile File)

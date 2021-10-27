@@ -7,6 +7,7 @@
         LineComment,
         BlockComment,
         Integer,
-        Punctuator
+        Punctuator,
+        Symbol
     }
 }
