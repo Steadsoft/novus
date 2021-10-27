@@ -1,3 +1,44 @@
 ﻿
-/*&()*()*/
+/* symbolic functions */
+
+&(x) = get address of x
+*(p) = deref pointer p
+**   = exponentiation
+
+a = b ** ()
+
+a = *(p);
+
+X++
+X--
+x!
+new
+typeof
+checked
+unchecked
+default
+nameof
+sizeof
+stackalloc
+
+*(p)
+&(p)
+
+tokens
+
++
+-
+++
+--
+*
+**
+=
+==
+>
+>>
+>>=
+<
+<<
+<<=
+
 
