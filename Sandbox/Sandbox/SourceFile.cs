@@ -38,7 +38,7 @@ namespace Sandbox
 
                         col++;
 
-                        if (ch.Kind == Kind.LF)
+                        if (ch.Char == '\n')
                         {
                             line++;
                             col = 1;

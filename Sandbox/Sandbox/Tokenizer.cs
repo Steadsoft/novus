@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using static Sandbox.CharSupport;
+using static Sandbox.CharClass;
 
 namespace Sandbox
 {
@@ -9,97 +11,28 @@ namespace Sandbox
     /// </summary>
     public class Tokenizer
     {
-        private static readonly Func<Character, Action>[,] table;
+        private static readonly FunctionTable<State, Char, Func<Character, Action>> table;
         private readonly SourceFile source;
 
         static Tokenizer()
         {
             /* we use a 2D map of functions indexed by state and character just read */
 
-            table = new Func<Character, Action>[50, 50];
+            table = new();
 
             // these are the initializations of the table
 
-            Add(States.INITIAL, Kind.CR, (a) => { return new Action(Step.DiscardResume, States.INITIAL); });
-            Add(States.INITIAL, Kind.LF, (a) => { return new Action(Step.DiscardResume, States.INITIAL); });
-            Add(States.INITIAL, Kind.Whitespace, (a) => { return new Action(Step.DiscardResume, States.INITIAL); });
-            Add(States.INITIAL, Kind.Letter, (a) => { return new Action(Step.AppendResume, States.IDENTIFIER); });
-            Add(States.INITIAL, Kind.Digit, (a) => { return new Action(Step.AppendResume, States.INTEGER); });
-            Add(States.INITIAL, Kind.Punctuation, (a) => { return new Action(Step.AppendHalt, States.INITIAL); });
-            Add(States.INITIAL, Kind.Brace, (a) => { return new Action(Step.AppendHalt, States.INITIAL); });
-            Add(States.INITIAL, Kind.Parenthesis, (a) => { return new Action(Step.AppendHalt, States.INITIAL); });
-            Add(States.INITIAL, Kind.Bracket, (a) => { return new Action(Step.AppendHalt, States.INITIAL); });
-            Add(States.INITIAL, Kind.Symbol, (a) =>
-            {
-                if (a.Char == '/')
-                    return new Action(Step.AppendResume, States.SLASH);
-                return new Action(Step.AppendHalt, 0);
+            table.Add(State.INITIAL, White, (a) => { return new Action(Step.DiscardResume, State.INITIAL); });
+            table.Add(State.INITIAL, Alpha, (a) => { return new Action(Step.AppendResume, State.IDENTIFIER); });
+            table.Add(State.INITIAL, Digit, (a) => { return new Action(Step.AppendResume, State.INTEGER); });
+            table.Add(State.INITIAL, '/',   (a) => { return new Action(Step.AppendResume, State.SLASH); });
 
-            });
+            table.Add(State.SLASH, '*', (a) => { return new Action(Step.AppendResume, State.SLASH_STAR); });
 
-            Add(States.INITIAL, Kind.Arrow, (a) => { return new Action(Step.AppendHalt, States.INITIAL); });
+            table.Add(State.SLASH_STAR, '*', (a) => { return new Action(Step.AppendResume, State.SLASH_STAR_STAR); });
+            table.Add(State.SLASH_STAR, Any, (a) => { return new Action(Step.AppendResume, State.SLASH_STAR); });
 
-            // Assume its an identifier
-
-            Add(States.IDENTIFIER, Kind.Letter, (a) => { return new Action(Step.AppendResume, States.IDENTIFIER); });
-            Add(States.IDENTIFIER, Kind.Digit, (a) => { return new Action(Step.AppendResume, States.IDENTIFIER); });
-            Add(States.IDENTIFIER, Kind.AnythingElse, (a) => { return new Action(Step.RestoreHalt, States.INITIAL, TokenType.Identifier); });
-
-            // Assume its an integer
-
-            Add(States.INTEGER, Kind.Digit, (a) => { return new Action(Step.AppendResume, States.INTEGER); });
-            Add(States.INTEGER, Kind.AnythingElse, (a) => { return new Action(Step.RestoreHalt, States.INITIAL, TokenType.Integer); });
-
-            // a token with 1st char a slash
-
-            Add(States.SLASH, Kind.Symbol, (a) =>
-            {
-                if (a.Char == '/')
-                    return new Action(Step.AppendResume, States.SLASH_SLASH);
-                if (a.Char == '*')
-                    return new Action(Step.AppendResume, States.SLASH_STAR);
-                return new Action(Step.AppendHalt, 0);
-
-            });
-
-            Add(States.SLASH_SLASH, Kind.LF, (a) =>
-            {
-                return new Action(Step.AppendHalt, States.INITIAL, TokenType.LineComment);
-            });
-
-            Add(States.SLASH_SLASH, Kind.AnythingElse, (a) =>
-            {
-                return new Action(Step.AppendResume, States.SLASH_SLASH);
-            });
-
-            Add(States.SLASH_STAR, Kind.Symbol, (a) =>
-            {
-                if (a.Char == '*')
-                    return new Action(Step.AppendResume, States.SLASH_STAR_STAR);
-
-                return new Action(Step.AppendResume, States.SLASH_STAR);
-            });
-
-            Add(States.SLASH_STAR, Kind.AnythingElse, (a) =>
-            {
-                return new Action(Step.AppendResume, States.SLASH_STAR);
-            });
-
-            Add(States.SLASH_STAR_STAR, Kind.Symbol, (a) =>
-            {
-                if (a.Char == '/')
-                    return new Action(Step.AppendHalt, States.INITIAL, TokenType.BlockComment);
-
-                if (a.Char == '*')
-                    return new Action(Step.AppendResume, States.SLASH_STAR_STAR);
-
-                return new Action(Step.AppendResume, States.SLASH_STAR);
-            });
-
-            Add(States.SLASH_STAR_STAR, Kind.AnythingElse, (a) =>
-            {
-                return new Action(Step.AppendResume, States.SLASH_STAR);
-            });
+            table.Add(State.SLASH_STAR_STAR, '/', (a) => { return new Action(Step.AppendHalt, State.INITIAL, TokenType.BlockComment); });
 
         }
         public Tokenizer(SourceFile File)
@@ -112,7 +45,7 @@ namespace Sandbox
             get
             {
                 StringBuilder lexeme = new();
-                States state = States.INITIAL;
+                State state = State.INITIAL;
 
                 for (int I = 0; I < source.Chars.Count; I++)
                 {
@@ -123,9 +56,17 @@ namespace Sandbox
                     // information that describes what to do, whether we've recognized
                     // a complete token and what state to enter next.
 
-                    var action = this[state, character.Kind](character);
+                    // If there's a handler for this specific char in this state then use it
+                    // else see if there's a handler for the general class of the char.
 
-                    switch (action.Step)
+                    var action = table.GetHandler(state, character.Char) ?? table.GetHandler(state, GetClass(character.Char)) ?? table.GetHandler(state, Any);
+
+                    if (action == null)
+                        throw new InvalidOperationException($"No handler found in state '{state}' for char '{character.Char}' having class '{GetClass(character.Char)}'.");
+
+                    var result = action(character);
+
+                    switch (result.Step)
                     {
                         case Step.AppendResume:
                             {
@@ -135,14 +76,14 @@ namespace Sandbox
                         case Step.AppendHalt:
                             {
                                 lexeme.Append(character.Char);
-                                yield return new Token(action.TokenType, lexeme.ToString(), character.Line, character.Col);
+                                yield return new Token(result.TokenType, lexeme.ToString(), character.Line, character.Col);
                                 lexeme.Clear();
                                 break;
                             }
                         case Step.RestoreHalt:
                             {
                                 I--;
-                                yield return new Token(action.TokenType, lexeme.ToString(), character.Line, character.Col);
+                                yield return new Token(result.TokenType, lexeme.ToString(), character.Line, character.Col);
                                 lexeme.Clear();
                                 break;
                             }
@@ -154,20 +95,8 @@ namespace Sandbox
                             throw new InvalidOperationException("really?");
                     }
 
-                    state = action.State; // set our state to whatever the handlder told us.
+                    state = result.State; // set our state to whatever the handlder told us.
                 }
-            }
-        }
-        private static void Add(States State, Kind Kind, Func<Character, Action> Function)
-        {
-            table[(int)State, (int)Kind] = Function;
-        }
-
-        private Func<Character, Action> this[States State, Kind Kind]
-        {
-            get
-            {
-                return table[(int)State, (int)Kind] ?? table[(int)State, (int)Kind.AnythingElse];
             }
         }
     }

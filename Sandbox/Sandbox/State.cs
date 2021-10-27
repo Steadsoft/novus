@@ -13,7 +13,7 @@ namespace Sandbox
     /// Multi character tokens that are only distinguished by their 2nd or later characters
     /// are represented as states named after the characters read so far.
     /// </remarks>
-    public enum States
+    public enum State
     {
         INITIAL = 0,
         IDENTIFIER = 1,
