@@ -6,6 +6,7 @@
         Identifier,
         LineComment,
         BlockComment,
-        Integer
+        Integer,
+        Punctuator
     }
 }

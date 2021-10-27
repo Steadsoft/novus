@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using static Sandbox.CharSupport;
-using static Sandbox.CharClass;
+using static Sandbox.LexicalClass;
 
 namespace Sandbox
 {
@@ -11,7 +10,7 @@ namespace Sandbox
     /// </summary>
     public class Tokenizer
     {
-        private static readonly FunctionTable<State, Char, Func<Character, Action>> table;
+        private static readonly SparseTable<State, Char, Func<Character, Action>> table;
         private readonly SourceFile source;
 
         static Tokenizer()
@@ -20,12 +19,16 @@ namespace Sandbox
 
             table = new();
 
-            // these are the initializations of the table
+            // these are the initializations of the table. 
+            // Initialization proceeds by designating a state and then for that state we
+            // add all desired handlers for specific characters, then we add handlers for 
+            // classs of characters and finally if desired, we can add handlers for 'any' characters.
 
+            table.Add(State.INITIAL, '/',   (a) => { return new Action(Step.AppendResume, State.SLASH); });
             table.Add(State.INITIAL, White, (a) => { return new Action(Step.DiscardResume, State.INITIAL); });
             table.Add(State.INITIAL, Alpha, (a) => { return new Action(Step.AppendResume, State.IDENTIFIER); });
             table.Add(State.INITIAL, Digit, (a) => { return new Action(Step.AppendResume, State.INTEGER); });
-            table.Add(State.INITIAL, '/',   (a) => { return new Action(Step.AppendResume, State.SLASH); });
+            table.Add(State.INITIAL, Punct, (a) => { return new Action(Step.AppendHalt, State.INITIAL, TokenType.Punctuator); });
 
             table.Add(State.SLASH, '*', (a) => { return new Action(Step.AppendResume, State.SLASH_STAR); });
 
@@ -50,6 +53,7 @@ namespace Sandbox
                 for (int I = 0; I < source.Chars.Count; I++)
                 {
                     var character = source.Chars[I];
+                    var charclass = character.Char.GetLexicalClass();
 
                     // given the current state and the character just read 
                     // locate and call a handler function. That will return
@@ -57,12 +61,13 @@ namespace Sandbox
                     // a complete token and what state to enter next.
 
                     // If there's a handler for this specific char in this state then use it
-                    // else see if there's a handler for the general class of the char.
+                    // else see if there's a handler for the general class of the char, finally
+                    // see if there's a handler for the 'any' case.
 
-                    var action = table.GetHandler(state, character.Char) ?? table.GetHandler(state, GetClass(character.Char)) ?? table.GetHandler(state, Any);
+                    var action = table.GetHandler(state, character.Char) ?? table.GetHandler(state, charclass) ?? table.GetHandler(state, Any);
 
                     if (action == null)
-                        throw new InvalidOperationException($"No handler found in state '{state}' for char '{character.Char}' having class '{GetClass(character.Char)}'.");
+                        throw new InvalidOperationException($"No handler found in state '{state}' for char '{character.Char}' having lexical class '{charclass}'.");
 
                     var result = action(character);
 

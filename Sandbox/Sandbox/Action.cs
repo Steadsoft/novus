@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sandbox
 {
@@ -16,6 +12,10 @@ namespace Sandbox
             this.Step = Step;
             this.State = State;
             this.TokenType = TokenType;
+
+            if (Step == Step.AppendHalt || Step == Step.RestoreHalt)
+                if (TokenType == TokenType.Undecided)
+                    throw new ArgumentException("You must supply a token type when creating an action that halts tokenization.");
         }
     }
 }
