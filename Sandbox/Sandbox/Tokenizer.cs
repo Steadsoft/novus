@@ -96,7 +96,7 @@ namespace Sandbox
                 return new Action(Step.AppendResume, States.SLASH_STAR);
             });
 
-            Add(States.SLASH_STAR_STAR, Kind.Parenthesis, (a) =>
+            Add(States.SLASH_STAR_STAR, Kind.AnythingElse, (a) =>
             {
                 return new Action(Step.AppendResume, States.SLASH_STAR);
             });
