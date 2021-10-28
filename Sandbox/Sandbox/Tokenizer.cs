@@ -30,7 +30,6 @@ namespace Sandbox
             table.Add(State.INITIAL, '<', (a) => { return new Action(Step.AppendContinue, State.LESSER); });
             table.Add(State.INITIAL, '"', (a) => { return new Action(Step.AppendContinue, State.QUOTATION); });
             table.Add(State.INITIAL, '\'', (a) => { return new Action(Step.AppendContinue, State.APOSTROPHE); });
-
             table.Add(State.INITIAL, White, (a) => { return new Action(Step.DiscardContinue, State.INITIAL); });
             table.Add(State.INITIAL, Alpha, (a) => { return new Action(Step.AppendContinue, State.IDENTIFIER); });
             table.Add(State.INITIAL, Digit, (a) => { return new Action(Step.AppendContinue, State.INTEGER); });
@@ -38,11 +37,16 @@ namespace Sandbox
             table.Add(State.INITIAL, Symbl, (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.Symbol); });
 
             table.Add(State.SLASH, '*', (a) => { return new Action(Step.AppendContinue, State.SLASH_STAR); });
+            table.Add(State.SLASH, '/', (a) => { return new Action(Step.AppendContinue, State.SLASH_SLASH); });
 
             table.Add(State.SLASH_STAR, '*', (a) => { return new Action(Step.AppendContinue, State.SLASH_STAR_STAR); });
             table.Add(State.SLASH_STAR, Any, (a) => { return new Action(Step.AppendContinue, State.SLASH_STAR); });
 
+            table.Add(State.SLASH_SLASH, '\r', (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.LineComment); });
+            table.Add(State.SLASH_SLASH, Any, (a) => { return new Action(Step.AppendContinue, State.SLASH_SLASH); });
+
             table.Add(State.SLASH_STAR_STAR, '/', (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.BlockComment); });
+            table.Add(State.SLASH_STAR_STAR, Any, (a) => { return new Action(Step.AppendContinue, State.SLASH_STAR_STAR); });
 
             table.Add(State.IDENTIFIER, '_',   (a) => { return new Action(Step.AppendContinue, State.IDENTIFIER); });
             table.Add(State.IDENTIFIER, Alpha, (a) => { return new Action(Step.AppendContinue, State.IDENTIFIER); });

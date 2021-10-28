@@ -1,6 +1,8 @@
 ﻿"test"
 
-/* symbolic functions */
+/* symbolic functions * H */
+
+// line comments
 
 i_am_an_ident
 1234567
