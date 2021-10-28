@@ -60,7 +60,9 @@ namespace Sandbox
 
                     if (parts[1].StartsWith('\'') && parts[1].EndsWith('\''))
                     {
-                        parts[1] = parts[1].Trim('\'');
+                        var len = parts[1].Length;
+
+                        parts[1] = parts[1].Substring(1).Substring(0, len - 2);
 
                         flag = Char.TryParse(parts[1], out char code);
 

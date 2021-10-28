@@ -1,12 +1,12 @@
 ﻿// This is the token defintions for the the C# language
 
+INITIAL, '\'',  AppendContinue,  APOSTROPHE, Undecided 
 INITIAL, '/',   AppendContinue,  SLASH,      Undecided 
 INITIAL, '-',   AppendContinue,  HYPHEN,     Undecided 
 INITIAL, '=',   AppendContinue,  EQUALS,     Undecided 
 INITIAL, '>',   AppendContinue,  GREATER,    Undecided 
 INITIAL, '<',   AppendContinue,  LESSER,     Undecided 
 INITIAL, '"',   AppendContinue,  QUOTATION,  Undecided 
-INITIAL, '\'',  AppendContinue,  APOSTROPHE, Undecided 
 INITIAL, White, DiscardContinue, INITIAL,    Undecided 
 INITIAL, Alpha, AppendContinue,  IDENTIFIER, Undecided 
 INITIAL, Digit, AppendContinue,  INTEGER,    Undecided 
