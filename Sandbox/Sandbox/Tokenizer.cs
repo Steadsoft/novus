@@ -24,29 +24,27 @@ namespace Sandbox
             // add all desired handlers for specific characters, then we add handlers for 
             // classs of characters and finally if desired, we can add handlers for 'any' characters.
 
-            table.Add(State.INITIAL, '/',   (a) => { return new Action(Step.AppendResume, State.SLASH); });
-            table.Add(State.INITIAL, White, (a) => { return new Action(Step.DiscardResume, State.INITIAL); });
-            table.Add(State.INITIAL, Alpha, (a) => { return new Action(Step.AppendResume, State.IDENTIFIER); });
-            table.Add(State.INITIAL, Digit, (a) => { return new Action(Step.AppendResume, State.INTEGER); });
-            table.Add(State.INITIAL, Punct, (a) => { return new Action(Step.AppendHalt, State.INITIAL, TokenType.Punctuator); });
-            table.Add(State.INITIAL, Symbl, (a) => { return new Action(Step.AppendHalt, State.INITIAL, TokenType.Symbol); });
+            table.Add(State.INITIAL, '/',   (a) => { return new Action(Step.AppendContinue, State.SLASH); });
+            table.Add(State.INITIAL, White, (a) => { return new Action(Step.DiscardContinue, State.INITIAL); });
+            table.Add(State.INITIAL, Alpha, (a) => { return new Action(Step.AppendContinue, State.IDENTIFIER); });
+            table.Add(State.INITIAL, Digit, (a) => { return new Action(Step.AppendContinue, State.INTEGER); });
+            table.Add(State.INITIAL, Punct, (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.Punctuator); });
+            table.Add(State.INITIAL, Symbl, (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.Symbol); });
 
-            table.Add(State.SLASH, '*', (a) => { return new Action(Step.AppendResume, State.SLASH_STAR); });
+            table.Add(State.SLASH, '*', (a) => { return new Action(Step.AppendContinue, State.SLASH_STAR); });
 
-            table.Add(State.SLASH_STAR, '*', (a) => { return new Action(Step.AppendResume, State.SLASH_STAR_STAR); });
-            table.Add(State.SLASH_STAR, Any, (a) => { return new Action(Step.AppendResume, State.SLASH_STAR); });
+            table.Add(State.SLASH_STAR, '*', (a) => { return new Action(Step.AppendContinue, State.SLASH_STAR_STAR); });
+            table.Add(State.SLASH_STAR, Any, (a) => { return new Action(Step.AppendContinue, State.SLASH_STAR); });
 
-            table.Add(State.SLASH_STAR_STAR, '/', (a) => { return new Action(Step.AppendHalt, State.INITIAL, TokenType.BlockComment); });
+            table.Add(State.SLASH_STAR_STAR, '/', (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.BlockComment); });
 
+            table.Add(State.IDENTIFIER, '_',   (a) => { return new Action(Step.AppendContinue, State.IDENTIFIER); });
+            table.Add(State.IDENTIFIER, Alpha, (a) => { return new Action(Step.AppendContinue, State.IDENTIFIER); });
+            table.Add(State.IDENTIFIER, Digit, (a) => { return new Action(Step.AppendContinue, State.IDENTIFIER); });
+            table.Add(State.IDENTIFIER, Any,   (a) => { return new Action(Step.RestoreReturn, State.INITIAL, TokenType.Identifier); });
 
-            table.Add(State.IDENTIFIER, '_',   (a) => { return new Action(Step.AppendResume, State.IDENTIFIER); });
-            table.Add(State.IDENTIFIER, Alpha, (a) => { return new Action(Step.AppendResume, State.IDENTIFIER); });
-            table.Add(State.IDENTIFIER, Digit, (a) => { return new Action(Step.AppendResume, State.IDENTIFIER); });
-            table.Add(State.IDENTIFIER, Any,   (a) => { return new Action(Step.RestoreHalt, State.INITIAL, TokenType.Identifier); });
-
-            table.Add(State.INTEGER, Digit, (a) => { return new Action(Step.AppendResume, State.INTEGER); });
-            table.Add(State.INTEGER, Any,   (a) => { return new Action(Step.RestoreHalt, State.INITIAL, TokenType.Integer); });
-
+            table.Add(State.INTEGER, Digit, (a) => { return new Action(Step.AppendContinue, State.INTEGER); });
+            table.Add(State.INTEGER, Any,   (a) => { return new Action(Step.RestoreReturn, State.INITIAL, TokenType.Integer); });
         }
         public Tokenizer(SourceFile File)
         {
@@ -83,26 +81,26 @@ namespace Sandbox
 
                     switch (result.Step)
                     {
-                        case Step.AppendResume:
+                        case Step.AppendContinue:
                             {
                                 lexeme.Append(character.Char);
                                 break;
                             }
-                        case Step.AppendHalt:
+                        case Step.AppendReturn:
                             {
                                 lexeme.Append(character.Char);
                                 yield return new Token(result.TokenType, lexeme.ToString(), character.Line, character.Col);
                                 lexeme.Clear();
                                 break;
                             }
-                        case Step.RestoreHalt:
+                        case Step.RestoreReturn:
                             {
                                 I--;
                                 yield return new Token(result.TokenType, lexeme.ToString(), character.Line, character.Col);
                                 lexeme.Clear();
                                 break;
                             }
-                        case Step.DiscardResume:
+                        case Step.DiscardContinue:
                             {
                                 break;
                             }

@@ -23,5 +23,15 @@ namespace Sandbox
                 Console.WriteLine("'");
             }
         }
+
+        static int func(int n)
+        {
+            return n;
+        }
+
+        static void Args(int a, int b, int c)
+        {
+            ;
+        }
     }
 }

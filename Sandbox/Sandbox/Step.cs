@@ -5,22 +5,18 @@
         /// <summary>
         /// Append the just-read char to the buffer and continue building the token.
         /// </summary>
-        AppendResume,
+        AppendContinue,
         /// <summary>
-        /// Append the just-read char to the buffer and finish building the token.
+        /// Append the just-read char to the buffer and retunr the built token.
         /// </summary>
-        AppendHalt,
+        AppendReturn,
         /// <summary>
-        /// Discard the just-read char and resume reading
+        /// Discard the just-read char but continue building the token.
         /// </summary>
-        DiscardResume,
+        DiscardContinue,
         /// <summary>
-        /// Return the just-read char so it will be read again then continue building the token.
+        /// Return the just-read char so it will be read again but return the currently built token
         /// </summary>
-        //RestoreResume, // Likely not needed as it will just loop forever.
-        /// <summary>
-        /// Return the just-read char so it will be read again and finish building the token
-        /// </summary>
-        RestoreHalt
+        RestoreReturn
     }
 }
