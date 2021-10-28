@@ -18,6 +18,8 @@
         STAR,
         SLASH_STAR_STAR,
         HYPHEN,
-        HYPHEN_ARROW
+        HYPHEN_ARROW,
+        EQUALS,
+        EQUALITY
     }
 }

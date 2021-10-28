@@ -9,6 +9,8 @@
         Integer,
         Punctuator,
         Symbol,
-        PointsTo
+        PointsTo,
+        Equals,
+        Equality
     }
 }
