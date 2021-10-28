@@ -15,7 +15,7 @@ namespace Sandbox
 
             foreach (var token in tokenizer.Tokens)
             {
-                Console.Write($"Token ({token.TokenCode,-10}) - Text '");
+                Console.Write($"{token.TokenCode,-12} - Text '");
                 var c = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.Write($"{token.Lexeme}");

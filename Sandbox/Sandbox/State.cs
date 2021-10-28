@@ -20,6 +20,12 @@
         HYPHEN,
         HYPHEN_ARROW,
         EQUALS,
-        EQUALITY
+        EQUALITY,
+        GREATER,
+        SHIFT_RIGHT,
+        LESSER,
+        SHIFT_LEFT,
+        QUOTATION,
+        APOSTROPHE,
     }
 }

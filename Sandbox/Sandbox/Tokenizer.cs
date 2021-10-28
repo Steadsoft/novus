@@ -27,6 +27,10 @@ namespace Sandbox
             table.Add(State.INITIAL, '/',   (a) => { return new Action(Step.AppendContinue, State.SLASH); });
             table.Add(State.INITIAL, '-', (a) => { return new Action(Step.AppendContinue, State.HYPHEN); });
             table.Add(State.INITIAL, '=', (a) => { return new Action(Step.AppendContinue, State.EQUALS); });
+            table.Add(State.INITIAL, '>', (a) => { return new Action(Step.AppendContinue, State.GREATER); });
+            table.Add(State.INITIAL, '<', (a) => { return new Action(Step.AppendContinue, State.LESSER); });
+            table.Add(State.INITIAL, '"', (a) => { return new Action(Step.AppendContinue, State.QUOTATION); });
+            table.Add(State.INITIAL, '\'', (a) => { return new Action(Step.AppendContinue, State.APOSTROPHE); });
 
             table.Add(State.INITIAL, White, (a) => { return new Action(Step.DiscardContinue, State.INITIAL); });
             table.Add(State.INITIAL, Alpha, (a) => { return new Action(Step.AppendContinue, State.IDENTIFIER); });
@@ -54,6 +58,18 @@ namespace Sandbox
 
             table.Add(State.EQUALS, '=', (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.Equality); });
             table.Add(State.EQUALS, Any, (a) => { return new Action(Step.RestoreReturn, State.INITIAL, TokenType.Equals); });
+
+            table.Add(State.GREATER, '>', (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.ShiftRight); });
+            table.Add(State.GREATER, Any, (a) => { return new Action(Step.RestoreReturn, State.INITIAL, TokenType.Greater); });
+
+            table.Add(State.LESSER, '<', (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.ShiftLeft); });
+            table.Add(State.LESSER, Any, (a) => { return new Action(Step.RestoreReturn, State.INITIAL, TokenType.Lesser); });
+
+            table.Add(State.QUOTATION, '"', (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.QString); });
+            table.Add(State.QUOTATION, Any, (a) => { return new Action(Step.AppendContinue, State.QUOTATION); });
+
+            table.Add(State.APOSTROPHE, '\'', (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.AString); });
+            table.Add(State.APOSTROPHE, Any, (a) => { return new Action(Step.AppendContinue, State.APOSTROPHE); });
 
         }
         public Tokenizer(SourceFile File)
@@ -85,7 +101,7 @@ namespace Sandbox
                     var action = table.GetHandler(state, character.Char) ?? table.GetHandler(state, charclass) ?? table.GetHandler(state, Any);
 
                     if (action == null)
-                        throw new InvalidOperationException($"No handler found in state '{state}' for char '{character.Char}' having lexical class '{charclass}'.");
+                        throw new InvalidOperationException($"No handler found in state '{state}' for char '{character.Char}' having lexical class '{charclass}' at L={character.Line} C={character.Col}.");
 
                     var result = action(character);
 

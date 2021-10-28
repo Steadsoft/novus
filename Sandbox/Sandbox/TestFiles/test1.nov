@@ -1,4 +1,5 @@
-﻿
+﻿"test"
+
 /* symbolic functions */
 
 i_am_an_ident
@@ -28,6 +29,11 @@ default
 nameof
 sizeof
 stackalloc
+
+text = "this is just a load of charcaters"
+
+this = 'this is too but is delimited with a different char'
+
 
 *(p)
 &(p)

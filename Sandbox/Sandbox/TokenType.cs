@@ -11,6 +11,12 @@
         Symbol,
         PointsTo,
         Equals,
-        Equality
+        Equality,
+        Greater,
+        ShiftRight,
+        Lesser,
+        ShiftLeft,
+        QString,
+        AString
     }
 }
