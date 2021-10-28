@@ -1,5 +1,8 @@
-﻿namespace Sandbox
+﻿using System.Diagnostics;
+
+namespace Sandbox
 {
+    [DebuggerDisplay("{TokenCode} {Lexeme}")]
     public class Token
     {
         public TokenType TokenCode { get; private set; }

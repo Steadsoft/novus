@@ -19,7 +19,6 @@ namespace Sandbox
 
             table = new();
 
-            // these are the initializations of the table. 
             // Initialization proceeds by designating a state and then for that state we
             // add all desired handlers for specific characters, then we add handlers for 
             // classs of characters and finally if desired, we can add handlers for 'any' characters.
@@ -115,14 +114,14 @@ namespace Sandbox
                         case Step.AppendReturn:
                             {
                                 lexeme.Append(character.Char);
-                                yield return new Token(result.TokenType, lexeme.ToString(), character.Line, character.Col);
+                                yield return new Token(result.TokenType, lexeme.ToString(), character.Line, character.Col + 1 - lexeme.Length);
                                 lexeme.Clear();
                                 break;
                             }
                         case Step.RestoreReturn:
                             {
                                 I--;
-                                yield return new Token(result.TokenType, lexeme.ToString(), character.Line, character.Col);
+                                yield return new Token(result.TokenType, lexeme.ToString(), character.Line, character.Col - lexeme.Length);
                                 lexeme.Clear();
                                 break;
                             }

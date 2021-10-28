@@ -3,6 +3,8 @@
 /* symbolic functions */
 
 i_am_an_ident
+1234567
+      "i start at column 7"
 
 and33_so_ami
 
