@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace Sandbox
 {
@@ -9,11 +12,9 @@ namespace Sandbox
         {
             var source = SourceFile.Create(@"..\..\..\TestFiles\test1.nov");
 
-            /* this is just a test */
+            var tokenizer = new Tokenizer(@"..\..\..\TestFiles\csharp.csv");
 
-            var tokenizer = new Tokenizer(source);
-
-            foreach (var token in tokenizer.Tokens)
+            foreach (var token in tokenizer.Tokenize(source))
             {
                 Console.Write($"[{token.LineNumber,-3} {token.ColNumber,-2}] {token.TokenCode,-12} '");
                 var c = Console.ForegroundColor;
@@ -22,7 +23,6 @@ namespace Sandbox
                 Console.ForegroundColor = c;
                 Console.WriteLine("'");
             }
-
         }
     }
 }

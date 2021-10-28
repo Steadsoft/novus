@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using static Sandbox.LexicalClass;
 
 namespace Sandbox
@@ -10,135 +13,120 @@ namespace Sandbox
     /// </summary>
     public class Tokenizer
     {
-        private static readonly SparseTable<State, Char, Func<Character, Action>> table;
-        private readonly SourceFile source;
+        private readonly SparseTable<State, Char, (Step, State, TokenType)> table;
+        private SourceFile source;
 
-        static Tokenizer()
+        public Tokenizer(string CSV)
         {
-            /* we use a 2D map of functions indexed by state and character just read */
-
             table = new();
 
-            // Initialization proceeds by designating a state and then for that state we
-            // add all desired handlers for specific characters, then we add handlers for 
-            // classs of characters and finally if desired, we can add handlers for 'any' characters.
+            using (FileStream fs = File.OpenRead(CSV))
+            {
+                bool flag;
 
-            table.Add(State.INITIAL, '/',   (a) => { return new Action(Step.AppendContinue, State.SLASH); });
-            table.Add(State.INITIAL, '-', (a) => { return new Action(Step.AppendContinue, State.HYPHEN); });
-            table.Add(State.INITIAL, '=', (a) => { return new Action(Step.AppendContinue, State.EQUALS); });
-            table.Add(State.INITIAL, '>', (a) => { return new Action(Step.AppendContinue, State.GREATER); });
-            table.Add(State.INITIAL, '<', (a) => { return new Action(Step.AppendContinue, State.LESSER); });
-            table.Add(State.INITIAL, '"', (a) => { return new Action(Step.AppendContinue, State.QUOTATION); });
-            table.Add(State.INITIAL, '\'', (a) => { return new Action(Step.AppendContinue, State.APOSTROPHE); });
-            table.Add(State.INITIAL, White, (a) => { return new Action(Step.DiscardContinue, State.INITIAL); });
-            table.Add(State.INITIAL, Alpha, (a) => { return new Action(Step.AppendContinue, State.IDENTIFIER); });
-            table.Add(State.INITIAL, Digit, (a) => { return new Action(Step.AppendContinue, State.INTEGER); });
-            table.Add(State.INITIAL, Punct, (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.Punctuator); });
-            table.Add(State.INITIAL, Symbl, (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.Symbol); });
+                using StreamReader sr = new(fs, Encoding.UTF8);
+                while (!sr.EndOfStream)
+                {
+                    var text = sr.ReadLine();
 
-            table.Add(State.SLASH, '*', (a) => { return new Action(Step.AppendContinue, State.SLASH_STAR); });
-            table.Add(State.SLASH, '/', (a) => { return new Action(Step.AppendContinue, State.SLASH_SLASH); });
+                    if (text == null)
+                        break;
 
-            table.Add(State.SLASH_STAR, '*', (a) => { return new Action(Step.AppendContinue, State.SLASH_STAR_STAR); });
-            table.Add(State.SLASH_STAR, Any, (a) => { return new Action(Step.AppendContinue, State.SLASH_STAR); });
+                    if (String.IsNullOrWhiteSpace(text))
+                        continue;
 
-            table.Add(State.SLASH_SLASH, '\r', (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.LineComment); });
-            table.Add(State.SLASH_SLASH, Any, (a) => { return new Action(Step.AppendContinue, State.SLASH_SLASH); });
+                    if (text.Contains("//"))
+                        continue;
 
-            table.Add(State.SLASH_STAR_STAR, '/', (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.BlockComment); });
-            table.Add(State.SLASH_STAR_STAR, Any, (a) => { return new Action(Step.AppendContinue, State.SLASH_STAR_STAR); });
+                    var parts = text.Split(',').Select(a => a.Trim()).ToArray();
 
-            table.Add(State.IDENTIFIER, '_',   (a) => { return new Action(Step.AppendContinue, State.IDENTIFIER); });
-            table.Add(State.IDENTIFIER, Alpha, (a) => { return new Action(Step.AppendContinue, State.IDENTIFIER); });
-            table.Add(State.IDENTIFIER, Digit, (a) => { return new Action(Step.AppendContinue, State.IDENTIFIER); });
-            table.Add(State.IDENTIFIER, Any,   (a) => { return new Action(Step.RestoreReturn, State.INITIAL, TokenType.Identifier); });
+                    var curstate = (State)Enum.Parse(typeof(State), parts[0]);
+                    var step = (Step)Enum.Parse(typeof(Step), parts[2]);
+                    var newstate = (State)Enum.Parse(typeof(State), parts[3]);
+                    var token = (TokenType)Enum.Parse(typeof(TokenType), parts[4]);
 
-            table.Add(State.INTEGER, Digit, (a) => { return new Action(Step.AppendContinue, State.INTEGER); });
-            table.Add(State.INTEGER, Any,   (a) => { return new Action(Step.RestoreReturn, State.INITIAL, TokenType.Integer); });
+                    if (parts[1].StartsWith('\'') && parts[1].EndsWith('\''))
+                    {
+                        parts[1] = parts[1].Trim('\'');
 
-            table.Add(State.HYPHEN, '>', (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.PointsTo); });
-            table.Add(State.HYPHEN, Any, (a) => { return new Action(Step.RestoreReturn, State.INITIAL, TokenType.Symbol); });
+                        flag = Char.TryParse(parts[1], out char code);
 
-            table.Add(State.EQUALS, '=', (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.Equality); });
-            table.Add(State.EQUALS, Any, (a) => { return new Action(Step.RestoreReturn, State.INITIAL, TokenType.Equals); });
+                        if (flag)
+                            table.Add(curstate, code, (step, newstate, token));
+                        else
+                        {
+                            parts[1] = Regex.Unescape(parts[1]);
+                            flag = Char.TryParse(parts[1], out code);
 
-            table.Add(State.GREATER, '>', (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.ShiftRight); });
-            table.Add(State.GREATER, Any, (a) => { return new Action(Step.RestoreReturn, State.INITIAL, TokenType.Greater); });
-
-            table.Add(State.LESSER, '<', (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.ShiftLeft); });
-            table.Add(State.LESSER, Any, (a) => { return new Action(Step.RestoreReturn, State.INITIAL, TokenType.Lesser); });
-
-            table.Add(State.QUOTATION, '"', (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.QString); });
-            table.Add(State.QUOTATION, Any, (a) => { return new Action(Step.AppendContinue, State.QUOTATION); });
-
-            table.Add(State.APOSTROPHE, '\'', (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.AString); });
-            table.Add(State.APOSTROPHE, Any, (a) => { return new Action(Step.AppendContinue, State.APOSTROPHE); });
-
+                            if (flag)
+                                table.Add(curstate, code, (step, newstate, token));
+                        }
+                    }
+                    else
+                    {
+                        var cls = (LexicalClass)Enum.Parse(typeof(LexicalClass), parts[1]);
+                        table.Add(curstate, cls, (step, newstate, token));
+                    }
+                }
+            }
         }
         public Tokenizer(SourceFile File)
         {
             this.source = File;
         }
 
-        public IEnumerable<Token> Tokens
+        public IEnumerable<Token> Tokenize(SourceFile Source)
         {
-            get
+            if (Source == null) throw new ArgumentNullException(nameof(Source));
+
+            source = Source;
+
+            StringBuilder lexeme = new();
+            State state = State.INITIAL;
+
+            var tuple = (Step: Step.AppendReturn, State: State.INITIAL, TokenType: TokenType.Undecided);
+
+            for (int I = 0; I < source.Chars.Count; I++)
             {
-                StringBuilder lexeme = new();
-                State state = State.INITIAL;
+                var character = source.Chars[I];
+                var charclass = character.Char.GetLexicalClass();
 
-                for (int I = 0; I < source.Chars.Count; I++)
+
+                bool found = table.TryGet(state, character.Char, out tuple) ? true : table.TryGet(state, charclass, out tuple) ? true : table.TryGet(state, Any, out tuple);
+
+                if (found == false)
+                    throw new InvalidOperationException($"No handler found in state '{state}' for char '{character.Char}' having lexical class '{charclass}' at L={character.Line} C={character.Col}.");
+
+                switch (tuple.Step)
                 {
-                    var character = source.Chars[I];
-                    var charclass = character.Char.GetLexicalClass();
-
-                    // given the current state and the character just read 
-                    // locate and call a handler function. That will return
-                    // information that describes what to do, whether we've recognized
-                    // a complete token and what state to enter next.
-
-                    // If there's a handler for this specific char in this state then use it
-                    // else see if there's a handler for the general class of the char, finally
-                    // see if there's a handler for the 'any' case.
-
-                    var action = table.GetHandler(state, character.Char) ?? table.GetHandler(state, charclass) ?? table.GetHandler(state, Any);
-
-                    if (action == null)
-                        throw new InvalidOperationException($"No handler found in state '{state}' for char '{character.Char}' having lexical class '{charclass}' at L={character.Line} C={character.Col}.");
-
-                    var result = action(character);
-
-                    switch (result.Step)
-                    {
-                        case Step.AppendContinue:
-                            {
-                                lexeme.Append(character.Char);
-                                break;
-                            }
-                        case Step.AppendReturn:
-                            {
-                                lexeme.Append(character.Char);
-                                yield return new Token(result.TokenType, lexeme.ToString(), character.Line, character.Col + 1 - lexeme.Length);
-                                lexeme.Clear();
-                                break;
-                            }
-                        case Step.RestoreReturn:
-                            {
-                                I--;
-                                yield return new Token(result.TokenType, lexeme.ToString(), character.Line, character.Col - lexeme.Length);
-                                lexeme.Clear();
-                                break;
-                            }
-                        case Step.DiscardContinue:
-                            {
-                                break;
-                            }
-                        default:
-                            throw new InvalidOperationException("really?");
-                    }
-
-                    state = result.State; // set our state to whatever the handlder told us.
+                    case Step.AppendContinue:
+                        {
+                            lexeme.Append(character.Char);
+                            break;
+                        }
+                    case Step.AppendReturn:
+                        {
+                            lexeme.Append(character.Char);
+                            yield return new Token(tuple.TokenType, lexeme.ToString(), character.Line, character.Col + 1 - lexeme.Length);
+                            lexeme.Clear();
+                            break;
+                        }
+                    case Step.RestoreReturn:
+                        {
+                            I--;
+                            yield return new Token(tuple.TokenType, lexeme.ToString(), character.Line, character.Col - lexeme.Length);
+                            lexeme.Clear();
+                            break;
+                        }
+                    case Step.DiscardContinue:
+                        {
+                            break;
+                        }
+                    default:
+                        throw new InvalidOperationException("really?");
                 }
+
+                state = tuple.State; // set our state to whatever the handlder told us.
             }
         }
     }

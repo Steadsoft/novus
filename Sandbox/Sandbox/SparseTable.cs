@@ -27,17 +27,22 @@ namespace Sandbox
             Add(t, (U)Convert.ChangeType(u, typeof(U)), f);
         }
 
-        public F GetHandler(T t, U u)
+        public bool TryGet(T t, U u, out F f)
         {
-            if (table.ContainsKey(t) && table[t].ContainsKey(u))
-                return table[t][u];
+            f = default;
 
-            return default;
+            if (table.ContainsKey(t) && table[t].ContainsKey(u))
+            {
+                f = table[t][u];
+                return true;
+            }
+
+            return false;
         }
 
-        public F GetHandler<V>(T t, V u) where V : System.Enum
+        public bool TryGet<V>(T t, V u, out F f) where V : System.Enum
         {
-            return GetHandler(t, (U)Convert.ChangeType(u, typeof(U)));
+            return TryGet(t, (U)Convert.ChangeType(u, typeof(U)), out f);
         }
     }
 }
