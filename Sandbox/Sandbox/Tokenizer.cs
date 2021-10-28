@@ -9,15 +9,28 @@ using static Sandbox.LexicalClass;
 namespace Sandbox
 {
     /// <summary>
-    /// Represents a mechanism which can consume C# source and emit language tokens.
+    /// Represents a mechanism which can consume source and emit language tokens.
     /// </summary>
+    /// <remarks>
+    /// A tokenizer instance is initialized with a handler map specific to some chosen
+    /// language and then its 'Toeknize' method can be called with a source file to
+    /// transform that source into a token stream.
+    /// </remarks>
     public class Tokenizer
     {
         private readonly SparseTable<State, Char, (Step, State, TokenType)> table;
         private SourceFile source;
 
+        /// <summary>
+        /// Creates a new instance of a tokenizer and initialises its state machine
+        /// from the CSV file that you supply.
+        /// </summary>
+        /// <param name="CSV"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public Tokenizer(string CSV)
         {
+            if (string.IsNullOrWhiteSpace(CSV)) throw new ArgumentNullException(nameof(CSV));
+
             table = new();
 
             using (FileStream fs = File.OpenRead(CSV))
@@ -75,6 +88,13 @@ namespace Sandbox
             this.source = File;
         }
 
+        /// <summary>
+        /// Transforms the supplied source into a stream of tokens.
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
         public IEnumerable<Token> Tokenize(SourceFile Source)
         {
             if (Source == null) throw new ArgumentNullException(nameof(Source));
