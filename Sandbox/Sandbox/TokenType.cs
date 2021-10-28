@@ -8,6 +8,7 @@
         BlockComment,
         Integer,
         Punctuator,
-        Symbol
+        Symbol,
+        PointsTo
     }
 }

@@ -13,7 +13,7 @@ and33_so_ami
 *(p) = deref pointer p
 **   = exponentiation
 
-a = b ** ()
+arion = b ** ()
 
 a = *(p);
 
@@ -33,7 +33,7 @@ stackalloc
 &(p)
 
 tokens
-
+->
 +
 -
 ++

@@ -16,6 +16,8 @@
         SLASH_SLASH,
         SLASH_STAR,
         STAR,
-        SLASH_STAR_STAR
+        SLASH_STAR_STAR,
+        HYPHEN,
+        HYPHEN_ARROW
     }
 }

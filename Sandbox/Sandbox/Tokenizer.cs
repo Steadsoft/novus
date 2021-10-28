@@ -25,6 +25,8 @@ namespace Sandbox
             // classs of characters and finally if desired, we can add handlers for 'any' characters.
 
             table.Add(State.INITIAL, '/',   (a) => { return new Action(Step.AppendContinue, State.SLASH); });
+            table.Add(State.INITIAL, '-', (a) => { return new Action(Step.AppendContinue, State.HYPHEN); });
+
             table.Add(State.INITIAL, White, (a) => { return new Action(Step.DiscardContinue, State.INITIAL); });
             table.Add(State.INITIAL, Alpha, (a) => { return new Action(Step.AppendContinue, State.IDENTIFIER); });
             table.Add(State.INITIAL, Digit, (a) => { return new Action(Step.AppendContinue, State.INTEGER); });
@@ -45,6 +47,10 @@ namespace Sandbox
 
             table.Add(State.INTEGER, Digit, (a) => { return new Action(Step.AppendContinue, State.INTEGER); });
             table.Add(State.INTEGER, Any,   (a) => { return new Action(Step.RestoreReturn, State.INITIAL, TokenType.Integer); });
+
+            table.Add(State.HYPHEN, '>', (a) => { return new Action(Step.AppendReturn, State.INITIAL, TokenType.PointsTo); });
+            table.Add(State.HYPHEN, Any, (a) => { return new Action(Step.RestoreReturn, State.INITIAL, TokenType.Symbol); });
+
         }
         public Tokenizer(SourceFile File)
         {
