@@ -1,5 +1,11 @@
 ﻿// This is the token defintions for the the C# language
 
+INITIAL, '{',   AppendReturn,    INITIAL,    LBrace 
+INITIAL, '}',   AppendReturn,    INITIAL,    RBrace 
+INITIAL, '[',   AppendReturn,    INITIAL,    LBrack 
+INITIAL, ']',   AppendReturn,    INITIAL,    RBrack 
+INITIAL, '(',   AppendReturn,    INITIAL,    LPar 
+INITIAL, ')',   AppendReturn,    INITIAL,    RPar 
 INITIAL, '\'',  AppendContinue,  APOSTROPHE, Undecided 
 INITIAL, '/',   AppendContinue,  SLASH,      Undecided 
 INITIAL, '-',   AppendContinue,  HYPHEN,     Undecided 

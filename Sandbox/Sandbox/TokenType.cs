@@ -17,6 +17,13 @@
         Lesser,
         ShiftLeft,
         QString,
-        AString
+        AString,
+        LBrace,
+        RBrace,
+        LBrack,
+        RBrack,
+        LPar,
+        RPar
+
     }
 }

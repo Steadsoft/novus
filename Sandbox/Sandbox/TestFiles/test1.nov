@@ -8,7 +8,7 @@ i_am_an_ident
 1234567
       "i start at column 7"
 
-and33_so_ami
+{ and33_so_ami }
 
 /* int below */
 
@@ -21,6 +21,30 @@ and33_so_ami
 arion = b ** ()
 
 a = *(p);
+
+result = some_builtin[arglist]
+result = some_builtin{arglist}
+result = some_builtin(arglist);
+
+/* 
+   Novus could use [ ] for representing an arglist in a builtin
+   function call. The other ( ) is absolutely fine for user 
+   methods, functions and array accessors. */
+
+/* 
+   Novus can rest upon the idea of a language namespace and that can be
+   written with a leading @ that is not available to users in names. */
+
+/*
+
+result = sizeof[arg];
+result = nameof[arg];
+
+and so on, are actually calls into functions defined in a namespace
+named: @language.builtin { }
+
+*/
+
 
 X++
 X--
