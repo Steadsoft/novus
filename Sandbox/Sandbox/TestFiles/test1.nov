@@ -18,6 +18,14 @@ i_am_an_ident
 *(p) = deref pointer p
 **   = exponentiation
 
+/*
+
+This could be how we handle pointers
+
+var ptr = addr[data];
+var data = cont[ptr];
+
+
 arion = b ** ()
 
 a = *(p);
