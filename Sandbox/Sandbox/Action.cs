@@ -13,7 +13,7 @@ namespace Sandbox
             this.State = State;
             this.TokenType = TokenType;
 
-            if (Step == Step.AppendReturn || Step == Step.RestoreReturn)
+            if (Step == Step.AppendReturn || Step == Step.RewindReturn)
                 if (TokenType == TokenType.Undecided)
                     throw new ArgumentException("You must supply a token type when creating an action that halts tokenization.");
         }

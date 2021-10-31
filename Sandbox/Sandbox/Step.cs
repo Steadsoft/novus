@@ -17,6 +17,6 @@
         /// <summary>
         /// Return the just-read char so it will be read again but return the currently built token
         /// </summary>
-        RestoreReturn
+        RewindReturn
     }
 }

@@ -133,7 +133,7 @@ namespace Sandbox
                             lexeme.Clear();
                             break;
                         }
-                    case Step.RestoreReturn:
+                    case Step.RewindReturn:
                         {
                             I--;
                             yield return new Token(tuple.TokenType, lexeme.ToString(), character.Line, character.Col - lexeme.Length);
