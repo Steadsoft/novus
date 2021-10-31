@@ -10,7 +10,7 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
-            var source = SourceFile.Create(@"..\..\..\TestFiles\examples1.nov");
+            var source = SourceFile.Create(@"..\..\..\TestFiles\test1.nov");
 
             var tokenizer = new Tokenizer(@"..\..\..\TestFiles\csharp.csv");
 
