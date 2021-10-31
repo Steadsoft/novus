@@ -2,3 +2,77 @@
 This file contains examples that let us see the kinds of syntactic options open to us for a range of statement types.
 */
 
+def mycode namespace
+{
+
+   /* a class named 'Person' */
+   type Person class
+   {
+   
+   }
+
+   /* a record named 'Vehicle' */
+   type Vehicle record
+   {
+   
+   }
+
+   /* A (static) function  that accepts a string arg and returns an int */
+
+   def SomeMethod (arg string) (int)
+   {
+   
+   }
+
+   /* a struct */
+   type MemoryStuff struct
+   {
+      /* a function that takes an int and returns an int pointer */
+
+      def allocate (space int) (int ptr)
+      {
+      
+      }
+
+      /* a 'static' function that has no args and returns an int */
+
+      def cleanup single (int)
+      {
+      
+      }
+
+      /* the same declaration in an alternative form */
+
+      /* the (<stuff>) is not an arglist because it contains only type names */
+
+      def cleanup (int) single
+      {
+      
+      }
+
+      /* This is not an ambiguity though because although 'int' could be the legal name for a parameter 
+         a 'ptr' (or 'pointer') is not - on its own - a type name.
+      */
+
+
+      def cleanup (int ptr) single
+      {
+      
+      }
+   }
+
+   type Example class
+   {
+      public
+      {
+         def name string;
+         def city string;
+      }
+
+      private
+      {
+         def counter;
+      }
+   }
+
+}
