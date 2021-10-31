@@ -101,6 +101,9 @@ namespace Sandbox
         {
             if (Source == null) throw new ArgumentNullException(nameof(Source));
 
+            int start_line = 0;
+            int start_col = 0;
+
             source = Source;
 
             StringBuilder lexeme = new();
@@ -119,6 +122,12 @@ namespace Sandbox
                 if (found == false)
                     throw new InvalidOperationException($"No handler found in state '{state}' for char '{character.Char}' having lexical class '{charclass}' at L={character.Line} C={character.Col}.");
 
+                if (state == State.INITIAL)
+                {
+                    start_line = character.Line;
+                    start_col = character.Col;
+                }
+
                 switch (tuple.Step)
                 {
                     case Step.AppendContinue:
@@ -129,14 +138,14 @@ namespace Sandbox
                     case Step.AppendReturn:
                         {
                             lexeme.Append(character.Char);
-                            yield return new Token(tuple.TokenType, lexeme.ToString(), character.Line, character.Col + 1 - lexeme.Length);
+                            yield return new Token(tuple.TokenType, lexeme.ToString(), start_line, start_col);
                             lexeme.Clear();
                             break;
                         }
                     case Step.RewindReturn:
                         {
                             I--;
-                            yield return new Token(tuple.TokenType, lexeme.ToString(), character.Line, character.Col - lexeme.Length);
+                            yield return new Token(tuple.TokenType, lexeme.ToString(), start_line, start_col);
                             lexeme.Clear();
                             break;
                         }

@@ -25,7 +25,7 @@ SLASH, '/',     AppendContinue,  SLASH_SLASH, Undecided
 SLASH_STAR, '*',  AppendContinue, SLASH_STAR_STAR, Undecided 
 SLASH_STAR, Any,  AppendContinue, SLASH_STAR, Undecided 
 
-SLASH_SLASH, '\r',  AppendReturn, INITIAL, LineComment 
+SLASH_SLASH, '\n',  AppendReturn, INITIAL, LineComment 
 SLASH_SLASH, Any,  AppendContinue, SLASH_SLASH, Undecided 
 
 SLASH_STAR_STAR, '/',  AppendReturn, INITIAL, BlockComment 
@@ -34,22 +34,22 @@ SLASH_STAR_STAR, Any,  AppendContinue, SLASH_STAR_STAR, Undecided
 IDENTIFIER, '_',    AppendContinue, IDENTIFIER, Undecided 
 IDENTIFIER, Alpha,  AppendContinue, IDENTIFIER, Undecided 
 IDENTIFIER, Digit,  AppendContinue, IDENTIFIER, Undecided 
-IDENTIFIER, Any,    RestoreReturn, INITIAL, Identifier 
+IDENTIFIER, Any,    RewindReturn, INITIAL, Identifier 
 
 INTEGER, Digit,  AppendContinue, INTEGER, Undecided 
-INTEGER, Any,    RestoreReturn, INITIAL, Integer 
+INTEGER, Any,    RewindReturn, INITIAL, Integer 
 
 HYPHEN, '>',  AppendReturn, INITIAL, PointsTo 
-HYPHEN, Any,  RestoreReturn, INITIAL, Symbol 
+HYPHEN, Any,  RewindReturn, INITIAL, Symbol 
 
 EQUALS, '=',  AppendReturn, INITIAL, Equality 
-EQUALS, Any,  RestoreReturn, INITIAL, Equals 
+EQUALS, Any,  RewindReturn, INITIAL, Equals 
 
 GREATER, '>',  AppendReturn, INITIAL, ShiftRight 
-GREATER, Any,  RestoreReturn, INITIAL, Greater 
+GREATER, Any,  RewindReturn, INITIAL, Greater 
 
 LESSER, '<',  AppendReturn, INITIAL, ShiftLeft 
-LESSER, Any,  RestoreReturn, INITIAL, Lesser 
+LESSER, Any,  RewindReturn, INITIAL, Lesser 
 
 QUOTATION, '"',  AppendReturn, INITIAL, QString 
 QUOTATION, Any,  AppendContinue, QUOTATION, Undecided 

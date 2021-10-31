@@ -1,4 +1,5 @@
-﻿'test'
+﻿// First line
+'test'
 
 /* symbolic functions * H */
 
@@ -33,6 +34,8 @@ a = *(p);
 result = some_builtin[arglist]
 result = some_builtin{arglist}
 result = some_builtin(arglist);
+
+*/
 
 /* 
    Novus could use [ ] for representing an arglist in a builtin

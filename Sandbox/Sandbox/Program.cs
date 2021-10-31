@@ -14,6 +14,8 @@ namespace Sandbox
 
             var tokenizer = new Tokenizer(@"..\..\..\TestFiles\csharp.csv");
 
+            Console.ForegroundColor = ConsoleColor.White;
+
             foreach (var token in tokenizer.Tokenize(source))
             {
                 Console.Write($"[{token.LineNumber,-3} {token.ColNumber,-2}] {token.TokenCode,-12} '");
