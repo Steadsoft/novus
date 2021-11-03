@@ -38,7 +38,7 @@ namespace Sandbox
 
         public static string ParsedGood(Statement Stmt)
         {
-            return $"Parsed a {Stmt.GetType().Name} on line {Stmt.Line} at column {Stmt.Col}";
+            return $"Parsed a {Stmt.GetType().Name} on line {Stmt.Line} at column {Stmt.Col} : '{Stmt.ToString()}'";
         }
 
         public static string ParsedBad(Statement Stmt)
@@ -54,7 +54,7 @@ namespace Sandbox
 
             // using <qualified-name> ;
             // namespace <qualified-name> { }
-            // one or more of: type <identifier> [<type-options>] { <type-body> }
+            // one or more of: type <identifier>  [<type-options>] { <type-body> }
 
             while (token.TokenCode != TokenType.NoMoreTokens)
             {
@@ -72,6 +72,7 @@ namespace Sandbox
                         }
                         token = source.GetNextToken();
                         continue;
+
                     case Keyword.Namespace:
                         if (TryParseNamespace(source, token, out var namespaceStatement))
                         {
@@ -207,6 +208,38 @@ namespace Sandbox
             return false;
         }
 
+        public static bool TryParseRecord(TokenEnumerator source, ref TypeStatement Stmt)
+        {
+            var token = source.GetNextToken();
+
+            while (token.Lexeme != "{")
+            {
+                switch (token.Keyword)
+                {
+                    case Keyword.Class:
+                        {
+                            Stmt.IsRecordClass = true;
+                            break;
+                        }
+
+                    case Keyword.Struct:
+                        {
+                            Stmt.IsRecordStruct = true;
+                            break;
+                        }
+                }
+
+                token = source.GetNextToken();
+            }
+
+            source.StepBackwards(token);
+
+            if (Stmt.IsRecordClass && Stmt.IsRecordStruct)
+                return false;
+
+            return true;
+        }
+
         public static bool TryParseType(TokenEnumerator source, Token Prior, out TypeStatement Stmt)
         {
             Stmt = null;
@@ -248,11 +281,35 @@ namespace Sandbox
 
                 typeKind = token.Keyword;
 
+                Stmt = new TypeStatement(new TypeBody(), typeKind, Prior.LineNumber, Prior.ColNumber, name);
+
+                switch (typeKind)
+                {
+                    case Keyword.Class:
+                        {
+                            //TryParseClass();
+                            break; // parse class options
+                        }
+                    case Keyword.Struct:
+                        {
+                            break; // parse struct options
+                        }
+                    case Keyword.Record:
+                        {
+                            TryParseRecord(source, ref Stmt);
+                            break; // parse record options
+                        }
+                    case Keyword.Singlet:
+                        {
+                            break; // parse singlet options
+                        }
+
+                }
+
                 token = source.GetNextToken();
 
                 if (token.Lexeme == "{")
                 {
-                    Stmt = new TypeStatement(new TypeBody(), typeKind, Prior.LineNumber, Prior.ColNumber, name);
                     // TryParseBlock
                     source.SkipToNext("}"); // very crude hack, just for now, to get progress through the file
                     return true;

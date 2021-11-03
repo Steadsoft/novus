@@ -21,5 +21,10 @@ namespace Sandbox
             this.Block = Block;
         }
 
+        public override string ToString()
+        {
+            return Name;
+        }
+
     }
 }

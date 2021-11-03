@@ -16,3 +16,14 @@ type Person struct
 {
 
 }
+
+type Engine record struct
+{
+
+}
+
+type Constants singlet
+{
+
+}
+
