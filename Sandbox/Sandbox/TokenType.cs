@@ -2,6 +2,7 @@
 {
     public enum TokenType
     {
+        NoMoreTokens,
         Undecided,
         Identifier,
         LineComment,
@@ -24,6 +25,5 @@
         RBrack,
         LPar,
         RPar
-
     }
 }

@@ -19,12 +19,27 @@ i_am_an_ident
 *(p) = deref pointer p
 **   = exponentiation
 
+F(G<A,B>(7));
+
+F(G(A,B)(7));
+
+F(G{A,B}(7));
+
+F(G<A^B^C>(7));
+
+
+
 /*
 
-This could be how we handle pointers
+This could be how we handle pointers */
 
 var ptr = addr[data];
 var data = cont[ptr];
+
+// OR 
+
+var ptr  = address[data];
+var data = content[data];
 
 
 arion = b ** ()
@@ -35,7 +50,7 @@ result = some_builtin[arglist]
 result = some_builtin{arglist}
 result = some_builtin(arglist);
 
-*/
+
 
 /* 
    Novus could use [ ] for representing an arglist in a builtin
