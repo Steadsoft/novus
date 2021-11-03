@@ -17,13 +17,19 @@ type Person struct
 
 }
 
-type Engine record struct
+		type Engine record struct
+		{
+
+		}
+
+type Engine2 record record
 {
 
 }
 
-type Constants singlet
-{
+		type         Constants                  
+		singlet
+		{
 
-}
+		}
 

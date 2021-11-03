@@ -30,7 +30,7 @@ namespace Sandbox
 
             List<int> ints = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
-            TokenEnumerator te = new TokenEnumerator(tokenizer.Tokenize(source));
+            TokenEnumerator te = new TokenEnumerator(tokenizer.Tokenize(source), TokenType.BlockComment, TokenType.LineComment);
 
             Parse(te);
 
@@ -94,7 +94,7 @@ namespace Sandbox
                         else
                         {
                             Console.WriteLine(ParsedBad(typeStatement));
-                            token = source.SkipToNext(";");
+                            token = source.SkipToNext("}");
                         }
                         token = source.GetNextToken();
                         continue;
@@ -227,6 +227,11 @@ namespace Sandbox
                             Stmt.IsRecordStruct = true;
                             break;
                         }
+                    default:
+                        {
+                            //source.SkipToNext("}");
+                            return false;
+                        }
                 }
 
                 token = source.GetNextToken();
@@ -296,14 +301,17 @@ namespace Sandbox
                         }
                     case Keyword.Record:
                         {
-                            TryParseRecord(source, ref Stmt);
+                            if (TryParseRecord(source, ref Stmt) == false)
+                            {
+                                //source.SkipToNext("}");
+                                return false;
+                            }
                             break; // parse record options
                         }
                     case Keyword.Singlet:
                         {
                             break; // parse singlet options
                         }
-
                 }
 
                 token = source.GetNextToken();

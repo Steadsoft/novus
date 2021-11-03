@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Sandbox
 {
@@ -6,9 +7,11 @@ namespace Sandbox
     {
         private IEnumerator<Token> enumerator;
         private Token pushed_token = null;
-        public TokenEnumerator(IEnumerable<Token> Source)
+        private TokenType[] Skips;
+        public TokenEnumerator(IEnumerable<Token> Source, params TokenType[] Skips)
         {
             enumerator = Source.GetEnumerator();
+            this.Skips = Skips;
         }
 
         public Token GetNextToken()
@@ -17,12 +20,15 @@ namespace Sandbox
             {
                 var token = pushed_token;
                 pushed_token = null;
-                return token;
+
+                if (Skips.Contains(token.TokenCode) == false)
+                   return token;
             }
 
             while (enumerator.MoveNext())
             {
-                return enumerator.Current;
+                if (Skips.Contains(enumerator.Current.TokenCode) == false)
+                    return enumerator.Current;
             }
 
             return new Token(TokenType.NoMoreTokens, "", 0, 0);
