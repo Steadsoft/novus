@@ -210,8 +210,61 @@ namespace Sandbox
         public static bool TryParseType(TokenEnumerator source, Token Prior, out TypeStatement Stmt)
         {
             Stmt = null;
+            string name;
+            Keyword typeKind = Keyword.IsNotKeyword;
+
+            // We expect any of the following
+
+            // type <identifier> [<type-options>] { }
+
+
+            // <ident>; or <ident>{
+            // <ident>.
+            // <ident>.<ident>; or <ident>.<ident>{
+            // <ident>.<ident>.
+            // <ident>.<ident>.<ident>; or <ident>.<ident>.<ident>{
+
+            var token = source.GetNextToken();
+
+            while (token.TokenCode != TokenType.NoMoreTokens)
+            {
+                if (token.TokenCode != TokenType.Identifier)
+                {
+                    Console.Write($"Unexpected token {token.Lexeme}");
+                    source.StepBackwards(token);
+                    return false;
+                }
+
+                name = token.Lexeme;
+
+                token = source.GetNextToken();
+
+                if (token.Keyword != Keyword.Class && token.Keyword != Keyword.Struct && token.Keyword != Keyword.Record && token.Keyword != Keyword.Singlet)
+                {
+                    Console.Write($"Unexpected token {token.Lexeme}");
+                    source.StepBackwards(token);
+                    return false;
+                }
+
+                typeKind = token.Keyword;
+
+                token = source.GetNextToken();
+
+                if (token.Lexeme == "{")
+                {
+                    Stmt = new TypeStatement(new TypeBody(), typeKind, Prior.LineNumber, Prior.ColNumber, name);
+                    // TryParseBlock
+                    source.SkipToNext("}"); // very crude hack, just for now, to get progress through the file
+                    return true;
+                }
+
+
+                token = source.GetNextToken();
+
+            }
 
             return false;
+
         }
 
 

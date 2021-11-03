@@ -11,6 +11,10 @@ namespace Sandbox
         IsNotKeyword,
         Using,
         Namespace,
-        Type
+        Type,
+        Class,
+        Struct,
+        Record,
+        Singlet
     }
 }
