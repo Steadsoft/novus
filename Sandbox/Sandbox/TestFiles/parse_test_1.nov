@@ -1,5 +1,12 @@
 ﻿using a.b.c;
 
+namespace x.y;
+
+namespace m.n
+{
+
+}
+
 type Vehicle class
 {
 

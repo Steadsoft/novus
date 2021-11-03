@@ -36,8 +36,17 @@ namespace Sandbox
 
         }
 
+        public static string ParsedGood(Statement Stmt)
+        {
+            return $"Parsed a {Stmt.GetType().Name} on line {Stmt.Line} at column {Stmt.Col}";
+        }
 
-        public static void Parse (TokenEnumerator source)
+        public static string ParsedBad(Statement Stmt)
+        {
+            return $" Failed to parse a {Stmt.GetType().Name} on line {Stmt.Line} at column {Stmt.Col}";
+        }
+
+        public static void Parse(TokenEnumerator source)
         {
             var token = source.GetNextToken();
 
@@ -49,23 +58,49 @@ namespace Sandbox
 
             while (token.TokenCode != TokenType.NoMoreTokens)
             {
-                if (token.Keyword == Keyword.Using)
+                switch (token.Keyword)
                 {
-                    if (TryParseUsing(source, token, out var usingStatement))
-                    {
+                    case Keyword.Using:
+                        if (TryParseUsing(source, token, out var usingStatement))
+                        {
+                            Console.WriteLine(ParsedGood(usingStatement));
+                        }
+                        else
+                        {
+                            Console.WriteLine(ParsedBad(usingStatement));
+                            token = source.SkipToNext(";");
+                        }
                         token = source.GetNextToken();
                         continue;
-                    }
-                }
+                    case Keyword.Namespace:
+                        if (TryParseNamespace(source, token, out var namespaceStatement))
+                        {
+                            Console.WriteLine(ParsedGood(namespaceStatement));
+                        }
+                        else
+                        {
+                            Console.WriteLine(ParsedBad(namespaceStatement));
+                            token = source.SkipToNext(";");
+                        }
+                        token = source.GetNextToken();
+                        continue;
 
-                if (token.Keyword == Keyword.Namespace)
-                {
-                    ParseNamespace(source);
-                }
+                    case Keyword.Type:
+                        if (TryParseType(source, token, out var typeStatement))
+                        {
+                            Console.WriteLine(ParsedGood(typeStatement));
+                        }
+                        else
+                        {
+                            Console.WriteLine(ParsedBad(typeStatement));
+                            token = source.SkipToNext(";");
+                        }
+                        token = source.GetNextToken();
+                        continue;
 
-                if (token.Keyword == Keyword.Type)
-                {
-                    ParseType(source);
+                    default:
+                        Console.WriteLine("Unexpected token {} found.");
+                        break;
                 }
 
                 Console.WriteLine("Expected one of 'using', 'namespace' or 'type");
@@ -90,7 +125,11 @@ namespace Sandbox
             while (token.TokenCode != TokenType.NoMoreTokens)
             {
                 if (token.TokenCode != TokenType.Identifier)
+                {
+                    Console.Write($"Unexpected token {token.Lexeme}");
+                    source.StepBackwards(token);
                     return false;
+                }
 
                 builder.Append(token.Lexeme);
 
@@ -114,12 +153,65 @@ namespace Sandbox
             return false;
         }
 
-        public static void ParseNamespace(TokenEnumerator source)
+        public static bool TryParseNamespace(TokenEnumerator source, Token Prior, out NamespaceStatement Stmt)
         {
+            Stmt = null;
+
+            StringBuilder builder = new StringBuilder();
+
+            // <ident>; or <ident>{
+            // <ident>.
+            // <ident>.<ident>; or <ident>.<ident>{
+            // <ident>.<ident>.
+            // <ident>.<ident>.<ident>; or <ident>.<ident>.<ident>{
+
+            var token = source.GetNextToken();
+
+            while (token.TokenCode != TokenType.NoMoreTokens)
+            {
+                if (token.TokenCode != TokenType.Identifier)
+                {
+                    Console.Write($"Unexpected token {token.Lexeme}");
+                    source.StepBackwards(token);
+                    return false;
+                }
+
+                builder.Append(token.Lexeme);
+
+                token = source.GetNextToken();
+
+                if (token.Lexeme == ";")
+                {
+                    Stmt = new NamespaceStatement(Prior.LineNumber, Prior.ColNumber, builder.ToString());
+                    return true;
+                }
+
+                if (token.Lexeme == "{")
+                {
+                    Stmt = new NamespaceStatement (new BlockStatement(),Prior.LineNumber, Prior.ColNumber, builder.ToString());
+                    // TryParseBlock
+                    source.SkipToNext("}"); // very crude hack, just for now, to get progress through the file
+                    return true;
+                }
+
+
+                if (token.Lexeme == ".")
+                {
+                    builder.Append(".");
+                }
+
+                token = source.GetNextToken();
+
+            }
+
+            return false;
         }
 
-        public static void ParseType(TokenEnumerator source)
+        public static bool TryParseType(TokenEnumerator source, Token Prior, out TypeStatement Stmt)
         {
+            Stmt = null;
+
+            return false;
         }
 
 
