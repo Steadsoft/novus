@@ -47,26 +47,29 @@ namespace Sandbox
             // namespace <qualified-name> { }
             // one or more of: type <identifier> [<type-options>] { <type-body> }
 
-            while (token != null)
+            while (token.TokenCode != TokenType.NoMoreTokens)
             {
-                if (token.TokenCode == TokenType.Identifier && token.Lexeme == "using")
+                if (token.Keyword == Keyword.Using)
                 {
-                    TryParseUsing(source, token, out var usingStatement);
+                    if (TryParseUsing(source, token, out var usingStatement))
+                    {
+                        token = source.GetNextToken();
+                        continue;
+                    }
                 }
 
-                if (token.TokenCode == TokenType.Identifier && token.Lexeme == "namespace")
+                if (token.Keyword == Keyword.Namespace)
                 {
                     ParseNamespace(source);
                 }
 
-                if (token.TokenCode == TokenType.Identifier && token.Lexeme == "type")
+                if (token.Keyword == Keyword.Type)
                 {
                     ParseType(source);
                 }
 
                 Console.WriteLine("Expected one of 'using', 'namespace' or 'type");
 
-                token = source.GetNextToken();
             }
         }
 
