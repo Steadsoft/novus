@@ -1,4 +1,9 @@
-﻿using a.b.c;
+﻿/*----------------------------------------------------------------------*/
+/* This is a simple source file for experimenting with parsing using C# */
+/*----------------------------------------------------------------------*/
+
+/*
+using a.b.c;
 
 namespace x.y;
 
@@ -17,12 +22,14 @@ type Person struct
 
 }
 
+
 		type Engine record struct
 		{
 
 		}
 
-type Engine2 record record
+
+type Engine2 record private internal
 {
 
 }
@@ -32,4 +39,16 @@ type Engine2 record record
 		{
 
 		}
+*/
 
+namespace Outer
+{
+	namespace Inner
+	{
+		type Contained class
+		{
+
+		}
+	
+	}
+}

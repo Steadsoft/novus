@@ -8,6 +8,7 @@ namespace Sandbox
         private IEnumerator<Token> enumerator;
         private Token pushed_token = null;
         private TokenType[] Skips;
+        private Stack<Token> pushed = new Stack<Token>();
         public TokenEnumerator(IEnumerable<Token> Source, params TokenType[] Skips)
         {
             enumerator = Source.GetEnumerator();
@@ -16,13 +17,14 @@ namespace Sandbox
 
         public Token GetNextToken()
         {
-            if (pushed_token != null)
-            {
-                var token = pushed_token;
-                pushed_token = null;
+            // Once a token has been consumed it is in the past, can't be re-read.
+            // But we can 'push' a token at any point and the next time we get a
+            // token it will be that pushed token.
+            // this is how the parser can backtrack.
 
-                if (Skips.Contains(token.TokenCode) == false)
-                   return token;
+            if (pushed.Any())
+            {
+                return pushed.Pop();
             }
 
             while (enumerator.MoveNext())
@@ -34,9 +36,9 @@ namespace Sandbox
             return new Token(TokenType.NoMoreTokens, "", 0, 0);
         }
 
-        public void StepBackwards(Token Token)
+        public void PushToken(Token Token)
         {
-            pushed_token = Token;
+            pushed.Push(Token);
         }
 
         public Token SkipToNext(string Lexeme)

@@ -11,8 +11,10 @@ namespace Sandbox
         public string Name { get; private set; }
         public TypeBody Body { get; private set; }
         public Keyword TypeKind { get; private set; }
+        public AccessType AccessType { get; set; }
         public bool IsRecordClass { get; set; }
         public bool IsRecordStruct { get; set; }
+        public bool IsReadOnly { get; set; }
         public TypeStatement(TypeBody Body, Keyword TypeKind, int Line, int Col, string Name) : base(Line, Col)
         {
             this.Name = Name;

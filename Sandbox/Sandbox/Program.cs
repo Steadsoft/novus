@@ -32,7 +32,7 @@ namespace Sandbox
 
             TokenEnumerator te = new TokenEnumerator(tokenizer.Tokenize(source), TokenType.BlockComment, TokenType.LineComment);
 
-            Parse(te);
+            ParseFile(te);
 
         }
 
@@ -41,13 +41,15 @@ namespace Sandbox
             return $"Parsed a {Stmt.GetType().Name} on line {Stmt.Line} at column {Stmt.Col} : '{Stmt.ToString()}'";
         }
 
-        public static string ParsedBad(Statement Stmt)
+        public static string ParsedBad(Statement Stmt, string Msg)
         {
-            return $" Failed to parse a {Stmt.GetType().Name} on line {Stmt.Line} at column {Stmt.Col}";
+            return $" Failed to parse a {Stmt.GetType().Name} on line {Stmt.Line} at column {Stmt.Col} ({Msg})";
         }
 
-        public static void Parse(TokenEnumerator source)
+        public static void ParseFile(TokenEnumerator source)
         {
+            string message;
+
             var token = source.GetNextToken();
 
             // We expect any of the following
@@ -61,39 +63,39 @@ namespace Sandbox
                 switch (token.Keyword)
                 {
                     case Keyword.Using:
-                        if (TryParseUsing(source, token, out var usingStatement))
+                        if (TryParseUsing(source, token, out var usingStatement, out message))
                         {
                             Console.WriteLine(ParsedGood(usingStatement));
                         }
                         else
                         {
-                            Console.WriteLine(ParsedBad(usingStatement));
+                            Console.WriteLine(ParsedBad(usingStatement, message));
                             token = source.SkipToNext(";");
                         }
                         token = source.GetNextToken();
                         continue;
 
                     case Keyword.Namespace:
-                        if (TryParseNamespace(source, token, out var namespaceStatement))
+                        if (TryParseNamespace(source, token, out var namespaceStatement, out message))
                         {
                             Console.WriteLine(ParsedGood(namespaceStatement));
                         }
                         else
                         {
-                            Console.WriteLine(ParsedBad(namespaceStatement));
+                            Console.WriteLine(ParsedBad(namespaceStatement, message));
                             token = source.SkipToNext(";");
                         }
                         token = source.GetNextToken();
                         continue;
 
                     case Keyword.Type:
-                        if (TryParseType(source, token, out var typeStatement))
+                        if (TryParseType(source, token, out var typeStatement, out message))
                         {
                             Console.WriteLine(ParsedGood(typeStatement));
                         }
                         else
                         {
-                            Console.WriteLine(ParsedBad(typeStatement));
+                            Console.WriteLine(ParsedBad(typeStatement, message));
                             token = source.SkipToNext("}");
                         }
                         token = source.GetNextToken();
@@ -109,9 +111,10 @@ namespace Sandbox
             }
         }
 
-        public static bool TryParseUsing(TokenEnumerator source, Token Prior, out UsingStatement Stmt)
+        public static bool TryParseUsing(TokenEnumerator source, Token Prior, out UsingStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
+            DiagMsg = null;
 
             StringBuilder builder = new StringBuilder();
 
@@ -127,8 +130,8 @@ namespace Sandbox
             {
                 if (token.TokenCode != TokenType.Identifier)
                 {
-                    Console.Write($"Unexpected token {token.Lexeme}");
-                    source.StepBackwards(token);
+                    DiagMsg = $"Unexpected token {token.Lexeme}";
+                    source.PushToken(token);
                     return false;
                 }
 
@@ -154,9 +157,10 @@ namespace Sandbox
             return false;
         }
 
-        public static bool TryParseNamespace(TokenEnumerator source, Token Prior, out NamespaceStatement Stmt)
+        public static bool TryParseNamespace(TokenEnumerator source, Token Prior, out NamespaceStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
+            DiagMsg = String.Empty;
 
             StringBuilder builder = new StringBuilder();
 
@@ -172,8 +176,8 @@ namespace Sandbox
             {
                 if (token.TokenCode != TokenType.Identifier)
                 {
-                    Console.Write($"Unexpected token {token.Lexeme}");
-                    source.StepBackwards(token);
+                    DiagMsg = $"Unexpected token {token.Lexeme}";
+                    source.PushToken(token);
                     return false;
                 }
 
@@ -189,8 +193,11 @@ namespace Sandbox
 
                 if (token.Lexeme == "{")
                 {
-                    Stmt = new NamespaceStatement (new BlockStatement(),Prior.LineNumber, Prior.ColNumber, builder.ToString());
-                    // TryParseBlock
+                    if (TryParseNamespaceBlock(source, out var block, out DiagMsg))
+                       {
+                       Stmt = new NamespaceStatement (block, Prior.LineNumber, Prior.ColNumber, builder.ToString());
+                       }
+                    
                     source.SkipToNext("}"); // very crude hack, just for now, to get progress through the file
                     return true;
                 }
@@ -208,8 +215,57 @@ namespace Sandbox
             return false;
         }
 
-        public static bool TryParseRecord(TokenEnumerator source, ref TypeStatement Stmt)
+        public static bool TryParseNamespaceBlock(TokenEnumerator source, out BlockStatement Block, out string DiagMsg)
         {
+            Block = null;
+            DiagMsg = string.Empty;
+
+            var token = source.GetNextToken();
+
+            while (token.TokenCode != TokenType.NoMoreTokens && token.TokenCode != TokenType.RBrace)
+            {
+                switch (token.Keyword)
+                {
+                    case Keyword.Namespace:
+                        if (TryParseNamespace(source, token, out var namespaceStatement, out DiagMsg))
+                        {
+                            ; // Console.WriteLine(ParsedGood(namespaceStatement));
+                        }
+                        else
+                        {
+                            Console.WriteLine(ParsedBad(namespaceStatement, DiagMsg));
+                            token = source.SkipToNext(";");
+                        }
+                        token = source.GetNextToken();
+                        continue;
+
+                    case Keyword.Type:
+                        if (TryParseType(source, token, out var typeStatement, out DiagMsg))
+                        {
+                            ; // Console.WriteLine(ParsedGood(typeStatement));
+                        }
+                        else
+                        {
+                            Console.WriteLine(ParsedBad(typeStatement, DiagMsg));
+                            token = source.SkipToNext("}");
+                        }
+                        token = source.GetNextToken();
+                        continue;
+
+                    default:
+                        Console.WriteLine("Unexpected token {} found.");
+                        break;
+                }
+            }
+
+            return true;
+
+        }
+
+        public static bool TryParseRecord(TokenEnumerator source, ref TypeStatement Stmt, out string DiagMsg)
+        {
+            DiagMsg = String.Empty;
+
             var token = source.GetNextToken();
 
             while (token.Lexeme != "{")
@@ -227,9 +283,36 @@ namespace Sandbox
                             Stmt.IsRecordStruct = true;
                             break;
                         }
+                    case Keyword.Readonly:
+                        {
+                            Stmt.IsReadOnly = true;
+                            break;
+                        }
+                    case Keyword.Private when Stmt.AccessType == AccessType.Undefined: 
+                        {
+                            Stmt.AccessType = AccessType.Private;
+                            break;
+                        }
+                    case Keyword.Internal when Stmt.AccessType == AccessType.Undefined:
+                        {
+                            Stmt.AccessType = AccessType.Internal;
+                            break;
+                        }
+                    case Keyword.Public when Stmt.AccessType == AccessType.Undefined:
+                        {
+                            Stmt.AccessType = AccessType.Public;
+                            break;
+                        }
+                    case Keyword.Private when Stmt.AccessType != AccessType.Undefined:
+                    case Keyword.Internal when Stmt.AccessType != AccessType.Undefined:
+                    case Keyword.Public when Stmt.AccessType != AccessType.Undefined:
+                        {
+                            DiagMsg = $"Cannot specify access type '{token.Keyword.ToString().ToLower()}' when access is already '{Stmt.AccessType.ToString().ToLower()}'";
+                            return false;
+                        }
                     default:
                         {
-                            //source.SkipToNext("}");
+                            DiagMsg = $"Unexpected token '{token.Lexeme}'";
                             return false;
                         }
                 }
@@ -237,17 +320,22 @@ namespace Sandbox
                 token = source.GetNextToken();
             }
 
-            source.StepBackwards(token);
+            source.PushToken(token);
 
             if (Stmt.IsRecordClass && Stmt.IsRecordStruct)
                 return false;
 
+            if (Stmt.AccessType == AccessType.Undefined)
+                Stmt.AccessType = AccessType.Internal;
+
             return true;
         }
 
-        public static bool TryParseType(TokenEnumerator source, Token Prior, out TypeStatement Stmt)
+        public static bool TryParseType(TokenEnumerator source, Token Prior, out TypeStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
+            DiagMsg = string.Empty;
+
             string name;
             Keyword typeKind = Keyword.IsNotKeyword;
 
@@ -268,8 +356,8 @@ namespace Sandbox
             {
                 if (token.TokenCode != TokenType.Identifier)
                 {
-                    Console.Write($"Unexpected token {token.Lexeme}");
-                    source.StepBackwards(token);
+                    DiagMsg = $"Unexpected token {token.Lexeme}";
+                    source.PushToken(token);
                     return false;
                 }
 
@@ -279,8 +367,8 @@ namespace Sandbox
 
                 if (token.Keyword != Keyword.Class && token.Keyword != Keyword.Struct && token.Keyword != Keyword.Record && token.Keyword != Keyword.Singlet)
                 {
-                    Console.Write($"Unexpected token {token.Lexeme}");
-                    source.StepBackwards(token);
+                    DiagMsg = $"Unexpected token {token.Lexeme}";
+                    source.PushToken(token);
                     return false;
                 }
 
@@ -301,7 +389,7 @@ namespace Sandbox
                         }
                     case Keyword.Record:
                         {
-                            if (TryParseRecord(source, ref Stmt) == false)
+                            if (TryParseRecord(source, ref Stmt, out DiagMsg) == false)
                             {
                                 //source.SkipToNext("}");
                                 return false;

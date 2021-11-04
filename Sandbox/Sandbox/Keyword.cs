@@ -15,6 +15,10 @@ namespace Sandbox
         Class,
         Struct,
         Record,
-        Singlet
+        Singlet,
+        Readonly,
+        Public,
+        Internal,
+        Private,
     }
 }
