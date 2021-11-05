@@ -34,19 +34,17 @@ namespace Sandbox
 
             var parser = new Parser(te);
 
-            parser.ParseFile(te);
+            parser.OnDiagnostic += MsgHandler;
+
+            parser.TryParseFile(te, out var root);
 
         }
 
-        public static string ParsedGood(Statement Stmt)
+        private static void MsgHandler(object Sender, DiagnosticEventArgs Args)
         {
-            return $"Parsed a {Stmt.GetType().Name} on line {Stmt.Line} at column {Stmt.Col} : '{Stmt.ToString()}'";
+            ;
         }
 
-        public static string ParsedBad(Statement Stmt, string Msg)
-        {
-            return $" Failed to parse a {Stmt.GetType().Name} on line {Stmt.Line} at column {Stmt.Col} ({Msg})";
-        }
 
 
 

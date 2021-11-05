@@ -6,16 +6,31 @@ using System.Threading.Tasks;
 
 namespace Sandbox
 {
+    public class DiagnosticEventArgs : EventArgs
+    {
+        public string Message { get; private set; }
+
+        public DiagnosticEventArgs (string Msg)
+        {
+            Message = Msg;
+        }
+    }
     public class Parser
     {
+        public delegate void DiagnosticEventHandler(object Sender, DiagnosticEventArgs Args);
         private TokenEnumerator source;
+        public event DiagnosticEventHandler OnDiagnostic;
 
         public Parser (TokenEnumerator Source)
         {
             source = Source;
         }
-        public void ParseFile(TokenEnumerator source)
+        public bool TryParseFile(TokenEnumerator source, out Statement Root)
         {
+            int errors = 0;
+
+            Root = null;
+
             string message;
 
             var token = source.GetNextToken();
@@ -33,11 +48,12 @@ namespace Sandbox
                     case Keyword.Using:
                         if (TryParseUsing(source, token, out var usingStatement, out message))
                         {
-                            Console.WriteLine(ParsedGood(usingStatement));
+                            OnDiagnostic(this, ParsedGood(usingStatement));
                         }
                         else
                         {
-                            Console.WriteLine(ParsedBad(usingStatement, message));
+                            errors++;
+                            OnDiagnostic(this, ParsedBad(usingStatement, message));
                             token = source.SkipToNext(";");
                         }
                         token = source.GetNextToken();
@@ -46,11 +62,12 @@ namespace Sandbox
                     case Keyword.Namespace:
                         if (TryParseNamespace(source, token, out var namespaceStatement, out message))
                         {
-                            Console.WriteLine(ParsedGood(namespaceStatement));
+                            OnDiagnostic(this, ParsedGood(namespaceStatement));
                         }
                         else
                         {
-                            Console.WriteLine(ParsedBad(namespaceStatement, message));
+                            errors++;
+                            OnDiagnostic(this, ParsedBad(namespaceStatement, message));
                             token = source.SkipToNext(";");
                         }
                         token = source.GetNextToken();
@@ -59,26 +76,29 @@ namespace Sandbox
                     case Keyword.Type:
                         if (TryParseType(source, token, out var typeStatement, out message))
                         {
-                            Console.WriteLine(ParsedGood(typeStatement));
+                            OnDiagnostic(this, ParsedGood(typeStatement));
                         }
                         else
                         {
-                            Console.WriteLine(ParsedBad(typeStatement, message));
+                            errors++;
+                            OnDiagnostic(this, ParsedBad(typeStatement, message));
                             token = source.SkipToNext("}");
                         }
                         token = source.GetNextToken();
                         continue;
 
                     default:
-                        Console.WriteLine("Unexpected token {} found.");
-                        break;
+                        {
+                            errors++;
+                            OnDiagnostic(this, new DiagnosticEventArgs("Expected one of 'using', 'namespace' or 'type"));
+                            break;
+                        }
                 }
-
-                Console.WriteLine("Expected one of 'using', 'namespace' or 'type");
-
             }
-        }
 
+            return errors == 0;
+
+        }
         public bool TryParseUsing(TokenEnumerator source, Token Prior, out UsingStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
@@ -124,7 +144,6 @@ namespace Sandbox
 
             return false;
         }
-
         public bool TryParseNamespace(TokenEnumerator source, Token Prior, out NamespaceStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
@@ -183,7 +202,6 @@ namespace Sandbox
 
             return false;
         }
-
         public bool TryParseNamespaceBlock(TokenEnumerator source, out BlockStatement Block, out string DiagMsg)
         {
             Block = null;
@@ -202,7 +220,7 @@ namespace Sandbox
                         }
                         else
                         {
-                            Console.WriteLine(ParsedBad(namespaceStatement, DiagMsg));
+                            OnDiagnostic(this, ParsedBad(namespaceStatement, DiagMsg));
                             token = source.SkipToNext(";");
                         }
                         token = source.GetNextToken();
@@ -215,14 +233,14 @@ namespace Sandbox
                         }
                         else
                         {
-                            Console.WriteLine(ParsedBad(typeStatement, DiagMsg));
+                            OnDiagnostic(this, ParsedBad(typeStatement, DiagMsg));
                             token = source.SkipToNext("}");
                         }
                         token = source.GetNextToken();
                         continue;
 
                     default:
-                        Console.WriteLine("Unexpected token {} found.");
+                        OnDiagnostic(this, new DiagnosticEventArgs("Unexpected token {} found."));
                         break;
                 }
             }
@@ -230,7 +248,6 @@ namespace Sandbox
             return true;
 
         }
-
         public bool TryParseRecord(TokenEnumerator source, ref TypeStatement Stmt, out string DiagMsg)
         {
             DiagMsg = String.Empty;
@@ -299,7 +316,6 @@ namespace Sandbox
 
             return true;
         }
-
         public bool TryParseType(TokenEnumerator source, Token Prior, out TypeStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
@@ -388,6 +404,14 @@ namespace Sandbox
             return false;
 
         }
+        public static DiagnosticEventArgs ParsedGood(Statement Stmt)
+        {
+            return new DiagnosticEventArgs($"Parsed a {Stmt.GetType().Name} on line {Stmt.Line} at column {Stmt.Col} : '{Stmt.ToString()}'");
+        }
 
+        public static DiagnosticEventArgs ParsedBad(Statement Stmt, string Msg)
+        {
+            return new DiagnosticEventArgs($" Failed to parse a {Stmt.GetType().Name} on line {Stmt.Line} at column {Stmt.Col} ({Msg})");
+        }
     }
 }
