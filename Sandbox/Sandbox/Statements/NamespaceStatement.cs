@@ -11,14 +11,17 @@ namespace Sandbox
         public string Name { get; private set; }
         public BlockStatement Block {get; private set;}
 
-        public NamespaceStatement(int Line, int Col, string Name):this(null, Line, Col, Name)
-        {
-        }
-
-        public NamespaceStatement(BlockStatement Block, int Line, int Col, string Name) : base(Line, Col)
+        public NamespaceStatement(int Line, int Col, string Name):base(Line, Col)
         {
             this.Name = Name;
-            this.Block = Block;
+        }
+
+        public void AddBlock (BlockStatement Stmt)
+        {
+            if (Stmt == null) throw new ArgumentNullException(nameof(Stmt));
+
+            Block = Stmt;
+            Block.Parent = this;
         }
 
         public override string ToString()
