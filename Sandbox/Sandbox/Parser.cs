@@ -22,7 +22,7 @@ namespace Sandbox
         private TokenEnumerator source;
         public event DiagnosticEventHandler OnDiagnostic;
 
-        public Parser (TokenEnumerator Source)
+        public Parser(TokenEnumerator Source)
         {
             source = Source;
         }
@@ -40,7 +40,7 @@ namespace Sandbox
 
             // using <qualified-name> ;
             // namespace <qualified-name> { }
-            // one or more of: type <identifier>  [<type-options>] { <type-body> }
+            // zero or more of: type <identifier>  [<type-options>] { <type-body> }
 
             while (token.TokenCode != TokenType.NoMoreTokens)
             {
@@ -53,9 +53,9 @@ namespace Sandbox
                 {
                     case Keyword.Using:
                         source.PushToken(token);
-;                       if (TryParseUsing(source, token, out var usingStatement, out message))
+                        if (TryParseUsing(source, token, out var usingStatement, out message))
                         {
-                            Root.AddChild(usingStatement); 
+                            Root.AddChild(usingStatement);
                         }
                         else
                         {
@@ -121,14 +121,11 @@ namespace Sandbox
             // <ident>.<ident>.
             // <ident>.<ident>.<ident>;
 
+            source.CheckExpectedToken(Keyword.Using);
+
             var token = source.GetNextToken();
 
-            if (token.Keyword != Keyword.Using)
-                throw new InvalidOperationException($"Expected keyword token '{Keyword.Using}' has not been pushed.");
-
-            token = source.GetNextToken();
-
-            while (token.TokenCode != TokenType.NoMoreTokens)
+            while (true)
             {
                 if (token.TokenCode != TokenType.Identifier)
                 {
@@ -155,8 +152,6 @@ namespace Sandbox
                 token = source.GetNextToken();
 
             }
-
-            return false;
         }
         public bool TryParseNamespace(TokenEnumerator source, Token Prior, out NamespaceStatement Stmt, out string DiagMsg)
         {
@@ -171,12 +166,9 @@ namespace Sandbox
             // <ident>.<ident>.
             // <ident>.<ident>.<ident>; or <ident>.<ident>.<ident>{
 
+            source.CheckExpectedToken(Keyword.Namespace);
+
             var token = source.GetNextToken();
-
-            if (token.Keyword != Keyword.Namespace)
-                throw new InvalidOperationException($"Expected keyword token '{Keyword.Namespace}'has not been pushed.");
-
-            token = source.GetNextToken();
 
             while (token.TokenCode != TokenType.NoMoreTokens)
             {
@@ -200,13 +192,13 @@ namespace Sandbox
                 if (token.TokenCode == TokenType.LBrace)
                 {
                     source.PushToken(token);
-                    if (TryParseNamespaceBlock(source, out var block, out DiagMsg))
+                    if (TryParseNamespaceBody(source, out var block, out DiagMsg))
                     {
                         Stmt = new NamespaceStatement(Prior.LineNumber, Prior.ColNumber, builder.ToString());
                         Stmt.AddBlock(block);
                     }
 
-                    source.SkipToNext("}"); // very crude hack, just for now, to get progress through the file
+                    //source.SkipToNext("}"); // very crude hack, just for now, to get progress through the file
                     return true;
                 }
 
@@ -222,7 +214,7 @@ namespace Sandbox
 
             return false;
         }
-        public bool TryParseNamespaceBlock(TokenEnumerator source, out BlockStatement Block, out string DiagMsg)
+        public bool TryParseNamespaceBody(TokenEnumerator source, out BlockStatement Block, out string DiagMsg)
         {
             Block = null;
             DiagMsg = string.Empty;
@@ -277,7 +269,45 @@ namespace Sandbox
             return true;
 
         }
-        public bool TryParseRecord(TokenEnumerator source, ref TypeStatement Stmt, out string DiagMsg)
+        public bool TryParseType(TokenEnumerator source, Token Prior, out TypeStatement Stmt, out string DiagMsg)
+        {
+            Stmt = null;
+            DiagMsg = string.Empty;
+
+            source.CheckExpectedToken(Keyword.Type);
+
+            var token = source.GetNextToken();
+
+            if (token.TokenCode != TokenType.Identifier)
+            {
+                DiagMsg = $"Unexpected token {token.Lexeme}";
+                return false;
+            }
+
+            var name = token.Lexeme;
+
+            token = source.GetNextToken();
+
+            Stmt = new TypeStatement(new TypeBody(), token.Keyword, Prior.LineNumber, Prior.ColNumber, name);
+
+            switch (token.Keyword)
+            {
+                case Keyword.Class:
+                case Keyword.Struct:
+                case Keyword.Record:
+                case Keyword.Singlet:
+                    {
+                        if (TryParseTypeOptions(source, token, ref Stmt, out DiagMsg))
+                            return TryParseTypeBody(source, token, ref Stmt, out DiagMsg);
+                        return false;
+                    }
+                default:
+                    DiagMsg = $"Unexpected token {token.Lexeme}";
+                    return false;
+
+            }
+        }
+        public bool TryParseTypeOptions(TokenEnumerator source, Token Prior, ref TypeStatement Stmt, out string DiagMsg)
         {
             DiagMsg = String.Empty;
 
@@ -285,165 +315,41 @@ namespace Sandbox
 
             while (token.Lexeme != "{")
             {
-                switch (token.Keyword)
+                if (token.Keyword == Keyword.IsNotKeyword)
                 {
-                    case Keyword.Class:
-                        {
-                            Stmt.IsRecordClass = true;
-                            break;
-                        }
-
-                    case Keyword.Struct:
-                        {
-                            Stmt.IsRecordStruct = true;
-                            break;
-                        }
-                    case Keyword.Readonly:
-                        {
-                            Stmt.IsReadOnly = true;
-                            break;
-                        }
-                    case Keyword.Private when Stmt.AccessType == AccessType.Undefined:
-                        {
-                            Stmt.AccessType = AccessType.Private;
-                            break;
-                        }
-                    case Keyword.Internal when Stmt.AccessType == AccessType.Undefined:
-                        {
-                            Stmt.AccessType = AccessType.Internal;
-                            break;
-                        }
-                    case Keyword.Public when Stmt.AccessType == AccessType.Undefined:
-                        {
-                            Stmt.AccessType = AccessType.Public;
-                            break;
-                        }
-                    case Keyword.Private when Stmt.AccessType != AccessType.Undefined:
-                    case Keyword.Internal when Stmt.AccessType != AccessType.Undefined:
-                    case Keyword.Public when Stmt.AccessType != AccessType.Undefined:
-                        {
-                            DiagMsg = $"Cannot specify access type '{token.Keyword.ToString().ToLower()}' when access is already '{Stmt.AccessType.ToString().ToLower()}'";
-                            return false;
-                        }
-                    default:
-                        {
-                            DiagMsg = $"Unexpected token '{token.Lexeme}'";
-                            return false;
-                        }
+                    DiagMsg = $"Unexpected token {token.Lexeme}";
+                    continue;
                 }
+
+                Stmt.AddOption(token.Keyword);
 
                 token = source.GetNextToken();
             }
 
             source.PushToken(token);
 
-            if (Stmt.IsRecordClass && Stmt.IsRecordStruct)
-                return false;
-
-            if (Stmt.AccessType == AccessType.Undefined)
-                Stmt.AccessType = AccessType.Internal;
-
             return true;
         }
-        public bool TryParseType(TokenEnumerator source, Token Prior, out TypeStatement Stmt, out string DiagMsg)
+        public bool TryParseTypeBody(TokenEnumerator source, Token Prior, ref TypeStatement Stmt, out string DiagMsg)
         {
-            Stmt = null;
             DiagMsg = string.Empty;
-
-            string name;
-            Keyword typeKind = Keyword.IsNotKeyword;
-
-            // We expect any of the following
-
-            // type <identifier> [<type-options>] { }
-
-
-            // <ident>; or <ident>{
-            // <ident>.
-            // <ident>.<ident>; or <ident>.<ident>{
-            // <ident>.<ident>.
-            // <ident>.<ident>.<ident>; or <ident>.<ident>.<ident>{
 
             var token = source.GetNextToken();
 
-            if (token.Keyword != Keyword.Type)
-                throw new InvalidOperationException($"Expected keyword token '{Keyword.Type}' has not been pushed.");
+            if (token.TokenCode != TokenType.LBrace)
+                throw new InvalidOperationException("Expected token '{' has not been pushed.");
 
-            token = source.GetNextToken();
+            source.SkipToNext("}");
 
-            while (token.TokenCode != TokenType.NoMoreTokens)
-            {
-                if (token.TokenCode != TokenType.Identifier)
-                {
-                    DiagMsg = $"Unexpected token {token.Lexeme}";
-                    source.PushToken(token);
-                    return false;
-                }
-
-                name = token.Lexeme;
-
-                token = source.GetNextToken();
-
-                if (token.Keyword != Keyword.Class && token.Keyword != Keyword.Struct && token.Keyword != Keyword.Record && token.Keyword != Keyword.Singlet)
-                {
-                    DiagMsg = $"Unexpected token {token.Lexeme}";
-                    source.PushToken(token);
-                    return false;
-                }
-
-                typeKind = token.Keyword;
-
-                Stmt = new TypeStatement(new TypeBody(), typeKind, Prior.LineNumber, Prior.ColNumber, name);
-
-                switch (typeKind)
-                {
-                    case Keyword.Class:
-                        {
-                            //TryParseClass();
-                            break; // parse class options
-                        }
-                    case Keyword.Struct:
-                        {
-                            break; // parse struct options
-                        }
-                    case Keyword.Record:
-                        {
-                            if (TryParseRecord(source, ref Stmt, out DiagMsg) == false)
-                            {
-                                //source.SkipToNext("}");
-                                return false;
-                            }
-                            break; // parse record options
-                        }
-                    case Keyword.Singlet:
-                        {
-                            break; // parse singlet options
-                        }
-                }
-
-                token = source.GetNextToken();
-
-                if (token.Lexeme == "{")
-                {
-                    // TryParseBlock
-                    source.SkipToNext("}"); // very crude hack, just for now, to get progress through the file
-                    return true;
-                }
-
-
-                token = source.GetNextToken();
-
-            }
-
-            return false;
+            return true;
 
         }
-        public static DiagnosticEventArgs ParsedGood(Statement Stmt)
+
+        private static DiagnosticEventArgs ParsedGood(Statement Stmt)
         {
             return new DiagnosticEventArgs($"Parsed a {Stmt.GetType().Name} on line {Stmt.Line} at column {Stmt.Col} : '{Stmt.ToString()}'");
         }
-
-        public static DiagnosticEventArgs ParsedBad(Statement Stmt, string Msg)
+        private static DiagnosticEventArgs ParsedBad(Statement Stmt, string Msg)
         {
             return new DiagnosticEventArgs($" Failed to parse a {Stmt.GetType().Name} on line {Stmt.Line} at column {Stmt.Col} ({Msg})");
         }

@@ -20,5 +20,18 @@ namespace Sandbox
         {
             Children.Add(Stmt);
         }
+
+        public override string Dump(int nesting)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            foreach (var child in Children)
+            {
+                builder.Append(child.Dump(nesting+1));
+            }
+
+            return builder.ToString();
+
+        }
     }
 }

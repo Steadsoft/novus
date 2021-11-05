@@ -20,5 +20,8 @@ namespace Sandbox
         Public,
         Internal,
         Private,
+        Abstract,
+        Static,
+        Sealed
     }
 }

@@ -1,0 +1,48 @@
+﻿namespace a
+{
+
+   namespace b
+   {
+      namespace c
+      {
+      }
+   } 
+}
+
+namespace d
+{
+
+}
+
+
+
+
+/*
+using Steadsoft.Novus.Support;
+
+namespace Steadsoft.Novus.Support
+{
+
+namespace Steadsoft.Novus.Compiler
+{
+
+}
+
+
+}
+
+type Umbrealla class
+{
+
+}
+
+type Window class public abstract sealed
+{
+
+}
+
+type Category class sealed sealed abstract static
+{
+
+}
+*/

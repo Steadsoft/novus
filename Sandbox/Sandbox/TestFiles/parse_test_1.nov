@@ -2,6 +2,7 @@
 /* This is a simple source file for experimenting with parsing using C# */
 /*----------------------------------------------------------------------*/
 
+/*
 
 using a.b.c;
 
@@ -11,6 +12,8 @@ namespace m.n
 {
 
 }
+*/
+
 
 type Vehicle class
 {
@@ -22,6 +25,7 @@ type Person struct
 
 }
 
+/*
 
 		type Engine record struct
 		{
@@ -52,3 +56,6 @@ namespace Outer
 	
 	}
 }
+
+*/
+

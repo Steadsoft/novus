@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Sandbox
@@ -13,6 +14,16 @@ namespace Sandbox
         {
             enumerator = Source.GetEnumerator();
             this.Skips = Skips;
+        }
+
+        public void CheckExpectedToken(Keyword Type)
+        {
+            var token = GetNextToken();
+
+            if (token.Keyword != Type)
+                throw new InternalErrorException($"Expected keyword token '{Keyword.Type}' has not been pushed.");
+
+            return;
         }
 
         public Token GetNextToken()

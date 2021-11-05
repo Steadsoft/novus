@@ -12,7 +12,7 @@ namespace Sandbox
         static void Main(string[] args)
         {
 
-            var source = SourceFile.Create(@"..\..\..\TestFiles\parse_test_1.nov");
+            var source = SourceFile.Create(@"..\..\..\TestFiles\parse_types_tests.nov");
 
             var tokenizer = new Tokenizer(@"..\..\..\TestFiles\csharp.csv");
 
@@ -38,6 +38,8 @@ namespace Sandbox
 
             parser.TryParseFile(te, out var root);
 
+            DumpParseTree(root);
+
         }
 
         private static void MsgHandler(object Sender, DiagnosticEventArgs Args)
@@ -45,9 +47,15 @@ namespace Sandbox
             Console.WriteLine(Args.Message);
         }
 
+        private static void DumpParseTree(BlockStatement Root)
+        {
 
-
-
+            foreach (var stmt in Root.Children)
+            {
+                string text = stmt.Dump(0);
+                Console.Write(text);
+            }
+        }
     }
 }
 

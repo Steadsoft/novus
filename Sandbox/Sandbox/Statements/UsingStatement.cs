@@ -6,17 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sandbox
 {
-    public abstract class Statement
-    {
-        public int Line { get; private set; }
-        public int Col { get; private set; }
 
-        public Statement(int Line, int Col)
-        {
-            this.Line = Line;
-            this.Col = Col;
-        }
-    }
     public class UsingStatement : Statement
     {
         public string Name { get; private set; }
@@ -29,6 +19,11 @@ namespace Sandbox
         public override string ToString()
         {
             return Name;
+        }
+
+        public override string Dump(int nesting)
+        {
+            return "Using " + Name;
         }
     }
 }

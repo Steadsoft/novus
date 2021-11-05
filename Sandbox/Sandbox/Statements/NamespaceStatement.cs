@@ -29,5 +29,15 @@ namespace Sandbox
             return Name;
         }
 
+        public override string Dump(int nesting)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            builder.AppendLine(new string(' ',nesting) + "Namespace " + Name);
+            
+            builder.Append(Block.Dump(nesting));
+
+            return builder.ToString();
+        }
     }
 }
