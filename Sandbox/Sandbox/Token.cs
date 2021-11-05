@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Sandbox
 {
-    [DebuggerDisplay("{TokenCode} {Lexeme}")]
+    [DebuggerDisplay("{TokenCode} {Lexeme} {Keyword}")]
     public class Token
     {
         private static List<string> keywords;

@@ -42,7 +42,7 @@ namespace Sandbox
 
         private static void MsgHandler(object Sender, DiagnosticEventArgs Args)
         {
-            ;
+            Console.WriteLine(Args.Message);
         }
 
 

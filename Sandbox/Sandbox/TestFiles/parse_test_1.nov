@@ -2,7 +2,7 @@
 /* This is a simple source file for experimenting with parsing using C# */
 /*----------------------------------------------------------------------*/
 
-/*
+
 using a.b.c;
 
 namespace x.y;
@@ -39,7 +39,7 @@ type Engine2 record private internal
 		{
 
 		}
-*/
+
 
 namespace Outer
 {

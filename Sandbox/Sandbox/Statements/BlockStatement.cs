@@ -11,9 +11,9 @@ namespace Sandbox
         public Statement Parent;
         public List<Statement> Children;
 
-        BlockStatement(int Line, int Col) : base(Line, Col)
+        public BlockStatement(int Line, int Col) : base(Line, Col)
         {
-
+            Children = new List<Statement>();
         }
 
         public void AddChild(Statement Stmt)

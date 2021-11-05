@@ -6,15 +6,6 @@ using System.Threading.Tasks;
 
 namespace Sandbox
 {
-    public class DiagnosticEventArgs : EventArgs
-    {
-        public string Message { get; private set; }
-
-        public DiagnosticEventArgs (string Msg)
-        {
-            Message = Msg;
-        }
-    }
     public class Parser
     {
         public delegate void DiagnosticEventHandler(object Sender, DiagnosticEventArgs Args);
@@ -25,7 +16,7 @@ namespace Sandbox
         {
             source = Source;
         }
-        public bool TryParseFile(TokenEnumerator source, out Statement Root)
+        public bool TryParseFile(TokenEnumerator source, out BlockStatement Root)
         {
             int errors = 0;
 
@@ -43,12 +34,18 @@ namespace Sandbox
 
             while (token.TokenCode != TokenType.NoMoreTokens)
             {
+                if (Root == null)
+                {
+                    Root = new BlockStatement(token.LineNumber, token.ColNumber);
+                }
+
                 switch (token.Keyword)
                 {
                     case Keyword.Using:
-                        if (TryParseUsing(source, token, out var usingStatement, out message))
+                        source.PushToken(token);
+;                       if (TryParseUsing(source, token, out var usingStatement, out message))
                         {
-                            OnDiagnostic(this, ParsedGood(usingStatement));
+                            Root.AddChild(usingStatement); 
                         }
                         else
                         {
@@ -60,9 +57,10 @@ namespace Sandbox
                         continue;
 
                     case Keyword.Namespace:
+                        source.PushToken(token);
                         if (TryParseNamespace(source, token, out var namespaceStatement, out message))
                         {
-                            OnDiagnostic(this, ParsedGood(namespaceStatement));
+                            Root.AddChild(namespaceStatement);
                         }
                         else
                         {
@@ -74,9 +72,10 @@ namespace Sandbox
                         continue;
 
                     case Keyword.Type:
+                        source.PushToken(token);
                         if (TryParseType(source, token, out var typeStatement, out message))
                         {
-                            OnDiagnostic(this, ParsedGood(typeStatement));
+                            Root.AddChild(typeStatement);
                         }
                         else
                         {
@@ -113,6 +112,11 @@ namespace Sandbox
             // <ident>.<ident>.<ident>;
 
             var token = source.GetNextToken();
+
+            if (token.Keyword != Keyword.Using)
+                throw new InvalidOperationException($"Expected keyword token '{Keyword.Using}' has not been pushed.");
+
+            token = source.GetNextToken();
 
             while (token.TokenCode != TokenType.NoMoreTokens)
             {
@@ -159,6 +163,11 @@ namespace Sandbox
 
             var token = source.GetNextToken();
 
+            if (token.Keyword != Keyword.Namespace)
+                throw new InvalidOperationException($"Expected keyword token '{Keyword.Namespace}'has not been pushed.");
+
+            token = source.GetNextToken();
+
             while (token.TokenCode != TokenType.NoMoreTokens)
             {
                 if (token.TokenCode != TokenType.Identifier)
@@ -178,8 +187,9 @@ namespace Sandbox
                     return true;
                 }
 
-                if (token.Lexeme == "{")
+                if (token.TokenCode == TokenType.LBrace)
                 {
+                    source.PushToken(token);
                     if (TryParseNamespaceBlock(source, out var block, out DiagMsg))
                     {
                         Stmt = new NamespaceStatement(Prior.LineNumber, Prior.ColNumber, builder.ToString());
@@ -209,14 +219,22 @@ namespace Sandbox
 
             var token = source.GetNextToken();
 
+            if (token.TokenCode != TokenType.LBrace)
+                throw new InvalidOperationException("Expected token '{' has not been pushed.");
+
+            Block = new BlockStatement(token.LineNumber, token.ColNumber);
+
+            token = source.GetNextToken();
+
             while (token.TokenCode != TokenType.NoMoreTokens && token.TokenCode != TokenType.RBrace)
             {
                 switch (token.Keyword)
                 {
                     case Keyword.Namespace:
+                        source.PushToken(token);
                         if (TryParseNamespace(source, token, out var namespaceStatement, out DiagMsg))
                         {
-                            ; // Console.WriteLine(ParsedGood(namespaceStatement));
+                            Block.AddChild(namespaceStatement);
                         }
                         else
                         {
@@ -227,9 +245,10 @@ namespace Sandbox
                         continue;
 
                     case Keyword.Type:
+                        source.PushToken(token);
                         if (TryParseType(source, token, out var typeStatement, out DiagMsg))
                         {
-                            ; // Console.WriteLine(ParsedGood(typeStatement));
+                            Block.AddChild(typeStatement);
                         }
                         else
                         {
@@ -336,6 +355,11 @@ namespace Sandbox
             // <ident>.<ident>.<ident>; or <ident>.<ident>.<ident>{
 
             var token = source.GetNextToken();
+
+            if (token.Keyword != Keyword.Type)
+                throw new InvalidOperationException($"Expected keyword token '{Keyword.Type}' has not been pushed.");
+
+            token = source.GetNextToken();
 
             while (token.TokenCode != TokenType.NoMoreTokens)
             {
