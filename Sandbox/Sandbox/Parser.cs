@@ -6,6 +6,16 @@ using System.Threading.Tasks;
 
 namespace Sandbox
 {
+    /// <summary>
+    /// This class implements a recursive descent parser.
+    /// </summary>
+    /// <remarks>
+    /// This class contains the methods needed to parse the language recursively. Each parse method conforms to a basic
+    /// pattern that makes debugging a bit easier and helps detect errors that can arise as code is routinely refactored.
+    /// The patter is that when a method has recognized a keyword, it pushes the token for that back into the source and
+    /// then calls the parser for that keyword. Each keyword parser method then re-reads that token and verifies that it 
+    /// is indeed the correct token before proceeding with its parsing.
+    /// </remarks>
     public class Parser
     {
         public delegate void DiagnosticEventHandler(object Sender, DiagnosticEventArgs Args);
