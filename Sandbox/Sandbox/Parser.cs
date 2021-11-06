@@ -330,6 +330,33 @@ namespace Sandbox
 
             Stmt.AddBody(body);
 
+            token = source.GetNextToken();
+
+            while (token.TokenCode != TokenType.NoMoreTokens && token.TokenCode != TokenType.RBrace)
+            {
+                switch (token.Keyword)
+                {
+                    case Keyword.Type:
+                        source.PushToken(token);
+                        if (TryParseType(source, token, out var typeStatement, out DiagMsg))
+                        {
+                            body.AddChild(typeStatement);
+                        }
+                        else
+                        {
+                            OnDiagnostic(this, ParsedBad(typeStatement, DiagMsg));
+                            token = source.SkipToNext("}");
+                        }
+                        token = source.GetNextToken();
+                        continue;
+
+                    default:
+                        OnDiagnostic(this, new DiagnosticEventArgs("Unexpected token {} found."));
+                        break;
+                }
+            }
+
+
             source.SkipToNext("}");
 
             return true;
@@ -345,4 +372,5 @@ namespace Sandbox
             return new DiagnosticEventArgs($" Failed to parse a {Stmt.GetType().Name} on line {Stmt.Line} at column {Stmt.Col} ({Msg})");
         }
     }
+
 }
