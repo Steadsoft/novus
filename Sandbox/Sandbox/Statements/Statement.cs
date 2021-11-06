@@ -12,5 +12,10 @@
         }
 
         public abstract string Dump(int nesting);
+
+        public static string Prepad (int N)
+        {
+            return new string(' ', N);
+        }
     }
 }

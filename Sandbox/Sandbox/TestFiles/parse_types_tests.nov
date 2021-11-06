@@ -5,12 +5,21 @@
    {
       namespace namespace
       {
+         type Category class sealed sealed abstract static
+         {
+
+         }
       }
    } 
 }
 
 namespace d
 {
+
+type Umbrealla class
+{
+
+}
 
 }
 

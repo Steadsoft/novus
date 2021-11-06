@@ -31,7 +31,6 @@ namespace Sandbox
             }
 
             return builder.ToString();
-
         }
     }
 }

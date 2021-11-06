@@ -288,7 +288,7 @@ namespace Sandbox
 
             token = source.GetNextToken();
 
-            Stmt = new TypeStatement(new TypeBody(), token.Keyword, Prior.LineNumber, Prior.ColNumber, name);
+            Stmt = new TypeStatement(Prior.LineNumber, Prior.ColNumber, name);
 
             switch (token.Keyword)
             {
@@ -338,6 +338,10 @@ namespace Sandbox
 
             if (token.TokenCode != TokenType.LBrace)
                 throw new InvalidOperationException("Expected token '{' has not been pushed.");
+
+            BlockStatement body = new BlockStatement(token.LineNumber, token.ColNumber);
+
+            Stmt.AddBody(body);
 
             source.SkipToNext("}");
 

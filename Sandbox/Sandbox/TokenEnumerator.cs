@@ -7,7 +7,6 @@ namespace Sandbox
     public class TokenEnumerator
     {
         private IEnumerator<Token> enumerator;
-        private Token pushed_token = null;
         private TokenType[] Skips;
         private Stack<Token> pushed = new Stack<Token>();
         public TokenEnumerator(IEnumerable<Token> Source, params TokenType[] Skips)
