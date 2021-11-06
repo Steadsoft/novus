@@ -5,7 +5,7 @@
    {
       namespace namespace
       {
-         type Category class sealed sealed abstract static
+         type Category class sealed sealed abstract static public private
          {
 
          }

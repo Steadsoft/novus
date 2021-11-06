@@ -10,8 +10,6 @@ namespace Sandbox
     {
         public string Name { get; private set; }
         public BlockStatement Body { get; private set; }
-        public Keyword TypeKind { get; private set; }
-        public AccessType AccessType { get; set; }
         /// <summary>
         /// Indicates optional keywords encountered while parsing.
         /// These are blindly added during parsing and checked for
@@ -22,7 +20,6 @@ namespace Sandbox
         {
             this.Name = Name;
             this.Body = Body;
-            this.TypeKind = TypeKind;
             this.Options = new List<Keyword>();
         }
         public void AddBody(BlockStatement Stmt)
@@ -40,14 +37,14 @@ namespace Sandbox
 
         public override string ToString()
         {
-            return $"{Name} {TypeKind.ToString().ToLower()}";
+            return $"{Name}";
         }
 
         public override string Dump(int nesting)
         {
             StringBuilder builder = new StringBuilder();
 
-            builder.AppendLine($"{Prepad(nesting)}Type: {Name}");
+            builder.AppendLine($"{Prepad(nesting)}Type: '{Name}' {String.Join<Keyword>(", ",Options.OrderBy(op => op.ToString()))}");
 
             builder.Append(Body.Dump(nesting));
 

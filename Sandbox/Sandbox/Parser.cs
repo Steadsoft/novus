@@ -286,26 +286,13 @@ namespace Sandbox
 
             var name = token.Lexeme;
 
-            token = source.GetNextToken();
-
             Stmt = new TypeStatement(Prior.LineNumber, Prior.ColNumber, name);
 
-            switch (token.Keyword)
-            {
-                case Keyword.Class:
-                case Keyword.Struct:
-                case Keyword.Record:
-                case Keyword.Singlet:
-                    {
-                        if (TryParseTypeOptions(source, token, ref Stmt, out DiagMsg))
-                            return TryParseTypeBody(source, token, ref Stmt, out DiagMsg);
-                        return false;
-                    }
-                default:
-                    DiagMsg = $"Unexpected token {token.Lexeme}";
-                    return false;
+            if (TryParseTypeOptions(source, token, ref Stmt, out DiagMsg))
+                return TryParseTypeBody(source, token, ref Stmt, out DiagMsg);
 
-            }
+            return false;
+
         }
         public bool TryParseTypeOptions(TokenEnumerator source, Token Prior, ref TypeStatement Stmt, out string DiagMsg)
         {
@@ -317,7 +304,7 @@ namespace Sandbox
             {
                 if (token.Keyword == Keyword.IsNotKeyword)
                 {
-                    DiagMsg = $"Unexpected token {token.Lexeme}";
+                    DiagMsg = $"Unexpected token in type declaration '{token.Lexeme}'";
                     continue;
                 }
 
