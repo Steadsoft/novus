@@ -1,9 +1,9 @@
-﻿namespace a
+﻿namespace a.x.rere
 {
 
    namespace b
    {
-      namespace c
+      namespace namespace
       {
       }
    } 

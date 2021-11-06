@@ -33,7 +33,7 @@ namespace Sandbox
         {
             StringBuilder builder = new StringBuilder();
 
-            builder.AppendLine(new string(' ',nesting) + "Namespace " + Name);
+            builder.AppendLine(new string(' ',nesting) + $"Namespace: {Name}");
             
             builder.Append(Block.Dump(nesting));
 
