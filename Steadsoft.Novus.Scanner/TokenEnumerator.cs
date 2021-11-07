@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Steadsoft.Novus.Scanner
 {
-    public class TokenEnumerator<T> where T : struct, System.Enum, IComparable<T>
+    public class TokenEnumerator<T> where T : struct, System.Enum
     {
         private IEnumerator<Token<T>> enumerator;
         private TokenType[] Skips;

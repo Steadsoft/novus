@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Steadsoft.Novus.Scanner;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,14 +20,14 @@ namespace Sandbox
     public class Parser
     {
         public delegate void DiagnosticEventHandler(object Sender, DiagnosticEventArgs Args);
-        private TokenEnumerator source;
+        private TokenEnumerator<Keyword> source;
         public event DiagnosticEventHandler OnDiagnostic;
 
-        public Parser(TokenEnumerator Source)
+        public Parser(TokenEnumerator<Keyword> Source)
         {
             source = Source;
         }
-        public bool TryParseFile(TokenEnumerator source, out BlockStatement Root)
+        public bool TryParseFile(TokenEnumerator<Keyword> source, out BlockStatement Root)
         {
             int errors = 0;
 
@@ -108,7 +109,7 @@ namespace Sandbox
             return errors == 0;
 
         }
-        public bool TryParseUsing(TokenEnumerator source, Token Prior, out UsingStatement Stmt, out string DiagMsg)
+        public bool TryParseUsing(TokenEnumerator<Keyword> source, Token<Keyword> Prior, out UsingStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
             DiagMsg = null;
@@ -153,7 +154,7 @@ namespace Sandbox
 
             }
         }
-        public bool TryParseNamespace(TokenEnumerator source, Token Prior, out NamespaceStatement Stmt, out string DiagMsg)
+        public bool TryParseNamespace(TokenEnumerator<Keyword> source, Token<Keyword> Prior, out NamespaceStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
             DiagMsg = String.Empty;
@@ -207,7 +208,7 @@ namespace Sandbox
 
             return false;
         }
-        public bool TryParseNamespaceBody(TokenEnumerator source, out BlockStatement Block, out string DiagMsg)
+        public bool TryParseNamespaceBody(TokenEnumerator<Keyword> source, out BlockStatement Block, out string DiagMsg)
         {
             Block = null;
             DiagMsg = string.Empty;
@@ -262,7 +263,7 @@ namespace Sandbox
             return true;
 
         }
-        public bool TryParseType(TokenEnumerator source, Token Prior, out TypeStatement Stmt, out string DiagMsg)
+        public bool TryParseType(TokenEnumerator<Keyword> source, Token<Keyword> Prior, out TypeStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
             DiagMsg = string.Empty;
@@ -287,7 +288,7 @@ namespace Sandbox
             return false;
 
         }
-        public bool TryParseTypeOptions(TokenEnumerator source, Token Prior, ref TypeStatement Stmt, out string DiagMsg)
+        public bool TryParseTypeOptions(TokenEnumerator<Keyword> source, Token<Keyword> Prior, ref TypeStatement Stmt, out string DiagMsg)
         {
             DiagMsg = String.Empty;
 
@@ -310,7 +311,7 @@ namespace Sandbox
 
             return true;
         }
-        public bool TryParseTypeBody(TokenEnumerator source, Token Prior, ref TypeStatement Stmt, out string DiagMsg)
+        public bool TryParseTypeBody(TokenEnumerator<Keyword> source, Token<Keyword> Prior, ref TypeStatement Stmt, out string DiagMsg)
         {
             DiagMsg = string.Empty;
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Steadsoft.Novus.Scanner;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,89 +14,77 @@ namespace Sandbox
         {
             string TEXT =
                 @"
-namespace a.x.rere
-{
-   namespace b
-   {
-      namespace namespace
-      {
-         type Category class sealed sealed abstract static public private
-         {
-            type Window class public abstract sealed
-            {
+                namespace a.x.rere
+                {
+                   namespace b
+                   {
+                      namespace namespace
+                      {
+                         type Category class sealed sealed abstract static public private
+                         {
+                            type Window class public abstract sealed
+                            {
 
-            }
-         }
-      }
-   } 
-}
+                            }
+                         }
+                      }
+                   } 
+                }
 
-namespace d
-{
-   type Umbrealla class
-   {
+                namespace d
+                {
+                   type Umbrealla class
+                   {
 
-   }
-}
+                   }
+                }
 
-namespace abc;
+                namespace abc;
 
-// using Steadsoft.Novus.Support;
+                // using Steadsoft.Novus.Support;
 
-namespace Steadsoft.Novus.Support
-{
-   namespace Steadsoft.Novus.Compiler
-   {
+                namespace Steadsoft.Novus.Support
+                {
+                   namespace Steadsoft.Novus.Compiler
+                   {
 
-   }
-}
+                   }
+                }
 
-type Umbrealla class
-{
+                type Umbrealla class
+                {
 
-}
+                }
 
-type Window class public abstract sealed
-{
+                type Window class public abstract sealed
+                {
 
-}
+                }
 
-type Category1 class sealed sealed abstract static
-{
-type Category2 class sealed sealed abstract static
-{
-type Category3 class sealed sealed abstract static
-{
-type Category4 class sealed sealed abstract static
-{
+                type Category1 class sealed sealed abstract static
+                {
+                type Category2 class sealed sealed abstract static
+                {
+                type Category3 class sealed sealed abstract static
+                {
+                type Category4 class sealed sealed abstract static
+                {
 
-}
-}
-}
-}
+                }
+                }
+                }
+                }
                 ";
 
             var source = SourceFile.CreateFromString(TEXT);
 
             //var source = SourceFile.CreateFromFile(@"..\..\..\TestFiles\parse_types_tests.nov");
 
-            var tokenizer = new Tokenizer(@"..\..\..\TestFiles\csharp.csv");
-
-            //Console.ForegroundColor = ConsoleColor.White;
-
-            //foreach (var token in tokenizer.Tokenize(source))
-            //{
-            //    Console.Write($"[{token.LineNumber,-3} {token.ColNumber,-2}] {token.TokenCode,-12} '");
-            //    var c = Console.ForegroundColor;
-            //    Console.ForegroundColor = ConsoleColor.Green;
-            //    Console.Write($"{token.Lexeme}");
-            //    Console.ForegroundColor = c;
-            //    Console.WriteLine("'");
-            //}
+            var tokenizer = new Tokenizer<Keyword>(@"..\..\..\TestFiles\csharp.csv");
 
             List<int> ints = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
-            TokenEnumerator te = new TokenEnumerator(tokenizer.Tokenize(source), TokenType.BlockComment, TokenType.LineComment);
+            TokenEnumerator<Keyword> te = new TokenEnumerator<Keyword>(tokenizer.Tokenize(source), TokenType.BlockComment, TokenType.LineComment);
 
             var parser = new Parser(te);
 

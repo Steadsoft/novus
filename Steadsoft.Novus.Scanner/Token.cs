@@ -31,7 +31,7 @@ namespace Steadsoft.Novus.Scanner
             if (TokenCode == TokenType.Identifier && Enum.TryParse<T>(Lexeme, true, out keyword))
                 Keyword = keyword;
             else
-                Keyword = (T)Convert.ChangeType(0, typeof(T));
+                Keyword = Enum.Parse<T>("0");
         }
     }
 }
