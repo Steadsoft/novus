@@ -1,6 +1,5 @@
 ﻿namespace a.x.rere
 {
-
    namespace b
    {
       namespace namespace
@@ -18,29 +17,21 @@
 
 namespace d
 {
+   type Umbrealla class
+   {
 
-type Umbrealla class
-{
-
+   }
 }
 
-}
 
-
-
-
-/*
-using Steadsoft.Novus.Support;
+// using Steadsoft.Novus.Support;
 
 namespace Steadsoft.Novus.Support
 {
+   namespace Steadsoft.Novus.Compiler
+   {
 
-namespace Steadsoft.Novus.Compiler
-{
-
-}
-
-
+   }
 }
 
 type Umbrealla class
@@ -57,4 +48,3 @@ type Category class sealed sealed abstract static
 {
 
 }
-*/

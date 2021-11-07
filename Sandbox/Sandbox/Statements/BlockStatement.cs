@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Sandbox
 {
+    /// <summary>
+    /// Represents any bracketed code block surrounded by { and }
+    /// </summary>
     public class BlockStatement : Statement
     {
         public Statement Parent;

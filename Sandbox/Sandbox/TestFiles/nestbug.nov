@@ -1,0 +1,11 @@
+﻿namespace A1
+{
+   type B1
+   {
+   }
+}
+
+namespace A2
+{
+
+}

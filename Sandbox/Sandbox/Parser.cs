@@ -261,7 +261,7 @@ namespace Sandbox
                         continue;
 
                     default:
-                        OnDiagnostic(this, new DiagnosticEventArgs("Unexpected token {} found."));
+                        OnDiagnostic(this, new DiagnosticEventArgs($"Unexpected token '{token.Lexeme}' found."));
                         break;
                 }
             }
@@ -357,7 +357,7 @@ namespace Sandbox
             }
 
 
-            source.SkipToNext("}");
+            //source.SkipToNext("}");
 
             return true;
 
