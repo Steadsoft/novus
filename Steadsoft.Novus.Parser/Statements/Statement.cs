@@ -1,4 +1,4 @@
-﻿namespace Sandbox
+﻿namespace Steadsoft.Novus.Parser
 {
     public abstract class Statement
     {

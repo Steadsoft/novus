@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sandbox
+namespace Steadsoft.Novus.Parser
 {
     /// <summary>
     /// Represents any bracketed code block surrounded by { and }

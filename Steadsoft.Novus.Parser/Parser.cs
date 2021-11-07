@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Steadsoft.Novus.Scanner;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sandbox
+namespace Steadsoft.Novus.Parser
 {
     /// <summary>
     /// This class implements a recursive descent parser.
@@ -19,14 +20,14 @@ namespace Sandbox
     public class Parser
     {
         public delegate void DiagnosticEventHandler(object Sender, DiagnosticEventArgs Args);
-        private TokenEnumerator source;
+        private TokenEnumerator<NovusKeywords> source;
         public event DiagnosticEventHandler OnDiagnostic;
 
-        public Parser(TokenEnumerator Source)
+        public Parser(TokenEnumerator<NovusKeywords> Source)
         {
             source = Source;
         }
-        public bool TryParseFile(TokenEnumerator source, out BlockStatement Root)
+        public bool TryParseFile(TokenEnumerator<NovusKeywords> source, out BlockStatement Root)
         {
             int errors = 0;
 
@@ -51,7 +52,7 @@ namespace Sandbox
 
                 switch (token.Keyword)
                 {
-                    case Keyword.Using:
+                    case NovusKeywords.Using:
                         source.PushToken(token);
                         if (TryParseUsing(source, token, out var usingStatement, out message))
                         {
@@ -66,7 +67,7 @@ namespace Sandbox
                         token = source.GetNextToken();
                         continue;
 
-                    case Keyword.Namespace:
+                    case NovusKeywords.Namespace:
                         source.PushToken(token);
                         if (TryParseNamespace(source, token, out var namespaceStatement, out message))
                         {
@@ -81,7 +82,7 @@ namespace Sandbox
                         token = source.GetNextToken();
                         continue;
 
-                    case Keyword.Type:
+                    case NovusKeywords.Type:
                         source.PushToken(token);
                         if (TryParseType(source, token, out var typeStatement, out message))
                         {
@@ -108,7 +109,7 @@ namespace Sandbox
             return errors == 0;
 
         }
-        public bool TryParseUsing(TokenEnumerator source, Token Prior, out UsingStatement Stmt, out string DiagMsg)
+        public bool TryParseUsing(TokenEnumerator<NovusKeywords> source, Token<NovusKeywords> Prior, out UsingStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
             DiagMsg = null;
@@ -121,7 +122,7 @@ namespace Sandbox
             // <ident>.<ident>.
             // <ident>.<ident>.<ident>;
 
-            source.CheckExpectedToken(Keyword.Using);
+            source.CheckExpectedToken(NovusKeywords.Using);
 
             var token = source.GetNextToken();
 
@@ -153,14 +154,14 @@ namespace Sandbox
 
             }
         }
-        public bool TryParseNamespace(TokenEnumerator source, Token Prior, out NamespaceStatement Stmt, out string DiagMsg)
+        public bool TryParseNamespace(TokenEnumerator<NovusKeywords> source, Token<NovusKeywords> Prior, out NamespaceStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
             DiagMsg = String.Empty;
 
             StringBuilder builder = new StringBuilder();
 
-            source.CheckExpectedToken(Keyword.Namespace);
+            source.CheckExpectedToken(NovusKeywords.Namespace);
 
             var token = source.GetNextToken();
 
@@ -207,7 +208,7 @@ namespace Sandbox
 
             return false;
         }
-        public bool TryParseNamespaceBody(TokenEnumerator source, out BlockStatement Block, out string DiagMsg)
+        public bool TryParseNamespaceBody(TokenEnumerator<NovusKeywords> source, out BlockStatement Block, out string DiagMsg)
         {
             Block = null;
             DiagMsg = string.Empty;
@@ -225,7 +226,7 @@ namespace Sandbox
             {
                 switch (token.Keyword)
                 {
-                    case Keyword.Namespace:
+                    case NovusKeywords.Namespace:
                         source.PushToken(token);
                         if (TryParseNamespace(source, token, out var namespaceStatement, out DiagMsg))
                         {
@@ -239,7 +240,7 @@ namespace Sandbox
                         token = source.GetNextToken();
                         continue;
 
-                    case Keyword.Type:
+                    case NovusKeywords.Type:
                         source.PushToken(token);
                         if (TryParseType(source, token, out var typeStatement, out DiagMsg))
                         {
@@ -262,12 +263,12 @@ namespace Sandbox
             return true;
 
         }
-        public bool TryParseType(TokenEnumerator source, Token Prior, out TypeStatement Stmt, out string DiagMsg)
+        public bool TryParseType(TokenEnumerator<NovusKeywords> source, Token<NovusKeywords> Prior, out TypeStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
             DiagMsg = string.Empty;
 
-            source.CheckExpectedToken(Keyword.Type);
+            source.CheckExpectedToken(NovusKeywords.Type);
 
             var token = source.GetNextToken();
 
@@ -287,7 +288,7 @@ namespace Sandbox
             return false;
 
         }
-        public bool TryParseTypeOptions(TokenEnumerator source, Token Prior, ref TypeStatement Stmt, out string DiagMsg)
+        public bool TryParseTypeOptions(TokenEnumerator<NovusKeywords> source, Token<NovusKeywords> Prior, ref TypeStatement Stmt, out string DiagMsg)
         {
             DiagMsg = String.Empty;
 
@@ -295,7 +296,7 @@ namespace Sandbox
 
             while (token.Lexeme != "{")
             {
-                if (token.Keyword == Keyword.IsNotKeyword)
+                if (token.Keyword == NovusKeywords.IsNotKeyword)
                 {
                     DiagMsg = $"Unexpected token in type declaration '{token.Lexeme}'";
                     continue;
@@ -310,7 +311,7 @@ namespace Sandbox
 
             return true;
         }
-        public bool TryParseTypeBody(TokenEnumerator source, Token Prior, ref TypeStatement Stmt, out string DiagMsg)
+        public bool TryParseTypeBody(TokenEnumerator<NovusKeywords> source, Token<NovusKeywords> Prior, ref TypeStatement Stmt, out string DiagMsg)
         {
             DiagMsg = string.Empty;
 
@@ -329,7 +330,7 @@ namespace Sandbox
             {
                 switch (token.Keyword)
                 {
-                    case Keyword.Type:
+                    case NovusKeywords.Type:
                         source.PushToken(token);
                         if (TryParseType(source, token, out var typeStatement, out DiagMsg))
                         {

@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Steadsoft.Novus.Scanner\Steadsoft.Novus.Scanner.csproj" />
+    <ProjectReference Include="..\..\Steadsoft.Novus.Parser\Steadsoft.Novus.Parser.csproj" />
   </ItemGroup>
 
 </Project>

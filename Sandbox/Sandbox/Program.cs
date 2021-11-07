@@ -1,4 +1,5 @@
-﻿using Steadsoft.Novus.Scanner;
+﻿using Steadsoft.Novus.Parser;
+using Steadsoft.Novus.Scanner;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -80,17 +81,15 @@ namespace Sandbox
 
             //var source = SourceFile.CreateFromFile(@"..\..\..\TestFiles\parse_types_tests.nov");
 
-            var tokenizer = new Tokenizer<Keyword>(@"..\..\..\TestFiles\csharp.csv");
+            var tokenizer = new Tokenizer<NovusKeywords>(@"..\..\..\TestFiles\csharp.csv");
 
-            List<int> ints = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+            var enumerator = new TokenEnumerator<NovusKeywords>(tokenizer.Tokenize(source), TokenType.BlockComment, TokenType.LineComment);
 
-            TokenEnumerator<Keyword> te = new TokenEnumerator<Keyword>(tokenizer.Tokenize(source), TokenType.BlockComment, TokenType.LineComment);
-
-            var parser = new Parser(te);
+            var parser = new Parser(enumerator);
 
             parser.OnDiagnostic += MsgHandler;
 
-            parser.TryParseFile(te, out var root);
+            parser.TryParseFile(enumerator, out var root);
 
             DumpParseTree(root);
 

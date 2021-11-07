@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sandbox
+namespace Steadsoft.Novus.Parser
 {
-    public enum Keyword
+    public enum NovusKeywords
     {
         IsNotKeyword = 0,
         Using,

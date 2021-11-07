@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sandbox
+namespace Steadsoft.Novus.Parser
 {
     public class TypeStatement : Statement
     {
@@ -15,12 +15,12 @@ namespace Sandbox
         /// These are blindly added during parsing and checked for
         /// consistency and applicability at a later step.
         /// </summary>
-        public List<Keyword> Options { get; private set; }
+        public List<NovusKeywords> Options { get; private set; }
         public TypeStatement(int Line, int Col, string Name) : base(Line, Col)
         {
             this.Name = Name;
             this.Body = Body;
-            this.Options = new List<Keyword>();
+            this.Options = new List<NovusKeywords>();
         }
         public void AddBody(BlockStatement Stmt)
         {
@@ -30,7 +30,7 @@ namespace Sandbox
             Body.Parent = this;
         }
 
-        public void AddOption(Keyword Option)
+        public void AddOption(NovusKeywords Option)
         {
             Options.Add(Option);
         }
@@ -44,7 +44,7 @@ namespace Sandbox
         {
             StringBuilder builder = new StringBuilder();
 
-            builder.AppendLine($"{Prepad(nesting)}Type: [{Name}] {String.Join<Keyword>(", ",Options.OrderBy(op => op.ToString()))}");
+            builder.AppendLine($"{Prepad(nesting)}Type: [{Name}] {String.Join<NovusKeywords>(", ",Options.OrderBy(op => op.ToString()))}");
 
             builder.Append(Body.Dump(nesting));
 

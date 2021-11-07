@@ -15,7 +15,7 @@ namespace Steadsoft.Novus.Scanner
             this.Skips = Skips;
         }
 
-        public void CheckExpectedToken(T Type)
+        public void CheckExpectedToken(T Type) 
         {
             var token = GetNextToken();
 
