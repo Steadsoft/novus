@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,28 +24,46 @@ namespace Steadsoft.Novus.Parser
         private TokenEnumerator<NovusKeywords> source;
         public event DiagnosticEventHandler OnDiagnostic;
 
-        public Parser(TokenEnumerator<NovusKeywords> Source)
+        private Parser(TokenEnumerator<NovusKeywords> Source)
         {
             source = Source;
         }
 
-        public Parser(string Input, bool IsPath)
+        public static Parser CreateParser(SourceText SourceText, string Input, TokenDefinition Definition, string Tokens)
         {
-            SourceFile input;
+            SourceFile sourceFile;
 
-            if (IsPath)
+            if (SourceText == SourceText.Pathname)
             {
-                input = SourceFile.CreateFromFile(Input);
+                sourceFile = SourceFile.CreateFromFile(Input);
             }
             else
             {
-                input = SourceFile.CreateFromString(Input);
+                sourceFile = SourceFile.CreateFromString(Input);
             }
 
-            var tokenizer = new Tokenizer<NovusKeywords>(@"..\..\..\TestFiles\csharp.csv");
-            source = new TokenEnumerator<NovusKeywords>(tokenizer.Tokenize(input), TokenType.BlockComment, TokenType.LineComment);
-
+            var tokenizer = new Tokenizer<NovusKeywords>(Tokens, Definition);
+            var source = new TokenEnumerator<NovusKeywords>(tokenizer.Tokenize(sourceFile), TokenType.BlockComment, TokenType.LineComment);
+            return new Parser(source);
         }
+
+        //public Parser(string Input, string Lexfile, bool IsPath)
+        //{
+        //    SourceFile input;
+
+        //    if (IsPath)
+        //    {
+        //        input = SourceFile.CreateFromFile(Input);
+        //    }
+        //    else
+        //    {
+        //        input = SourceFile.CreateFromString(Input);
+        //    }
+
+        //    var tokenizer = new Tokenizer<NovusKeywords>(Lexfile, TokenDefinition.Pathname);
+        //    source = new TokenEnumerator<NovusKeywords>(tokenizer.Tokenize(input), TokenType.BlockComment, TokenType.LineComment);
+
+        //}
 
         public bool TryParse(out BlockStatement Root)
         {

@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31808.319
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sandbox", "Sandbox\Sandbox.csproj", "{01CCF09A-BDA7-4A1F-A3ED-9D9C39FE1A1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sandbox", "Novus\Sandbox.csproj", "{01CCF09A-BDA7-4A1F-A3ED-9D9C39FE1A1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Steadsoft.Novus.Parser", "..\Steadsoft.Novus.Parser\Steadsoft.Novus.Parser.csproj", "{1ACBE51E-958B-492E-83AD-DF2FC7D1E37B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Steadsoft.Novus.Parser", "..\Steadsoft.Novus.Parser\Steadsoft.Novus.Parser.csproj", "{1ACBE51E-958B-492E-83AD-DF2FC7D1E37B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Steadsoft.Novus.Scanner", "..\Steadsoft.Novus.Scanner\Steadsoft.Novus.Scanner.csproj", "{39E0C2EC-1CE5-4D50-BA9A-D58DC257F011}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Steadsoft.Novus.Scanner", "..\Steadsoft.Novus.Scanner\Steadsoft.Novus.Scanner.csproj", "{39E0C2EC-1CE5-4D50-BA9A-D58DC257F011}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTesting", "UnitTesting\UnitTesting.csproj", "{582554C5-ADBD-4A41-AEF2-120E652BF1B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{39E0C2EC-1CE5-4D50-BA9A-D58DC257F011}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39E0C2EC-1CE5-4D50-BA9A-D58DC257F011}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39E0C2EC-1CE5-4D50-BA9A-D58DC257F011}.Release|Any CPU.Build.0 = Release|Any CPU
+		{582554C5-ADBD-4A41-AEF2-120E652BF1B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{582554C5-ADBD-4A41-AEF2-120E652BF1B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{582554C5-ADBD-4A41-AEF2-120E652BF1B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{582554C5-ADBD-4A41-AEF2-120E652BF1B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

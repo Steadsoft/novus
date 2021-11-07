@@ -25,6 +25,10 @@
         RBrack,
         LPar,
         RPar,
-        SemiColon
+        SemiColon,
+        Minus,
+        Plus,
+        Call,
+        GoesTo
     }
 }

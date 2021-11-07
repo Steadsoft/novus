@@ -1,23 +1,18 @@
-﻿using Steadsoft.Novus.Parser;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Steadsoft.Novus.Parser;
 using Steadsoft.Novus.Scanner;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 
-namespace Sandbox
+namespace UnitTesting
 {
-    // Just a sandbox for a lexer
-    internal partial class Program
+    [TestClass]
+    public class UnitTest1
     {
-        private static string parse_types_tests = @"..\..\..\TestFiles\parse_types_tests.nov";
-
-        static void Main(string[] args)
+        [TestMethod]
+        public void TestMethod1()
         {
             string TEXT =
                 @"
-                namespace a.x.rere
+                namespace A
                 {
                    namespace b
                    {
@@ -79,31 +74,27 @@ namespace Sandbox
                 }
                 ";
 
-            var parser = new Parser(TEXT, false);
-            //var parser = new Parser(parse_types_tests, true);
-
-            parser.OnDiagnostic += MsgHandler;
+            var parser = Parser.CreateParser(SourceText.Text, TEXT, TokenDefinition.Pathname, "novus.csv");
 
             parser.TryParse(out var root);
 
-            DumpParseTree(root);
+            Assert.IsTrue(root.Children.Count == 7);
 
-        }
+            Assert.IsTrue(root.Children[0] is NamespaceStatement);
+            Assert.IsTrue(((NamespaceStatement)(root.Children[0])).Block.Children.Count == 1);
 
-        private static void MsgHandler(object Sender, DiagnosticEventArgs Args)
-        {
-            Console.WriteLine(Args.Message);
-        }
+            Assert.IsTrue(root.Children[1] is NamespaceStatement);
+            Assert.IsTrue(((NamespaceStatement)(root.Children[1])).Block.Children.Count == 1);
 
-        private static void DumpParseTree(BlockStatement Root)
-        {
+            Assert.IsTrue(root.Children[2] is NamespaceStatement);
+            Assert.IsTrue(root.Children[3] is NamespaceStatement);
+            Assert.IsTrue(root.Children[4] is TypeStatement);
+            Assert.IsTrue(root.Children[5] is TypeStatement);
 
-            foreach (var stmt in Root.Children)
-            {
-                string text = stmt.Dump(0);
-                Console.Write(text);
-            }
+            Assert.IsTrue(root.Children[6] is TypeStatement);
+            Assert.IsTrue(((TypeStatement)(root.Children[6])).Body.Children.Count == 1);
+
+            ;
         }
     }
 }
-

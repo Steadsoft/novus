@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using static Steadsoft.Novus.Scanner.LexicalClass; 
@@ -25,65 +26,93 @@ namespace Steadsoft.Novus.Scanner
         /// Creates a new instance of a tokenizer and initialises its state machine
         /// from the CSV file that you supply.
         /// </summary>
-        /// <param name="CSV"></param>
+        /// <param name="TokenData"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public Tokenizer(string CSV)
+        public Tokenizer(string TokenData, TokenDefinition TokenSource)
         {
-            if (string.IsNullOrWhiteSpace(CSV)) throw new ArgumentNullException(nameof(CSV));
+            bool flag;
+
+            if (string.IsNullOrWhiteSpace(TokenData)) throw new ArgumentNullException(nameof(TokenData));
 
             table = new();
 
-            using (FileStream fs = File.OpenRead(CSV))
+            switch (TokenSource)
             {
-                bool flag;
-
-                using StreamReader sr = new(fs, Encoding.UTF8);
-                while (!sr.EndOfStream)
-                {
-                    var text = sr.ReadLine();
-
-                    if (text == null)
-                        break;
-
-                    if (String.IsNullOrWhiteSpace(text))
-                        continue;
-
-                    if (text.Contains("//"))
-                        continue;
-
-                    var parts = text.Split(',').Select(a => a.Trim()).ToArray();
-
-                    var curstate = (State)Enum.Parse(typeof(State), parts[0]);
-                    var step = (Step)Enum.Parse(typeof(Step), parts[2]);
-                    var newstate = (State)Enum.Parse(typeof(State), parts[3]);
-                    var token = (TokenType)Enum.Parse(typeof(TokenType), parts[4]);
-
-                    if (parts[1].StartsWith('\'') && parts[1].EndsWith('\''))
+                case TokenDefinition.Pathname:
                     {
-                        var len = parts[1].Length;
+                        using (FileStream fs = File.OpenRead(TokenData))
+                        {
+                            using (StreamReader sr = new(fs, Encoding.UTF8))
+                            {
+                                PopulateTable(sr);
+                            }
+                        }
+                        break;
+                    }
+                case TokenDefinition.Resource:
+                    {
+                        Assembly asm = Assembly.GetExecutingAssembly();
+                        Stream stream = asm.GetManifestResourceStream(TokenData);
+                        using (StreamReader sr = new StreamReader(stream))
+                        {
+                            PopulateTable(sr);
+                        }
+                        break;
+                    }
+            }
 
-                        parts[1] = parts[1].Substring(1).Substring(0, len - 2);
+        }
 
-                        flag = Char.TryParse(parts[1], out char code);
+        private void PopulateTable (StreamReader sr)
+        {
+            bool flag;
+
+            while (!sr.EndOfStream)
+            {
+                var text = sr.ReadLine();
+
+                if (text == null)
+                    break;
+
+                if (String.IsNullOrWhiteSpace(text))
+                    continue;
+
+                if (text.Contains("//"))
+                    continue;
+
+                var parts = text.Split(',').Select(a => a.Trim()).ToArray();
+
+                var curstate = (State)Enum.Parse(typeof(State), parts[0]);
+                var step = (Step)Enum.Parse(typeof(Step), parts[2]);
+                var newstate = (State)Enum.Parse(typeof(State), parts[3]);
+                var token = (TokenType)Enum.Parse(typeof(TokenType), parts[4]);
+
+                if (parts[1].StartsWith('\'') && parts[1].EndsWith('\''))
+                {
+                    var len = parts[1].Length;
+
+                    parts[1] = parts[1].Substring(1).Substring(0, len - 2);
+
+                    flag = Char.TryParse(parts[1], out char code);
+
+                    if (flag)
+                        table.Add(curstate, code, (step, newstate, token));
+                    else
+                    {
+                        parts[1] = Regex.Unescape(parts[1]);
+                        flag = Char.TryParse(parts[1], out code);
 
                         if (flag)
                             table.Add(curstate, code, (step, newstate, token));
-                        else
-                        {
-                            parts[1] = Regex.Unescape(parts[1]);
-                            flag = Char.TryParse(parts[1], out code);
-
-                            if (flag)
-                                table.Add(curstate, code, (step, newstate, token));
-                        }
-                    }
-                    else
-                    {
-                        var cls = (LexicalClass)Enum.Parse(typeof(LexicalClass), parts[1]);
-                        table.Add(curstate, cls, (step, newstate, token));
                     }
                 }
+                else
+                {
+                    var cls = (LexicalClass)Enum.Parse(typeof(LexicalClass), parts[1]);
+                    table.Add(curstate, cls, (step, newstate, token));
+                }
             }
+
         }
         public Tokenizer(SourceFile File)
         {
