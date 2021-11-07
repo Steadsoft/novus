@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Sandbox
@@ -11,37 +12,49 @@ namespace Sandbox
     {
         public List<Character> Chars { get; private set; }
         public int Lines { get; private set; }
-
-        public static SourceFile Create(string Path)
+        public static SourceFile CreateFromString(string Text)
         {
-            return new SourceFile(Path);
+            return new SourceFile(Text, false);
         }
-        private SourceFile(string Path)
+        public static SourceFile CreateFromFile(string Path)
+        {
+            return new SourceFile(Path, true);
+        }
+        private SourceFile(string Path, bool FromFile = true)
         {
             int line = 1;
             int col = 1;
 
             List<Character> source = new();
 
-            using (FileStream fs = File.OpenRead(Path))
+            if (FromFile)
             {
-                using StreamReader sr = new(fs, Encoding.UTF8);
-                while (!sr.EndOfStream)
+                using (FileStream fs = File.OpenRead(Path))
                 {
-                    var C = (char)(sr.Read());
-
-                    var ch = (new Character(C, line, col));
-
-                    source.Add(ch);
-
-                    col++;
-
-                    if (ch.Char == '\n')
+                    using StreamReader sr = new(fs, Encoding.UTF8);
+                    while (!sr.EndOfStream)
                     {
-                        line++;
-                        col = 1;
+                        var C = (char)(sr.Read());
+
+                        var ch = (new Character(C, line, col));
+
+                        source.Add(ch);
+
+                        col++;
+
+                        if (ch.Char == '\n')
+                        {
+                            line++;
+                            col = 1;
+                        }
                     }
                 }
+
+            }
+            else
+            {
+                var lines = Path.ToCharArray().Select(C => new Character(C, line, col));
+                source.AddRange(lines);
             }
 
             Lines = line;

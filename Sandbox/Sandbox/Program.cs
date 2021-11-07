@@ -11,8 +11,73 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
+            string TEXT =
+                @"
+namespace a.x.rere
+{
+   namespace b
+   {
+      namespace namespace
+      {
+         type Category class sealed sealed abstract static public private
+         {
+            type Window class public abstract sealed
+            {
 
-            var source = SourceFile.Create(@"..\..\..\TestFiles\parse_types_tests.nov");
+            }
+         }
+      }
+   } 
+}
+
+namespace d
+{
+   type Umbrealla class
+   {
+
+   }
+}
+
+namespace abc;
+
+// using Steadsoft.Novus.Support;
+
+namespace Steadsoft.Novus.Support
+{
+   namespace Steadsoft.Novus.Compiler
+   {
+
+   }
+}
+
+type Umbrealla class
+{
+
+}
+
+type Window class public abstract sealed
+{
+
+}
+
+type Category1 class sealed sealed abstract static
+{
+type Category2 class sealed sealed abstract static
+{
+type Category3 class sealed sealed abstract static
+{
+type Category4 class sealed sealed abstract static
+{
+
+}
+}
+}
+}
+                ";
+
+            var source = SourceFile.CreateFromString(TEXT);
+
+            //var source = SourceFile.CreateFromFile(@"..\..\..\TestFiles\parse_types_tests.nov");
 
             var tokenizer = new Tokenizer(@"..\..\..\TestFiles\csharp.csv");
 
