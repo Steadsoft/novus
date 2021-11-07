@@ -27,7 +27,26 @@ namespace Steadsoft.Novus.Parser
         {
             source = Source;
         }
-        public bool TryParseFile(TokenEnumerator<NovusKeywords> source, out BlockStatement Root)
+
+        public Parser(string Input, bool IsPath)
+        {
+            SourceFile input;
+
+            if (IsPath)
+            {
+                input = SourceFile.CreateFromFile(Input);
+            }
+            else
+            {
+                input = SourceFile.CreateFromString(Input);
+            }
+
+            var tokenizer = new Tokenizer<NovusKeywords>(@"..\..\..\TestFiles\csharp.csv");
+            source = new TokenEnumerator<NovusKeywords>(tokenizer.Tokenize(input), TokenType.BlockComment, TokenType.LineComment);
+
+        }
+
+        public bool TryParse(out BlockStatement Root)
         {
             int errors = 0;
 

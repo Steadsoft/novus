@@ -11,6 +11,8 @@ namespace Sandbox
     // Just a sandbox for a lexer
     internal partial class Program
     {
+        private static string parse_types_tests = @"..\..\..\TestFiles\parse_types_tests.nov";
+
         static void Main(string[] args)
         {
             string TEXT =
@@ -77,19 +79,12 @@ namespace Sandbox
                 }
                 ";
 
-            var source = SourceFile.CreateFromString(TEXT);
-
-            //var source = SourceFile.CreateFromFile(@"..\..\..\TestFiles\parse_types_tests.nov");
-
-            var tokenizer = new Tokenizer<NovusKeywords>(@"..\..\..\TestFiles\csharp.csv");
-
-            var enumerator = new TokenEnumerator<NovusKeywords>(tokenizer.Tokenize(source), TokenType.BlockComment, TokenType.LineComment);
-
-            var parser = new Parser(enumerator);
+            var parser = new Parser(TEXT, false);
+            //var parser = new Parser(parse_types_tests, true);
 
             parser.OnDiagnostic += MsgHandler;
 
-            parser.TryParseFile(enumerator, out var root);
+            parser.TryParse(out var root);
 
             DumpParseTree(root);
 
