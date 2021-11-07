@@ -44,7 +44,7 @@ namespace Sandbox
         {
             StringBuilder builder = new StringBuilder();
 
-            builder.AppendLine($"{Prepad(nesting)}Type: '{Name}' {String.Join<Keyword>(", ",Options.OrderBy(op => op.ToString()))}");
+            builder.AppendLine($"{Prepad(nesting)}Type: [{Name}] {String.Join<Keyword>(", ",Options.OrderBy(op => op.ToString()))}");
 
             builder.Append(Body.Dump(nesting));
 

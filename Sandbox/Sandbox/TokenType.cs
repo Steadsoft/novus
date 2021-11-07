@@ -24,6 +24,7 @@
         LBrack,
         RBrack,
         LPar,
-        RPar
+        RPar,
+        SemiColon
     }
 }

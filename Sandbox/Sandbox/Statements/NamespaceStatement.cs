@@ -33,9 +33,10 @@ namespace Sandbox
         {
             StringBuilder builder = new StringBuilder();
 
-            builder.AppendLine($"{Prepad(nesting)}Namespace: {Name}");
+            builder.AppendLine($"{Prepad(nesting)}Namespace: [{Name}]");
             
-            builder.Append(Block.Dump(nesting));
+            if (Block != null)
+               builder.Append(Block.Dump(nesting));
 
             return builder.ToString();
         }

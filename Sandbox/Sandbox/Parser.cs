@@ -138,7 +138,7 @@ namespace Sandbox
 
                 token = source.GetNextToken();
 
-                if (token.Lexeme == ";")
+                if (token.TokenCode == TokenType.SemiColon)
                 {
                     Stmt = new UsingStatement(Prior.LineNumber, Prior.ColNumber, builder.ToString());
                     return true;
@@ -160,12 +160,6 @@ namespace Sandbox
 
             StringBuilder builder = new StringBuilder();
 
-            // <ident>; or <ident>{
-            // <ident>.
-            // <ident>.<ident>; or <ident>.<ident>{
-            // <ident>.<ident>.
-            // <ident>.<ident>.<ident>; or <ident>.<ident>.<ident>{
-
             source.CheckExpectedToken(Keyword.Namespace);
 
             var token = source.GetNextToken();
@@ -183,7 +177,7 @@ namespace Sandbox
 
                 token = source.GetNextToken();
 
-                if (token.Lexeme == ";")
+                if (token.TokenCode == TokenType.SemiColon)
                 {
                     Stmt = new NamespaceStatement(Prior.LineNumber, Prior.ColNumber, builder.ToString());
                     return true;
@@ -198,7 +192,6 @@ namespace Sandbox
                         Stmt.AddBlock(block);
                     }
 
-                    //source.SkipToNext("}"); // very crude hack, just for now, to get progress through the file
                     return true;
                 }
 

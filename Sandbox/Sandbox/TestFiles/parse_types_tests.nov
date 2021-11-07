@@ -23,6 +23,7 @@ namespace d
    }
 }
 
+namespace abc;
 
 // using Steadsoft.Novus.Support;
 
@@ -44,7 +45,16 @@ type Window class public abstract sealed
 
 }
 
-type Category class sealed sealed abstract static
+type Category1 class sealed sealed abstract static
+{
+type Category2 class sealed sealed abstract static
+{
+type Category3 class sealed sealed abstract static
+{
+type Category4 class sealed sealed abstract static
 {
 
+}
+}
+}
 }
