@@ -29,11 +29,19 @@ namespace Steadsoft.Novus.Parser
             source = Source;
         }
 
-        public static Parser CreateParser(SourceText SourceText, string Input, TokenDefinition Definition, string Tokens)
+        /// <summary>
+        /// Creates a parser instance that includes a lexical analyzer instance.
+        /// </summary>
+        /// <param name="SourceText">Indicates whether the source to be parsed is in a file or passed as a string.</param>
+        /// <param name="Input">The pathname of a file or raw source code.</param>
+        /// <param name="Definition">Indicates whether the token defintion file is passed as plain text, a file path or is an embedded resource file.</param>
+        /// <param name="Tokens">The pathname of a token defintion file, tha plain text token definitions or the name of the embedded resource.</param>
+        /// <returns></returns>
+        public static Parser CreateParser(SourceOrigin SourceText, string Input, TokenDefinition Definition, string Tokens)
         {
             SourceFile sourceFile;
 
-            if (SourceText == SourceText.Pathname)
+            if (SourceText == SourceOrigin.Pathname)
             {
                 sourceFile = SourceFile.CreateFromFile(Input);
             }
@@ -42,7 +50,7 @@ namespace Steadsoft.Novus.Parser
                 sourceFile = SourceFile.CreateFromString(Input);
             }
 
-            var tokenizer = new Tokenizer<NovusKeywords>(Tokens, Definition);
+            var tokenizer = new Tokenizer<NovusKeywords>(Tokens, Definition, Assembly.GetExecutingAssembly());
             var source = new TokenEnumerator<NovusKeywords>(tokenizer.Tokenize(sourceFile), TokenType.BlockComment, TokenType.LineComment);
             return new Parser(source);
         }

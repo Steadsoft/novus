@@ -19,7 +19,7 @@ namespace Sandbox
             // or as a pathname to a source file. Likewise we can supply the token defintion CSV as either a pathname
             // to a file or the name of an embedded resource.
 
-            var parser = Parser.CreateParser(SourceText.Pathname, parse_types_tests, TokenDefinition.Pathname, "novus.csv");
+            var parser = Parser.CreateParser(SourceOrigin.Pathname, parse_types_tests, TokenDefinition.Resource, "novus.csv");
 
             parser.OnDiagnostic += MsgHandler;
 

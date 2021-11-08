@@ -28,7 +28,7 @@ namespace Steadsoft.Novus.Scanner
         /// </summary>
         /// <param name="TokenData"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public Tokenizer(string TokenData, TokenDefinition TokenSource)
+        public Tokenizer(string TokenData, TokenDefinition TokenSource, Assembly SourceAssembly = null)
         {
             bool flag;
 
@@ -51,8 +51,7 @@ namespace Steadsoft.Novus.Scanner
                     }
                 case TokenDefinition.Resource:
                     {
-                        Assembly asm = Assembly.GetExecutingAssembly();
-                        Stream stream = asm.GetManifestResourceStream(TokenData);
+                        Stream stream = SourceAssembly.GetManifestResourceStream($"Steadsoft.Novus.Parser.{TokenData}");
                         using (StreamReader sr = new StreamReader(stream))
                         {
                             PopulateTable(sr);

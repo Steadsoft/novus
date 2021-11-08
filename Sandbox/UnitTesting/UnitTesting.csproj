@@ -18,10 +18,4 @@
     <ProjectReference Include="..\..\Steadsoft.Novus.Parser\Steadsoft.Novus.Parser.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="novus.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>
