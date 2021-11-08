@@ -1,7 +1,7 @@
 # novus
 A new grammar for a new .Net language.
 
-Some years ago, in the early 1990s I took an opportunity to design and write an optimizing compiler for the PL/I language that could run on and generate code for, Windows NT. The compiler became a pretty solid implementation of the PL/I Subset G as found on DEC and Stratus minicomputers. To write the compiler I chose the C language (initially Borland C). The compiler was eventually able to produce NT compatible 32-bit COFF object modules that were linkable with the standard MS linker and a small boostrap/runtime written in assembler.
+Some years ago, in the early 1990s I took an opportunity to design and write an optimizing [compiler for the PL/I language](https://github.com/Steadsoft/PLI-2000) that could run on and generate code for, Windows NT. The compiler became a pretty solid implementation of the PL/I Subset G as found on DEC and Stratus minicomputers. To write the compiler I chose the C language (initially Borland C). The compiler was eventually able to produce NT compatible 32-bit COFF object modules that were linkable with the standard MS linker and a small boostrap/runtime written in assembler.
 
 PL/I was a language I'd used for many years and being familair with it was a help, but I also used the ANSI standard too (which I had to order by mail, a 1" thick printed book) and several other resources including a short but valuable paper by Robert Freiburghouse who was a member of the GE Multics team and responsible for developing that systems PL/I compiler.
 
