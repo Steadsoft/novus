@@ -79,7 +79,7 @@ namespace Steadsoft.Novus.Scanner
                 if (text.Contains("//"))
                     continue;
 
-                var parts = text.Split(',').Select(a => a.Trim()).ToArray();
+                var parts = text.Split(' ').Select(a => a.Trim()).Where(a => a.Length > 0).ToArray();
 
                 var curstate = (State)Enum.Parse(typeof(State), parts[0]);
                 var step = (Step)Enum.Parse(typeof(Step), parts[2]);

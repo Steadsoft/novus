@@ -389,7 +389,19 @@ namespace Steadsoft.Novus.Parser
                         }
                         token = source.GetNextToken();
                         continue;
-
+                    case NovusKeywords.Def:
+                        source.PushToken(token);
+                        if (TryParseDef(source, token, out var defStatement, out DiagMsg))
+                        {
+                            body.AddChild(defStatement);
+                        }
+                        else
+                        {
+                            OnDiagnostic(this, ParsedBad(defStatement, DiagMsg));
+                            token = source.SkipToNext("}");
+                        }
+                        token = source.GetNextToken();
+                        continue;
                     default:
                         OnDiagnostic(this, new DiagnosticEventArgs("Unexpected token {} found."));
                         break;
@@ -403,6 +415,118 @@ namespace Steadsoft.Novus.Parser
 
         }
 
+        public bool TryParseDef(TokenEnumerator<NovusKeywords> source, Token<NovusKeywords> Prior, out DefStatement Stmt, out string DiagMsg)
+        {
+            Stmt = null;
+            DiagMsg = string.Empty;
+
+            source.CheckExpectedToken(NovusKeywords.Def);
+
+            var token = source.GetNextToken();
+
+            if (token.TokenCode != TokenType.Identifier)
+            {
+                DiagMsg = $"Unexpected token {token.Lexeme}";
+                return false;
+            }
+
+            var name = token.Lexeme;
+
+            Stmt = new DefStatement(Prior.LineNumber, Prior.ColNumber, name);
+
+            if (TryParseDefOptions(source, token, ref Stmt, out DiagMsg))
+                return TryParseDefBody(source, token, ref Stmt, out DiagMsg);
+
+            return false;
+
+        }
+        public bool TryParseDefOptions(TokenEnumerator<NovusKeywords> source, Token<NovusKeywords> Prior, ref DefStatement Stmt, out string DiagMsg)
+        {
+            DefMethodStatement methodDef = null; ;
+
+            DiagMsg = String.Empty;
+
+            var token = source.GetNextToken();
+
+            while (token.TokenCode != TokenType.LBrace)
+            {
+                if (token.TokenCode == TokenType.LPar)
+                {
+                    methodDef = new DefMethodStatement(Stmt); // OK we know that this is a specific kind of def statement now...
+
+                    token = source.GetNextToken();
+
+                    while (token.TokenCode != TokenType.RPar)
+                    {
+                        if (token.TokenCode != TokenType.Identifier)
+                        {
+                            DiagMsg = $"Unexpected token in parameter declaration '{token.Lexeme}'";
+                            continue;
+                        }
+
+                        var pname = token.Lexeme;
+
+                        token = source.GetNextToken();
+
+                        if (token.TokenCode != TokenType.Identifier)
+                        {
+                            DiagMsg = $"Unexpected token in parameter declaration '{token.Lexeme}'";
+                            continue;
+                        }
+
+                        var typename = token.Lexeme;
+
+                        var param = new Parameter(pname, typename);
+
+                        // Add the param to the def...
+
+                        methodDef.AddParameter(param);
+
+                        // if next token is a comma, go around again..
+
+                        token = source.GetNextToken();
+
+                        if (token.TokenCode != TokenType.RPar && token.TokenCode != TokenType.Comma)
+                        {
+                            DiagMsg = $"Unexpected token in parameter declaration '{token.Lexeme}'";
+                            continue;
+                        }
+
+                        if (token.TokenCode != TokenType.RPar)
+                            token = source.GetNextToken();
+                    }
+
+                    Stmt = methodDef;
+
+                    token = source.GetNextToken();
+
+                    while (token.Keyword != NovusKeywords.IsNotKeyword)
+                    {
+                        Stmt.AddOption(token.Keyword);
+                        token = source.GetNextToken();
+                    }
+                }
+            }
+
+            source.PushToken(token); // push the opening brace back
+
+            return true;
+        }
+
+        public bool TryParseDefBody(TokenEnumerator<NovusKeywords> source, Token<NovusKeywords> Prior, ref DefStatement Stmt, out string DiagMsg)
+        {
+            DiagMsg = String.Empty;
+            var token = source.GetNextToken();
+
+            if (token.TokenCode != TokenType.LBrace)
+                throw new InvalidOperationException("Expected token '{' has not been pushed.");
+
+            source.SkipToNext("}");
+
+            ((DefMethodStatement)(Stmt)).AddBody(new BlockStatement(Prior.LineNumber, Prior.ColNumber));
+
+            return true;
+        }
         private static DiagnosticEventArgs ParsedGood(Statement Stmt)
         {
             return new DiagnosticEventArgs($"Parsed a {Stmt.GetType().Name} on line {Stmt.Line} at column {Stmt.Col} : '{Stmt.ToString()}'");

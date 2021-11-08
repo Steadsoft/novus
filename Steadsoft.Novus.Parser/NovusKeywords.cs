@@ -11,6 +11,7 @@ namespace Steadsoft.Novus.Parser
         IsNotKeyword = 0,
         Using,
         Namespace,
+        Def,
         Type,
         Class,
         Struct,

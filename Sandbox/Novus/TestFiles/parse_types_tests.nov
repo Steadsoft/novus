@@ -8,7 +8,10 @@
          {
             type Window class public abstract sealed
             {
-
+               def ClearScreen (arg1 int, arg2 string, arg3 float) private
+               {
+               
+               }
             }
          }
       }
