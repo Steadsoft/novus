@@ -130,9 +130,39 @@ namespace Steadsoft.Novus.Parser
                                 AnalyzeType((TypeStatement)node);
                                 break;
                             }
+                        case DefStatement _:
+                            {
+                                AnalyzeDef((DefStatement)node);
+                                break;
+                            }
                     }
                 }
+        }
+        private void AnalyzeDef (DefStatement Stmt)
+        {
+            switch (Stmt)
+            {
+                case DefMethodStatement _:
+                    {
+                        Stmt = (DefMethodStatement)Stmt;
+                        var groups = Stmt.Options.GroupBy(a => a).Where(g => g.Count() > 1);
 
+                        if (groups.Any())
+                        {
+                            foreach (var group in groups)
+                            {
+                                OnDiagnostic(this, new DiagnosticEventArgs($"Line {Stmt.Line} duplicate options '{group.Key.ToString().ToLower()}' in method '{Stmt.Name}'."));
+                            }
+                        }
+
+                        AnalyzeParameterList(((DefMethodStatement)Stmt).Parameters);
+                        break;
+                    }
+            }
+        }
+        private void AnalyzeParameterList(List<Parameter> Params)
+        {
+            ;
         }
         public bool TrySyntaxPhase(out BlockStatement Tree)
         {
