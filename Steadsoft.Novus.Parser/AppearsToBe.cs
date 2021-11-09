@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Steadsoft.Novus.Parser
 {
+    /// <summary>
+    /// Set of functions that try to determine if the next few tokens are compatible with some grammatical non-terminal.
+    /// </summary>
     public static class AppearsToBeA
     {
         public static bool MethodDeclaration(TokenEnumerator<NovusKeywords> TokenSource)
