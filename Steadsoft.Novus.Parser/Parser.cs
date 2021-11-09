@@ -399,6 +399,7 @@ namespace Steadsoft.Novus.Parser
         public bool TryParseDef(Token<NovusKeywords> Prior, out DefStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
+            DiagMsg = String.Empty;
 
             TokenSource.CheckExpectedToken(NovusKeywords.Def);
 
@@ -414,8 +415,11 @@ namespace Steadsoft.Novus.Parser
 
             Stmt = new DefStatement(Prior.LineNumber, Prior.ColNumber, name);
 
-            if (TryParseDefOptions(token, ref Stmt, out DiagMsg))
-                return TryParseDefBody(token, ref Stmt, out DiagMsg);
+            if (AppearsToBeA.MethodDeclaration(TokenSource))
+            {
+                if (TryParseMethodDeclaration(token, ref Stmt, out DiagMsg))
+                    return TryParseMethodBody(token, ref Stmt, out DiagMsg);
+            }
 
             return false;
 
@@ -493,7 +497,7 @@ namespace Steadsoft.Novus.Parser
             return true;
 
         }
-        public bool TryParseDefOptions(Token<NovusKeywords> Prior, ref DefStatement Stmt, out string DiagMsg)
+        public bool TryParseMethodDeclaration(Token<NovusKeywords> Prior, ref DefStatement Stmt, out string DiagMsg)
         {
             Token<NovusKeywords> token;
 
@@ -501,27 +505,28 @@ namespace Steadsoft.Novus.Parser
 
             DiagMsg = String.Empty;
 
-            // Is the next sequence a parameter list?
-
-            if (TokenSource.NextTokensAre(TokenType.LPar, TokenType.Identifier, TokenType.Identifier))
+            if (!AppearsToBeA.MethodDeclaration(TokenSource))
             {
-                methodDef = new DefMethodStatement(Stmt);
+                DiagMsg = "Invalid parser method called.";
+                return false;
+            }
 
-                TryParseParameterList(Prior, ref methodDef, out DiagMsg);
+            methodDef = new DefMethodStatement(Stmt);
 
-                Stmt = methodDef;
+            TryParseParameterList(Prior, ref methodDef, out DiagMsg);
 
-                var tokens = TokenSource.PeekNextTokens(3);
+            Stmt = methodDef;
 
-                // Is the next sequence a method return type?
+            var tokens = TokenSource.PeekNextTokens(3);
 
-                if (TokenSource.NextTokensAre(TokenType.LPar, TokenType.Identifier, TokenType.RPar))
-                {
-                    TokenSource.GetNextToken();
-                    TokenSource.GetNextToken();
-                    methodDef.Returns = tokens[1].Lexeme;
-                    TokenSource.GetNextToken(); // Consume the closing rpar
-                }
+            // Is the next sequence a method return type?
+
+            if (AppearsToBeA.FunctionReturnType(TokenSource))
+            {
+                TokenSource.GetNextToken();
+                TokenSource.GetNextToken();
+                methodDef.Returns = tokens[1].Lexeme;
+                TokenSource.GetNextToken(); // Consume the closing rpar
             }
 
             // OK now look for any additional keywords (options like public, abstract etc)
@@ -545,7 +550,7 @@ namespace Steadsoft.Novus.Parser
             return true;
         }
 
-        public bool TryParseDefBody(Token<NovusKeywords> Prior, ref DefStatement Stmt, out string DiagMsg)
+        public bool TryParseMethodBody(Token<NovusKeywords> Prior, ref DefStatement Stmt, out string DiagMsg)
         {
             DiagMsg = String.Empty;
             var token = TokenSource.GetNextToken();
