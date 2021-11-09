@@ -23,12 +23,10 @@ namespace Steadsoft.Novus.Parser
         public delegate void DiagnosticEventHandler(object Sender, DiagnosticEventArgs Args);
         public TokenEnumerator<NovusKeywords> TokenSource { get; private set; }
         public event DiagnosticEventHandler OnDiagnostic;
-
         private Parser(TokenEnumerator<NovusKeywords> Source)
         {
             TokenSource = Source;
         }
-
         /// <summary>
         /// Creates a parser instance that includes a lexical analyzer instance.
         /// </summary>
@@ -54,7 +52,6 @@ namespace Steadsoft.Novus.Parser
             var source = new TokenEnumerator<NovusKeywords>(tokenizer.Tokenize(sourceFile), TokenType.BlockComment, TokenType.LineComment);
             return new Parser(source);
         }
-
         public bool TryParse(out BlockStatement Root)
         {
             int errors = 0;
@@ -137,7 +134,7 @@ namespace Steadsoft.Novus.Parser
             return errors == 0;
 
         }
-        public bool TryParseUsing(Token<NovusKeywords> Prior, out UsingStatement Stmt, out string DiagMsg)
+        private bool TryParseUsing(Token<NovusKeywords> Prior, out UsingStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
             DiagMsg = null;
@@ -182,7 +179,7 @@ namespace Steadsoft.Novus.Parser
 
             }
         }
-        public bool TryParseNamespace(Token<NovusKeywords> Prior, out NamespaceStatement Stmt, out string DiagMsg)
+        private bool TryParseNamespace(Token<NovusKeywords> Prior, out NamespaceStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
             DiagMsg = String.Empty;
@@ -236,7 +233,7 @@ namespace Steadsoft.Novus.Parser
 
             return false;
         }
-        public bool TryParseNamespaceBody(out BlockStatement Block, out string DiagMsg)
+        private bool TryParseNamespaceBody(out BlockStatement Block, out string DiagMsg)
         {
             Block = null;
             DiagMsg = string.Empty;
@@ -291,7 +288,7 @@ namespace Steadsoft.Novus.Parser
             return true;
 
         }
-        public bool TryParseType(Token<NovusKeywords> Prior, out TypeStatement Stmt, out string DiagMsg)
+        private bool TryParseType(Token<NovusKeywords> Prior, out TypeStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
 
@@ -315,7 +312,7 @@ namespace Steadsoft.Novus.Parser
             return false;
 
         }
-        public bool TryParseTypeOptions(Token<NovusKeywords> Prior, ref TypeStatement Stmt, out string DiagMsg)
+        private bool TryParseTypeOptions(Token<NovusKeywords> Prior, ref TypeStatement Stmt, out string DiagMsg)
         {
             DiagMsg = String.Empty;
 
@@ -338,7 +335,7 @@ namespace Steadsoft.Novus.Parser
 
             return true;
         }
-        public bool TryParseTypeBody(Token<NovusKeywords> Prior, ref TypeStatement Stmt, out string DiagMsg)
+        private bool TryParseTypeBody(Token<NovusKeywords> Prior, ref TypeStatement Stmt, out string DiagMsg)
         {
             DiagMsg = string.Empty;
 
@@ -395,8 +392,7 @@ namespace Steadsoft.Novus.Parser
             return true;
 
         }
-
-        public bool TryParseDef(Token<NovusKeywords> Prior, out DefStatement Stmt, out string DiagMsg)
+        private bool TryParseDef(Token<NovusKeywords> Prior, out DefStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
             DiagMsg = String.Empty;
@@ -429,8 +425,7 @@ namespace Steadsoft.Novus.Parser
             return false;
 
         }
-
-        public bool TryParseFieldDeclaration(Token<NovusKeywords> Prior, ref DefStatement Stmt, out string DiagMsg)
+        private bool TryParseFieldDeclaration(Token<NovusKeywords> Prior, ref DefStatement Stmt, out string DiagMsg)
         {
             DiagMsg = String.Empty;
 
@@ -457,8 +452,7 @@ namespace Steadsoft.Novus.Parser
 
             return true;
         }
-
-        public bool TryParseParameterList(Token<NovusKeywords> Prior, ref DefMethodStatement Stmt, out string DiagMsg)
+        private bool TryParseParameterList(Token<NovusKeywords> Prior, ref DefMethodStatement Stmt, out string DiagMsg)
         {
             Parameter param;
 
@@ -533,7 +527,7 @@ namespace Steadsoft.Novus.Parser
             return true;
 
         }
-        public bool TryParseMethodDeclaration(Token<NovusKeywords> Prior, ref DefStatement Stmt, out string DiagMsg)
+        private bool TryParseMethodDeclaration(Token<NovusKeywords> Prior, ref DefStatement Stmt, out string DiagMsg)
         {
             Token<NovusKeywords> token;
 
@@ -585,8 +579,7 @@ namespace Steadsoft.Novus.Parser
 
             return true;
         }
-
-        public bool TryParseMethodBody(Token<NovusKeywords> Prior, ref DefStatement Stmt, out string DiagMsg)
+        private bool TryParseMethodBody(Token<NovusKeywords> Prior, ref DefStatement Stmt, out string DiagMsg)
         {
             DiagMsg = String.Empty;
             var token = TokenSource.GetNextToken();
@@ -605,5 +598,4 @@ namespace Steadsoft.Novus.Parser
             return new DiagnosticEventArgs($" Failed to parse a {Stmt.GetType().Name} on line {Stmt.Line} at column {Stmt.Col} ({Msg})");
         }
     }
-
 }
