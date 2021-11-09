@@ -5,7 +5,6 @@ namespace Steadsoft.Novus.Parser
     public class DefMethodStatement : DefStatement
     {
         public BlockStatement Body { get; private set; }
-
         public List<Parameter> Parameters { get; private set; }
         public string Returns { get; internal set; }
         public DefMethodStatement(DefStatement Stmt) : base(Stmt.Line, Stmt.Col, Stmt.Name)
@@ -27,7 +26,6 @@ namespace Steadsoft.Novus.Parser
             Body.Parent = this;
         }
 
-
         public override string Dump(int nesting)
         {
             StringBuilder builder = new StringBuilder();
@@ -42,7 +40,7 @@ namespace Steadsoft.Novus.Parser
         {
             get
             {
-                return $"({Returns})";
+                return Returns == null ? "" : $"({Returns})";
             }
         }
         private string ParametersText

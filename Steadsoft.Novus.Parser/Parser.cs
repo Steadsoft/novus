@@ -506,7 +506,7 @@ namespace Steadsoft.Novus.Parser
 
             // Is the next sequence a parameter list?
 
-            if (tokens[0].TokenCode == TokenType.LPar && tokens[1].TokenCode == TokenType.Identifier && tokens[2].TokenCode == TokenType.Identifier)
+            if (source.NextTokensAre(TokenType.LPar, TokenType.Identifier, TokenType.Identifier))
             {
                 methodDef = new DefMethodStatement(Stmt);
 
@@ -518,7 +518,7 @@ namespace Steadsoft.Novus.Parser
 
                 // Is the next sequence a method return type?
 
-                if (tokens[0].TokenCode == TokenType.LPar && tokens[1].TokenCode == TokenType.Identifier && tokens[2].TokenCode == TokenType.RPar)
+                if (source.NextTokensAre(TokenType.LPar, TokenType.Identifier, TokenType.RPar))
                 {
                     source.GetNextToken();
                     source.GetNextToken();

@@ -4,18 +4,23 @@
    {
       namespace namespace
       {
+         // The parser does not care about these words or dupes etc, that's handled by a second
+         // pass after the parse is done.
+
          type Category class sealed sealed abstract static public private
          {
             type Window class public abstract sealed
             {
                // This is a method defintion, it has no return type, so its not a 'function'
 
-               def ClearScreen (arg1 int, arg2 string, arg3 float) (string) private
+               def ClearScreen (arg1 int, arg2 string, arg3 float) private
                {
                   return;
                }
 
-               def GetScreenArea (arg1 float) public override
+               // This is a function delaration, returns a string
+
+               def GetScreenArea (arg1 float)  (string) public override
                {
                   return;
                }
@@ -57,14 +62,14 @@ type Window class public abstract sealed
 
 type Category1 class sealed sealed abstract static
 {
-type Category2 class sealed sealed abstract static
-{
-type Category3 class sealed sealed abstract static
-{
-type Category4 class sealed sealed abstract static
-{
+    type Category2 class sealed sealed abstract static
+    {
+        type Category3 class sealed sealed abstract static
+        {
+            type Category4 class sealed sealed abstract static
+            {
 
-}
-}
-}
+            }
+        }
+    }
 }

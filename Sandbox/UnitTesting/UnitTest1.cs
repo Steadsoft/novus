@@ -10,14 +10,23 @@ namespace UnitTesting
         [TestMethod]
         public void TestTokenizer_1()
         {
+            Token<NovusKeywords> token;
+
             var parser = Parser.CreateParser(SourceOrigin.Text, Source.ValidText_1, TokenDefinition.Resource, "novus.csv");
 
             var tokens = parser.TokenSource.PeekNextTokens(9);
 
-            parser.TokenSource.PushTokens(tokens);
-            parser.TokenSource.PeekNextTokens(9);
+            token = parser.TokenSource.GetNextToken();
+            token = parser.TokenSource.GetNextToken();
+            token = parser.TokenSource.GetNextToken();
+            token = parser.TokenSource.GetNextToken();
+            token = parser.TokenSource.GetNextToken();
+            token = parser.TokenSource.GetNextToken();
+            token = parser.TokenSource.GetNextToken();
+            token = parser.TokenSource.GetNextToken();
+            token = parser.TokenSource.GetNextToken();
 
-            var token = parser.TokenSource.GetNextToken();
+            token = parser.TokenSource.GetNextToken();
 
             Assert.IsTrue(token.Keyword == NovusKeywords.Type);
         }

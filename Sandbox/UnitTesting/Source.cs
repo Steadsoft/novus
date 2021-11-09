@@ -18,10 +18,10 @@ namespace UnitTesting
                     {
                         type Category class sealed sealed abstract static public private
                         {
-                        type Window class public abstract sealed
-                        {
+                            type Window class public abstract sealed
+                            {
 
-                        }
+                            }
                         }
                     }
                 } 

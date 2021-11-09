@@ -25,6 +25,24 @@ namespace Steadsoft.Novus.Scanner
             return;
         }
 
+        public bool NextTokensAre(params TokenType[] Tokens)
+        {
+            var list = PeekNextTokens(Tokens.Length).ToArray();
+
+            for (int I=0; I < Tokens.Length; I++)
+            {
+                if (Tokens[I] != list[I].TokenCode)
+                    return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Returns the next 'n' tokens in order, without consuming them from the input.
+        /// </summary>
+        /// <param name="N"></param>
+        /// <returns></returns>
         public List<Token<T>> PeekNextTokens(int N)
         {
             var list = new List<Token<T>>();
@@ -39,6 +57,10 @@ namespace Steadsoft.Novus.Scanner
             return list;
         }
 
+        /// <summary>
+        /// Consume and returns the next token.
+        /// </summary>
+        /// <returns></returns>
         public Token<T> GetNextToken()
         {
             // Once a token has been consumed it is in the past, can't be re-read.
@@ -60,6 +82,10 @@ namespace Steadsoft.Novus.Scanner
             return new Token<T>(TokenType.NoMoreTokens, "", 0, 0);
         }
 
+        /// <summary>
+        /// Returns the supplied token to the input, no check is made so be careful!
+        /// </summary>
+        /// <param name="Token"></param>
         public void PushToken(Token<T> Token)
         {
             pushed.Push(Token);
