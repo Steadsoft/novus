@@ -24,6 +24,8 @@
                {
                   return;
                }
+
+               def Name string public readonly;
             }
          }
       }

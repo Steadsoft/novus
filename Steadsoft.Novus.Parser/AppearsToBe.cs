@@ -21,5 +21,27 @@ namespace Steadsoft.Novus.Parser
         {
             return TokenSource.NextTokensAre(TokenType.LPar, TokenType.Identifier, TokenType.RPar);
         }
+
+        public static bool FieldDeclaration(TokenEnumerator<NovusKeywords> TokenSource)
+        {
+            var tokens = new List<Token<NovusKeywords>>();
+
+            var token = TokenSource.GetNextToken();
+
+            while (token.TokenCode != TokenType.LBrace && token.TokenCode != TokenType.SemiColon)
+            {
+                tokens.Add(token);
+                token = TokenSource.GetNextToken();
+            }
+
+            if (token.TokenCode == TokenType.SemiColon)
+            {
+                TokenSource.PushToken(token);
+                TokenSource.PushTokens(tokens);
+                return true;
+            }
+
+            return false;
+        }
     }
 }

@@ -420,9 +420,42 @@ namespace Steadsoft.Novus.Parser
                 if (TryParseMethodDeclaration(token, ref Stmt, out DiagMsg))
                     return TryParseMethodBody(token, ref Stmt, out DiagMsg);
             }
+            else
+            {
+                if (AppearsToBeA.FieldDeclaration(TokenSource))
+                    return TryParseFieldDeclaration(token, ref Stmt, out DiagMsg);
+            }
 
             return false;
 
+        }
+
+        public bool TryParseFieldDeclaration(Token<NovusKeywords> Prior, ref DefStatement Stmt, out string DiagMsg)
+        {
+            DiagMsg = String.Empty;
+
+            var token = TokenSource.GetNextToken();
+
+            DefFieldStatement field = new DefFieldStatement(Stmt.Line, Stmt.Col, Stmt.Name, token.Lexeme);
+
+            token = TokenSource.GetNextToken();
+
+            while (token.TokenCode != TokenType.SemiColon)
+            {
+                if (token.Keyword != NovusKeywords.IsNotKeyword)
+                {
+                    field.AddOption(token.Keyword);
+                    token = TokenSource.GetNextToken();
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            Stmt = field;
+
+            return true;
         }
 
         public bool TryParseParameterList(Token<NovusKeywords> Prior, ref DefMethodStatement Stmt, out string DiagMsg)
