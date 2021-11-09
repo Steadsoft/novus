@@ -24,9 +24,7 @@ namespace Steadsoft.Novus.Parser
         }
         public void AddBody(BlockStatement Stmt)
         {
-            if (Stmt == null) throw new ArgumentNullException(nameof(Stmt));
-
-            Body = Stmt;
+            Body = Stmt ?? throw new ArgumentNullException(nameof(Stmt));
             Body.Parent = this;
         }
 
@@ -42,7 +40,7 @@ namespace Steadsoft.Novus.Parser
 
         public override string Dump(int nesting)
         {
-            StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new();
 
             builder.AppendLine($"{Prepad(nesting)}Type: [{Name}] {String.Join<NovusKeywords>(", ",Options.OrderBy(op => op.ToString()))}");
 

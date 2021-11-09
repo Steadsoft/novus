@@ -52,7 +52,7 @@ namespace Steadsoft.Novus.Scanner
                 case TokenDefinition.Resource:
                     {
                         Stream stream = SourceAssembly.GetManifestResourceStream($"Steadsoft.Novus.Parser.{TokenData}");
-                        using (StreamReader sr = new StreamReader(stream))
+                        using (StreamReader sr = new(stream))
                         {
                             PopulateTable(sr);
                         }

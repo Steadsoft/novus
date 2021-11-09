@@ -90,7 +90,7 @@ namespace Steadsoft.Novus.Parser
                         {
                             errors++;
                             OnDiagnostic(this, ParsedBad(usingStatement, message));
-                            token = TokenSource.SkipToNext(";");
+                            TokenSource.SkipToNext(";");
                         }
                         token = TokenSource.GetNextToken();
                         continue;
@@ -105,7 +105,7 @@ namespace Steadsoft.Novus.Parser
                         {
                             errors++;
                             OnDiagnostic(this, ParsedBad(namespaceStatement, message));
-                            token = TokenSource.SkipToNext(";");
+                            TokenSource.SkipToNext(";");
                         }
                         token = TokenSource.GetNextToken();
                         continue;
@@ -120,7 +120,7 @@ namespace Steadsoft.Novus.Parser
                         {
                             errors++;
                             OnDiagnostic(this, ParsedBad(typeStatement, message));
-                            token = TokenSource.SkipToNext("}");
+                            TokenSource.SkipToNext("}");
                         }
                         token = TokenSource.GetNextToken();
                         continue;
@@ -142,7 +142,7 @@ namespace Steadsoft.Novus.Parser
             Stmt = null;
             DiagMsg = null;
 
-            StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new();
 
             // <ident>;
             // <ident>.
@@ -175,7 +175,7 @@ namespace Steadsoft.Novus.Parser
 
                 if (token.Lexeme == ".")
                 {
-                    builder.Append(".");
+                    builder.Append('.');
                 }
 
                 token = source.GetNextToken();
@@ -187,7 +187,7 @@ namespace Steadsoft.Novus.Parser
             Stmt = null;
             DiagMsg = String.Empty;
 
-            StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new();
 
             source.CheckExpectedToken(NovusKeywords.Namespace);
 
@@ -227,7 +227,7 @@ namespace Steadsoft.Novus.Parser
 
                 if (token.Lexeme == ".")
                 {
-                    builder.Append(".");
+                    builder.Append('.');
                 }
 
                 token = source.GetNextToken();
@@ -263,7 +263,7 @@ namespace Steadsoft.Novus.Parser
                         else
                         {
                             OnDiagnostic(this, ParsedBad(namespaceStatement, DiagMsg));
-                            token = source.SkipToNext(";");
+                            source.SkipToNext(";");
                         }
                         token = source.GetNextToken();
                         continue;
@@ -277,7 +277,7 @@ namespace Steadsoft.Novus.Parser
                         else
                         {
                             OnDiagnostic(this, ParsedBad(typeStatement, DiagMsg));
-                            token = source.SkipToNext("}");
+                            source.SkipToNext("}");
                         }
                         token = source.GetNextToken();
                         continue;
@@ -294,7 +294,6 @@ namespace Steadsoft.Novus.Parser
         public bool TryParseType(TokenEnumerator<NovusKeywords> source, Token<NovusKeywords> Prior, out TypeStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
-            DiagMsg = string.Empty;
 
             source.CheckExpectedToken(NovusKeywords.Type);
 
@@ -348,7 +347,7 @@ namespace Steadsoft.Novus.Parser
             if (token.TokenCode != TokenType.LBrace)
                 throw new InvalidOperationException("Expected token '{' has not been pushed.");
 
-            BlockStatement body = new BlockStatement(token.LineNumber, token.ColNumber);
+            BlockStatement body = new(token.LineNumber, token.ColNumber);
 
             Stmt.AddBody(body);
 
@@ -367,7 +366,7 @@ namespace Steadsoft.Novus.Parser
                         else
                         {
                             OnDiagnostic(this, ParsedBad(typeStatement, DiagMsg));
-                            token = source.SkipToNext("}");
+                            source.SkipToNext("}");
                         }
                         token = source.GetNextToken();
                         continue;
@@ -380,7 +379,7 @@ namespace Steadsoft.Novus.Parser
                         else
                         {
                             OnDiagnostic(this, ParsedBad(defStatement, DiagMsg));
-                            token = source.SkipToNext("}");
+                            source.SkipToNext("}");
                         }
                         token = source.GetNextToken();
                         continue;
@@ -400,7 +399,6 @@ namespace Steadsoft.Novus.Parser
         public bool TryParseDef(TokenEnumerator<NovusKeywords> source, Token<NovusKeywords> Prior, out DefStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
-            DiagMsg = string.Empty;
 
             source.CheckExpectedToken(NovusKeywords.Def);
 
@@ -563,7 +561,7 @@ namespace Steadsoft.Novus.Parser
         }
         private static DiagnosticEventArgs ParsedGood(Statement Stmt)
         {
-            return new DiagnosticEventArgs($"Parsed a {Stmt.GetType().Name} on line {Stmt.Line} at column {Stmt.Col} : '{Stmt.ToString()}'");
+            return new DiagnosticEventArgs($"Parsed a {Stmt.GetType().Name} on line {Stmt.Line} at column {Stmt.Col} : '{Stmt}'");
         }
         private static DiagnosticEventArgs ParsedBad(Statement Stmt, string Msg)
         {

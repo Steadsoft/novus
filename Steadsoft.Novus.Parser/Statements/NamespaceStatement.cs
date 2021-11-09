@@ -31,7 +31,7 @@ namespace Steadsoft.Novus.Parser
 
         public override string Dump(int nesting)
         {
-            StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new();
 
             builder.AppendLine($"{Prepad(nesting)}Namespace: [{Name}]");
             

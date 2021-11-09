@@ -6,9 +6,9 @@ namespace Steadsoft.Novus.Scanner
 {
     public class TokenEnumerator<T> where T : struct, System.Enum
     {
-        private IEnumerator<Token<T>> enumerator;
-        private TokenType[] Skips;
-        private Stack<Token<T>> pushed = new Stack<Token<T>>();
+        private readonly IEnumerator<Token<T>> enumerator;
+        private readonly TokenType[] Skips;
+        private readonly Stack<Token<T>> pushed = new();
         public TokenEnumerator(IEnumerable<Token<T>> Source, params TokenType[] Skips)
         {
             enumerator = Source.GetEnumerator();
@@ -99,7 +99,7 @@ namespace Steadsoft.Novus.Scanner
             }
         }
 
-        public Token<T> SkipToNext(string Lexeme)
+        public void SkipToNext(string Lexeme)
         {
             var token = GetNextToken();
 
@@ -107,11 +107,6 @@ namespace Steadsoft.Novus.Scanner
             {
                 token = GetNextToken();
             }
-
-            return token;
         }
-
-
     }
 }
-
