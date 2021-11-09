@@ -449,63 +449,47 @@ namespace Steadsoft.Novus.Parser
 
             token = source.GetNextToken();
 
-            while (token.TokenCode != TokenType.LBrace)
+            if (token.TokenCode != TokenType.LPar)
             {
-                if (token.TokenCode == TokenType.LPar)
-                {
-                    token = source.GetNextToken();
-
-                    while (token.TokenCode != TokenType.RPar)
-                    {
-                        if (token.TokenCode != TokenType.Identifier)
-                        {
-                            DiagMsg = $"Unexpected token in parameter declaration '{token.Lexeme}'";
-                            continue;
-                        }
-
-                        var pname = token.Lexeme;
-
-                        token = source.GetNextToken();
-
-                        if (token.TokenCode != TokenType.Identifier)
-                        {
-                            DiagMsg = $"Unexpected token in parameter declaration '{token.Lexeme}'";
-                            continue;
-                        }
-
-                        var typename = token.Lexeme;
-
-                        var param = new Parameter(pname, typename);
-
-                        // Add the param to the def...
-
-                        Stmt.AddParameter(param);
-
-                        // if next token is a comma, go around again..
-
-                        token = source.GetNextToken();
-
-                        if (token.TokenCode != TokenType.RPar && token.TokenCode != TokenType.Comma)
-                        {
-                            DiagMsg = $"Unexpected token in parameter declaration '{token.Lexeme}'";
-                            continue;
-                        }
-
-                        if (token.TokenCode != TokenType.RPar)
-                            token = source.GetNextToken();
-                    }
-
-                    token = source.GetNextToken();
-
-                    while (token.Keyword != NovusKeywords.IsNotKeyword)
-                    {
-                        Stmt.AddOption(token.Keyword);
-                        token = source.GetNextToken();
-                    }
-                }
+                DiagMsg = $"Unexpected token {token.Lexeme}";
+                return false;
             }
 
-            source.PushToken(token); // push the opening brace back
+            token = source.GetNextToken();
+
+            while (token.TokenCode != TokenType.RPar)
+            {
+                if (token.TokenCode != TokenType.Identifier)
+                {
+                    DiagMsg = $"Unexpected token in parameter declaration '{token.Lexeme}'";
+                    continue;
+                }
+
+                var pname = token.Lexeme;
+
+                token = source.GetNextToken();
+
+                if (token.TokenCode != TokenType.Identifier)
+                {
+                    DiagMsg = $"Unexpected token in parameter declaration '{token.Lexeme}'";
+                    continue;
+                }
+
+                var typename = token.Lexeme;
+
+                var param = new Parameter(pname, typename);
+
+                // Add the param to the def...
+
+                Stmt.AddParameter(param);
+
+                // if next token is a comma, go around again..
+
+                token = source.GetNextToken();
+
+                if (token.TokenCode == TokenType.Comma)
+                    token = source.GetNextToken();
+            }
 
             return true;
 
@@ -518,28 +502,48 @@ namespace Steadsoft.Novus.Parser
 
             DiagMsg = String.Empty;
 
-            var tokens = source.GetNextTokens(3);
-
-            // Is the next sequence a method return type?
-
-            if (tokens[0].TokenCode == TokenType.LPar && tokens[1].TokenCode == TokenType.Identifier && tokens[2].TokenCode == TokenType.RPar)
-            {
-
-            }
+            var tokens = source.PeekNextTokens(3);
 
             // Is the next sequence a parameter list?
 
             if (tokens[0].TokenCode == TokenType.LPar && tokens[1].TokenCode == TokenType.Identifier && tokens[2].TokenCode == TokenType.Identifier)
             {
-                source.PushTokens(tokens);
+                methodDef = new DefMethodStatement(Stmt);
 
-                var method = new DefMethodStatement(Stmt);
+                TryParseParameterList(source, Prior, ref methodDef, out DiagMsg);
 
-                TryParseParameterList(source, Prior, ref method, out DiagMsg);
+                Stmt = methodDef;
 
-                Stmt = method;
+                tokens = source.PeekNextTokens(3);
 
+                // Is the next sequence a method return type?
+
+                if (tokens[0].TokenCode == TokenType.LPar && tokens[1].TokenCode == TokenType.Identifier && tokens[2].TokenCode == TokenType.RPar)
+                {
+                    source.GetNextToken();
+                    source.GetNextToken();
+                    methodDef.Returns = tokens[1].Lexeme;
+                    source.GetNextToken(); // Consume the closing rpar
+                }
             }
+
+            // OK now look for any additional keywords (options like public, abstract etc)
+
+            token = source.GetNextToken(); 
+
+            while (token.TokenCode != TokenType.LBrace)
+            {
+                if (token.Keyword == NovusKeywords.IsNotKeyword)
+                {
+                    ; // error
+                }
+
+                methodDef.AddOption(token.Keyword);
+
+                token = source.GetNextToken();
+            }
+
+            source.PushToken(token);
 
             return true;
         }

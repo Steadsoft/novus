@@ -25,7 +25,7 @@ namespace Steadsoft.Novus.Scanner
             return;
         }
 
-        public List<Token<T>> GetNextTokens(int N)
+        public List<Token<T>> PeekNextTokens(int N)
         {
             var list = new List<Token<T>>();
 
@@ -33,6 +33,8 @@ namespace Steadsoft.Novus.Scanner
             {
                 list.Add(GetNextToken());
             }
+
+            PushTokens(list);
 
             return list;
         }

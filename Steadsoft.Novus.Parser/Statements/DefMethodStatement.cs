@@ -7,9 +7,11 @@ namespace Steadsoft.Novus.Parser
         public BlockStatement Body { get; private set; }
 
         public List<Parameter> Parameters { get; private set; }
+        public string Returns { get; internal set; }
         public DefMethodStatement(DefStatement Stmt) : base(Stmt.Line, Stmt.Col, Stmt.Name)
         {
             this.Parameters = new List<Parameter>();
+            this.Returns = null;
         }
 
         public void AddParameter(Parameter Parameter)
@@ -30,13 +32,19 @@ namespace Steadsoft.Novus.Parser
         {
             StringBuilder builder = new StringBuilder();
 
-            builder.AppendLine($"{Prepad(nesting)}Method: [{Name}] {ParametersText} {String.Join<NovusKeywords>(", ", Options.OrderBy(op => op.ToString()))}");
+            builder.AppendLine($"{Prepad(nesting)}Method: [{Name}] {ParametersText} {ReturnsText} {String.Join<NovusKeywords>(", ", Options.OrderBy(op => op.ToString()))}");
 
             builder.Append(Body.Dump(nesting));
 
             return builder.ToString();
         }
-
+        private string ReturnsText
+        {
+            get
+            {
+                return $"({Returns})";
+            }
+        }
         private string ParametersText
         {
             get

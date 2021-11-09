@@ -12,10 +12,10 @@ namespace UnitTesting
         {
             var parser = Parser.CreateParser(SourceOrigin.Text, Source.ValidText_1, TokenDefinition.Resource, "novus.csv");
 
-            var tokens = parser.TokenSource.GetNextTokens(9);
+            var tokens = parser.TokenSource.PeekNextTokens(9);
 
             parser.TokenSource.PushTokens(tokens);
-            parser.TokenSource.GetNextTokens(9);
+            parser.TokenSource.PeekNextTokens(9);
 
             var token = parser.TokenSource.GetNextToken();
 
