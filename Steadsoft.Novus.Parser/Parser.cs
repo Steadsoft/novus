@@ -52,11 +52,93 @@ namespace Steadsoft.Novus.Parser
             var source = new TokenEnumerator<NovusKeywords>(tokenizer.Tokenize(sourceFile), TokenType.BlockComment, TokenType.LineComment);
             return new Parser(source);
         }
-        public bool TryParse(out BlockStatement Root)
+        public bool TrySemanticPhase(ref BlockStatement Tree)
+        {
+            if (Tree == null) throw new ArgumentNullException(nameof(Tree));
+
+            foreach (var node in Tree.Children)
+            {
+                switch (node)
+                {
+                    case BlockStatement:
+                        {
+                            break;
+                        }
+                    case NamespaceStatement:
+                        {
+                            AnalyzeNamespace((NamespaceStatement)node);
+                            break;
+                        }
+                }
+            }
+
+            return true;
+        }
+
+        private void AnalyzeNamespace (NamespaceStatement Stmt)
+        {
+            if (Stmt.Block != null)
+                foreach (var node in Stmt.Block.Children)
+                {
+                    switch (node)
+                    {
+                        case NamespaceStatement _:
+                            {
+                                AnalyzeNamespace((NamespaceStatement)node);
+                                break;
+                            }
+                        case TypeStatement _:
+                            {
+                                AnalyzeType((TypeStatement)node);
+                                break;
+                            }
+                    }
+                }
+        }
+
+        private void AnalyzeType (TypeStatement Stmt)
+        {
+            if (Stmt.Options.ContainsMoreThanOneOf(NovusKeywords.Class, NovusKeywords.Struct, NovusKeywords.Singlet))
+            {
+                OnDiagnostic(this, new DiagnosticEventArgs($"Line {Stmt.Line} a type must have only one of the keywords 'class', 'struct' or 'singlet'."));
+            }
+            else
+            {
+                if (Stmt.Options.TryGetUnique(out var Item, NovusKeywords.Class, NovusKeywords.Struct, NovusKeywords.Singlet))
+                {
+                    Stmt.DeclaredKind = Item;
+                }
+            }
+
+            var groups = Stmt.Options.GroupBy(a => a).Where(g => g.Count() > 1);
+
+            if (groups.Any())
+            {
+                foreach (var group in groups)
+                {
+                    OnDiagnostic(this, new DiagnosticEventArgs($"Line {Stmt.Line} duplicate options '{group.Key.ToString().ToLower()}' in {Stmt.DeclaredKind.ToString().ToLower()} '{Stmt.Name}'."));
+                }
+            }
+
+            if (Stmt.Body != null)
+                foreach (var node in Stmt.Body.Children)
+                {
+                    switch (node)
+                    {
+                        case TypeStatement _:
+                            {
+                                AnalyzeType((TypeStatement)node);
+                                break;
+                            }
+                    }
+                }
+
+        }
+        public bool TrySyntaxPhase(out BlockStatement Tree)
         {
             int errors = 0;
 
-            Root = null;
+            Tree = null;
 
             string message;
 
@@ -70,9 +152,9 @@ namespace Steadsoft.Novus.Parser
 
             while (token.TokenCode != TokenType.NoMoreTokens)
             {
-                if (Root == null)
+                if (Tree == null)
                 {
-                    Root = new BlockStatement(token.LineNumber, token.ColNumber);
+                    Tree = new BlockStatement(token.LineNumber, token.ColNumber);
                 }
 
                 switch (token.Keyword)
@@ -81,7 +163,7 @@ namespace Steadsoft.Novus.Parser
                         TokenSource.PushToken(token);
                         if (TryParseUsing(token, out var usingStatement, out message))
                         {
-                            Root.AddChild(usingStatement);
+                            Tree.AddChild(usingStatement);
                         }
                         else
                         {
@@ -96,7 +178,7 @@ namespace Steadsoft.Novus.Parser
                         TokenSource.PushToken(token);
                         if (TryParseNamespace(token, out var namespaceStatement, out message))
                         {
-                            Root.AddChild(namespaceStatement);
+                            Tree.AddChild(namespaceStatement);
                         }
                         else
                         {
@@ -111,7 +193,7 @@ namespace Steadsoft.Novus.Parser
                         TokenSource.PushToken(token);
                         if (TryParseType(token, out var typeStatement, out message))
                         {
-                            Root.AddChild(typeStatement);
+                            Tree.AddChild(typeStatement);
                         }
                         else
                         {

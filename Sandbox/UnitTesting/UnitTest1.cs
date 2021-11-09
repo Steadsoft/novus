@@ -35,7 +35,7 @@ namespace UnitTesting
         {
             var parser = Parser.CreateParser(SourceOrigin.Text, Source.ValidText_1, TokenDefinition.Resource, "novus.csv");
 
-            parser.TryParse(out var root);
+            parser.TrySyntaxPhase(out var root);
 
             Assert.IsTrue(root.Children.Count == 7);
 

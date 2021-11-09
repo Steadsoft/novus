@@ -20,6 +20,7 @@ namespace Steadsoft.Novus.Parser
         Readonly,
         Public,
         Internal,
+        Protected,
         Private,
         Abstract,
         Static,

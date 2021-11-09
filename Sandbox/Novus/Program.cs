@@ -23,7 +23,11 @@ namespace Sandbox
 
             parser.OnDiagnostic += MsgHandler;
 
-            parser.TryParse(out var root);
+            parser.TrySyntaxPhase(out var root);
+
+            parser.TrySemanticPhase(ref root);
+
+            Console.WriteLine();
 
             DumpParseTree(root);
         }

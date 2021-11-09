@@ -8,6 +8,7 @@ namespace Steadsoft.Novus.Parser
 {
     public class TypeStatement : Statement
     {
+        public NovusKeywords DeclaredKind { get; internal set; }
         public string Name { get; private set; }
         public BlockStatement Body { get; private set; }
         /// <summary>
