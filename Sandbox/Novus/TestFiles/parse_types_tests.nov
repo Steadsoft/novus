@@ -20,7 +20,7 @@
 
                // This is a function delaration, returns a string
 
-               def GetScreenArea (arg1 float)  (string) public override
+               def GetScreenArea (arg1 float ref, arg2 int out)  (string) public override
                {
                   return;
                }

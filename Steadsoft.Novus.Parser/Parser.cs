@@ -477,18 +477,37 @@ namespace Steadsoft.Novus.Parser
 
                 var typename = token.Lexeme;
 
-                var param = new Parameter(pname, typename);
+                token = source.GetNextToken();
 
-                // Add the param to the def...
+                switch (token.Keyword)
+                {
+                    case NovusKeywords.Ref:
+                        {
+                            var param = new Parameter(pname, typename, PassBy.Ref);
+                            Stmt.AddParameter(param);
+                            break;
+                        }
+                    case NovusKeywords.Out:
+                        {
+                            var param = new Parameter(pname, typename, PassBy.Out);
+                            Stmt.AddParameter(param);
+                            break;
+                        }
 
-                Stmt.AddParameter(param);
+                    default:
+                        source.PushToken(token);
+                        break;
+                }
 
                 // if next token is a comma, go around again..
 
                 token = source.GetNextToken();
 
                 if (token.TokenCode == TokenType.Comma)
+                {
                     token = source.GetNextToken();
+                    continue;
+                }
             }
 
             return true;
@@ -502,8 +521,6 @@ namespace Steadsoft.Novus.Parser
 
             DiagMsg = String.Empty;
 
-            var tokens = source.PeekNextTokens(3);
-
             // Is the next sequence a parameter list?
 
             if (source.NextTokensAre(TokenType.LPar, TokenType.Identifier, TokenType.Identifier))
@@ -514,7 +531,7 @@ namespace Steadsoft.Novus.Parser
 
                 Stmt = methodDef;
 
-                tokens = source.PeekNextTokens(3);
+                var tokens = source.PeekNextTokens(3);
 
                 // Is the next sequence a method return type?
 

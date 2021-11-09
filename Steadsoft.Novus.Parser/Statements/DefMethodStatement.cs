@@ -53,7 +53,10 @@ namespace Steadsoft.Novus.Parser
 
                 foreach (var p in Parameters)
                 {
-                    builder.Append($"{p.Name} {p.TypeName}, ");
+                    if (p.PassBy == PassBy.Value)
+                        builder.Append($"{p.Name} {p.TypeName}, ");
+                    else
+                        builder.Append($"{p.Name} {p.TypeName} {p.PassBy}, ");
                 }
 
                 return builder.ToString().Trim(' ').Trim(',') + ")";
