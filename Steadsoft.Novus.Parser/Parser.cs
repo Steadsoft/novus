@@ -427,6 +427,8 @@ namespace Steadsoft.Novus.Parser
 
         public bool TryParseParameterList(Token<NovusKeywords> Prior, ref DefMethodStatement Stmt, out string DiagMsg)
         {
+            Parameter param;
+
             DiagMsg = String.Empty;
 
             Token<NovusKeywords> token;
@@ -467,20 +469,21 @@ namespace Steadsoft.Novus.Parser
                 {
                     case NovusKeywords.Ref:
                         {
-                            var param = new Parameter(pname, typename, PassBy.Ref);
-                            Stmt.AddParameter(param);
+                            Stmt.AddParameter(new Parameter(pname, typename, PassBy.Ref));
                             break;
                         }
                     case NovusKeywords.Out:
                         {
-                            var param = new Parameter(pname, typename, PassBy.Out);
-                            Stmt.AddParameter(param);
+                            Stmt.AddParameter(new Parameter(pname, typename, PassBy.Out));
                             break;
                         }
 
                     default:
-                        TokenSource.PushToken(token);
-                        break;
+                        {
+                            TokenSource.PushToken(token);
+                            Stmt.AddParameter(new Parameter(pname, typename, PassBy.Value));
+                            break;
+                        }
                 }
 
                 // if next token is a comma, go around again..
