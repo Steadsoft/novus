@@ -440,20 +440,19 @@ namespace Steadsoft.Novus.Parser
             return false;
 
         }
-        public bool TryParseDefOptions(TokenEnumerator<NovusKeywords> source, Token<NovusKeywords> Prior, ref DefStatement Stmt, out string DiagMsg)
-        {
-            DefMethodStatement methodDef = null; ;
 
+        public bool TryParseParameterList(TokenEnumerator<NovusKeywords> source, Token<NovusKeywords> Prior, ref DefMethodStatement Stmt, out string DiagMsg)
+        {
             DiagMsg = String.Empty;
 
-            var token = source.GetNextToken();
+            Token<NovusKeywords> token;
+
+            token = source.GetNextToken();
 
             while (token.TokenCode != TokenType.LBrace)
             {
                 if (token.TokenCode == TokenType.LPar)
                 {
-                    methodDef = new DefMethodStatement(Stmt); // OK we know that this is a specific kind of def statement now...
-
                     token = source.GetNextToken();
 
                     while (token.TokenCode != TokenType.RPar)
@@ -480,7 +479,7 @@ namespace Steadsoft.Novus.Parser
 
                         // Add the param to the def...
 
-                        methodDef.AddParameter(param);
+                        Stmt.AddParameter(param);
 
                         // if next token is a comma, go around again..
 
@@ -496,8 +495,6 @@ namespace Steadsoft.Novus.Parser
                             token = source.GetNextToken();
                     }
 
-                    Stmt = methodDef;
-
                     token = source.GetNextToken();
 
                     while (token.Keyword != NovusKeywords.IsNotKeyword)
@@ -509,6 +506,40 @@ namespace Steadsoft.Novus.Parser
             }
 
             source.PushToken(token); // push the opening brace back
+
+            return true;
+
+        }
+        public bool TryParseDefOptions(TokenEnumerator<NovusKeywords> source, Token<NovusKeywords> Prior, ref DefStatement Stmt, out string DiagMsg)
+        {
+            Token<NovusKeywords> token;
+
+            DefMethodStatement methodDef = null; ;
+
+            DiagMsg = String.Empty;
+
+            var tokens = source.GetNextTokens(3);
+
+            // Is the next sequence a method return type?
+
+            if (tokens[0].TokenCode == TokenType.LPar && tokens[1].TokenCode == TokenType.Identifier && tokens[2].TokenCode == TokenType.RPar)
+            {
+
+            }
+
+            // Is the next sequence a parameter list?
+
+            if (tokens[0].TokenCode == TokenType.LPar && tokens[1].TokenCode == TokenType.Identifier && tokens[2].TokenCode == TokenType.Identifier)
+            {
+                source.PushTokens(tokens);
+
+                var method = new DefMethodStatement(Stmt);
+
+                TryParseParameterList(source, Prior, ref method, out DiagMsg);
+
+                Stmt = method;
+
+            }
 
             return true;
         }
