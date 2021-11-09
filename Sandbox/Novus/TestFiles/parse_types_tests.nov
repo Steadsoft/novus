@@ -32,6 +32,26 @@
    } 
 }
 
+/*
+
+Consider a syntax like this:
+
+type Data struct
+{
+   public 
+   {
+   
+   }
+
+   internal
+   {
+   
+   }
+}
+
+*/
+
+
 namespace d
 {
    type Umbrealla class
