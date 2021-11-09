@@ -8,73 +8,23 @@ namespace UnitTesting
     public class UnitTest1
     {
         [TestMethod]
-        public void TestMethod1()
+        public void TestTokenizer_1()
         {
-            string TEXT =
-                @"
-                namespace A
-                {
-                   namespace b
-                   {
-                      namespace namespace
-                      {
-                         type Category class sealed sealed abstract static public private
-                         {
-                            type Window class public abstract sealed
-                            {
+            var parser = Parser.CreateParser(SourceOrigin.Text, Source.ValidText_1, TokenDefinition.Resource, "novus.csv");
 
-                            }
-                         }
-                      }
-                   } 
-                }
+            var tokens = parser.TokenSource.GetNextTokens(9);
 
-                namespace d
-                {
-                   type Umbrealla class
-                   {
+            parser.TokenSource.PushTokens(tokens);
+            parser.TokenSource.GetNextTokens(9);
 
-                   }
-                }
+            var token = parser.TokenSource.GetNextToken();
 
-                namespace abc;
-
-                // using Steadsoft.Novus.Support;
-
-                namespace Steadsoft.Novus.Support
-                {
-                   namespace Steadsoft.Novus.Compiler
-                   {
-
-                   }
-                }
-
-                type Umbrealla class
-                {
-
-                }
-
-                type Window class public abstract sealed
-                {
-
-                }
-
-                type Category1 class sealed sealed abstract static
-                {
-                    type Category2 class sealed sealed abstract static
-                    {
-                        type Category3 class sealed sealed abstract static
-                        {
-                            type Category4 class sealed sealed abstract static
-                            {
-
-                            }
-                        }
-                    }
-                }
-                ";
-
-            var parser = Parser.CreateParser(SourceOrigin.Text, TEXT, TokenDefinition.Resource, "novus.csv");
+            Assert.IsTrue(token.Keyword == NovusKeywords.Type);
+        }
+        [TestMethod]
+        public void TestParser_1()
+        {
+            var parser = Parser.CreateParser(SourceOrigin.Text, Source.ValidText_1, TokenDefinition.Resource, "novus.csv");
 
             parser.TryParse(out var root);
 

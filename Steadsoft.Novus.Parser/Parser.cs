@@ -21,12 +21,12 @@ namespace Steadsoft.Novus.Parser
     public class Parser
     {
         public delegate void DiagnosticEventHandler(object Sender, DiagnosticEventArgs Args);
-        private TokenEnumerator<NovusKeywords> source;
+        public TokenEnumerator<NovusKeywords> TokenSource { get; private set; }
         public event DiagnosticEventHandler OnDiagnostic;
 
         private Parser(TokenEnumerator<NovusKeywords> Source)
         {
-            source = Source;
+            TokenSource = Source;
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Steadsoft.Novus.Parser
 
             string message;
 
-            var token = source.GetNextToken();
+            var token = TokenSource.GetNextToken();
 
             // We expect any of the following
 
@@ -99,8 +99,8 @@ namespace Steadsoft.Novus.Parser
                 switch (token.Keyword)
                 {
                     case NovusKeywords.Using:
-                        source.PushToken(token);
-                        if (TryParseUsing(source, token, out var usingStatement, out message))
+                        TokenSource.PushToken(token);
+                        if (TryParseUsing(TokenSource, token, out var usingStatement, out message))
                         {
                             Root.AddChild(usingStatement);
                         }
@@ -108,14 +108,14 @@ namespace Steadsoft.Novus.Parser
                         {
                             errors++;
                             OnDiagnostic(this, ParsedBad(usingStatement, message));
-                            token = source.SkipToNext(";");
+                            token = TokenSource.SkipToNext(";");
                         }
-                        token = source.GetNextToken();
+                        token = TokenSource.GetNextToken();
                         continue;
 
                     case NovusKeywords.Namespace:
-                        source.PushToken(token);
-                        if (TryParseNamespace(source, token, out var namespaceStatement, out message))
+                        TokenSource.PushToken(token);
+                        if (TryParseNamespace(TokenSource, token, out var namespaceStatement, out message))
                         {
                             Root.AddChild(namespaceStatement);
                         }
@@ -123,14 +123,14 @@ namespace Steadsoft.Novus.Parser
                         {
                             errors++;
                             OnDiagnostic(this, ParsedBad(namespaceStatement, message));
-                            token = source.SkipToNext(";");
+                            token = TokenSource.SkipToNext(";");
                         }
-                        token = source.GetNextToken();
+                        token = TokenSource.GetNextToken();
                         continue;
 
                     case NovusKeywords.Type:
-                        source.PushToken(token);
-                        if (TryParseType(source, token, out var typeStatement, out message))
+                        TokenSource.PushToken(token);
+                        if (TryParseType(TokenSource, token, out var typeStatement, out message))
                         {
                             Root.AddChild(typeStatement);
                         }
@@ -138,9 +138,9 @@ namespace Steadsoft.Novus.Parser
                         {
                             errors++;
                             OnDiagnostic(this, ParsedBad(typeStatement, message));
-                            token = source.SkipToNext("}");
+                            token = TokenSource.SkipToNext("}");
                         }
-                        token = source.GetNextToken();
+                        token = TokenSource.GetNextToken();
                         continue;
 
                     default:

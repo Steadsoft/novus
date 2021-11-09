@@ -8,9 +8,16 @@
          {
             type Window class public abstract sealed
             {
+               // This is a method defintion, it has no return type, so its not a 'function'
+
                def ClearScreen (arg1 int, arg2 string, arg3 float) private
                {
-               
+                  return;
+               }
+
+               def GetScreenArea (arg1 float) public override
+               {
+                  return;
                }
             }
          }

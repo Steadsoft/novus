@@ -23,6 +23,7 @@ namespace Steadsoft.Novus.Parser
         Private,
         Abstract,
         Static,
-        Sealed
+        Sealed,
+        Override
     }
 }

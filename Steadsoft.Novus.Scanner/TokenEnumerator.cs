@@ -25,6 +25,18 @@ namespace Steadsoft.Novus.Scanner
             return;
         }
 
+        public List<Token<T>> GetNextTokens(int N)
+        {
+            var list = new List<Token<T>>();
+
+            for (int I=0; I < N; I++)
+            {
+                list.Add(GetNextToken());
+            }
+
+            return list;
+        }
+
         public Token<T> GetNextToken()
         {
             // Once a token has been consumed it is in the past, can't be re-read.
@@ -49,6 +61,14 @@ namespace Steadsoft.Novus.Scanner
         public void PushToken(Token<T> Token)
         {
             pushed.Push(Token);
+        }
+
+        public void PushTokens(List<Token<T>> Tokens)
+        {
+            for (int I = Tokens.Count - 1; I >= 0; I--)
+            {
+                pushed.Push(Tokens[I]);
+            }
         }
 
         public Token<T> SkipToNext(string Lexeme)
