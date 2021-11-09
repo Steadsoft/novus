@@ -60,13 +60,13 @@ namespace Steadsoft.Novus.Parser
             {
                 switch (node)
                 {
-                    case BlockStatement:
+                    case BlockStatement st:
                         {
                             break;
                         }
-                    case NamespaceStatement:
+                    case NamespaceStatement st:
                         {
-                            AnalyzeNamespace((NamespaceStatement)node);
+                            AnalyzeNamespace(st);
                             break;
                         }
                 }
@@ -82,14 +82,14 @@ namespace Steadsoft.Novus.Parser
                 {
                     switch (node)
                     {
-                        case NamespaceStatement _:
+                        case NamespaceStatement stmt:
                             {
-                                AnalyzeNamespace((NamespaceStatement)node);
+                                AnalyzeNamespace(stmt);
                                 break;
                             }
-                        case TypeStatement _:
+                        case TypeStatement stmt:
                             {
-                                AnalyzeType((TypeStatement)node);
+                                AnalyzeType(stmt);
                                 break;
                             }
                     }
@@ -125,14 +125,14 @@ namespace Steadsoft.Novus.Parser
                 {
                     switch (node)
                     {
-                        case TypeStatement _:
+                        case TypeStatement stmt:
                             {
-                                AnalyzeType((TypeStatement)node);
+                                AnalyzeType(stmt);
                                 break;
                             }
-                        case DefStatement _:
+                        case DefStatement stmt:
                             {
-                                AnalyzeDef((DefStatement)node);
+                                AnalyzeDef(stmt);
                                 break;
                             }
                     }
