@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
 	  <LangVersion>10.0</LangVersion>
+	  <WarningsAsErrors>CS1717,CS2245</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

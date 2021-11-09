@@ -55,24 +55,6 @@ namespace Steadsoft.Novus.Parser
             return new Parser(source);
         }
 
-        //public Parser(string Input, string Lexfile, bool IsPath)
-        //{
-        //    SourceFile input;
-
-        //    if (IsPath)
-        //    {
-        //        input = SourceFile.CreateFromFile(Input);
-        //    }
-        //    else
-        //    {
-        //        input = SourceFile.CreateFromString(Input);
-        //    }
-
-        //    var tokenizer = new Tokenizer<NovusKeywords>(Lexfile, TokenDefinition.Pathname);
-        //    source = new TokenEnumerator<NovusKeywords>(tokenizer.Tokenize(input), TokenType.BlockComment, TokenType.LineComment);
-
-        //}
-
         public bool TryParse(out BlockStatement Root)
         {
             int errors = 0;

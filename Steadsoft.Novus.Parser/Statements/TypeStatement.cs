@@ -19,7 +19,7 @@ namespace Steadsoft.Novus.Parser
         public TypeStatement(int Line, int Col, string Name) : base(Line, Col)
         {
             this.Name = Name;
-            this.Body = Body;
+            this.Body = null;
             this.Options = new List<NovusKeywords>();
         }
         public void AddBody(BlockStatement Stmt)

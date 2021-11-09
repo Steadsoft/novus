@@ -1,23 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>10.0</LangVersion>
+		<WarningsAsErrors>CS1717,CA2245</WarningsAsErrors>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="novus.csv" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="novus.csv" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="novus.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="novus.csv">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Steadsoft.Novus.Scanner\Steadsoft.Novus.Scanner.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Steadsoft.Novus.Scanner\Steadsoft.Novus.Scanner.csproj" />
+	</ItemGroup>
 
 </Project>
