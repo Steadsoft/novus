@@ -78,7 +78,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
         private void AnalyzeNamespace(DclNamespaceStatement Stmt)
         {
-            ReportDuplicatesDeclarations(Stmt);
+            ReportDuplicateDeclarations(Stmt);
 
             if (Stmt.Block != null)
                 foreach (var node in Stmt.Block.Children)
@@ -102,7 +102,7 @@ namespace Steadsoft.Novus.Parser.Classes
         private void AnalyzeType(DclTypeStatement Stmt)
         {
 
-            ReportDuplicatesDeclarations(Stmt);
+            ReportDuplicateDeclarations(Stmt);
 
             if (Stmt.Options.ContainsMoreThanOneOf(NovusKeywords.Class, NovusKeywords.Struct, NovusKeywords.Singlet))
             {
@@ -721,7 +721,7 @@ namespace Steadsoft.Novus.Parser.Classes
         /// Statements that can contain declarations are namespaces and types.
         /// </remarks>
         /// <param name="Stmt">A statement that can contain declarations.</param>
-        private void ReportDuplicatesDeclarations(IBlockContainer Stmt)
+        private void ReportDuplicateDeclarations(IBlockContainer Stmt)
         {
             var dupeDeclarations = Stmt.Block.Children.
                 Where(c => c is DclStatement).
@@ -731,11 +731,12 @@ namespace Steadsoft.Novus.Parser.Classes
 
             foreach (var declaration in dupeDeclarations)
             {
-                var duplicates = declaration.OrderBy(ns => ns.Line).Skip(1);
+                var firstuse = declaration.OrderBy(ns => ns.Line).Take(1).First();  // the original, legally declared instance of the name.
+                var duplicates = declaration.OrderBy(ns => ns.Line).Skip(1); // all the subsequent illegal declarations of the same name.
 
                 foreach (var duplicate in duplicates)
                 {
-                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"There is already a defintion for a {duplicate.ShortTypeName} named '{duplicate.Name}' present at this level within the {Stmt.ShortTypeName} '{Stmt.Name}'."));
+                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortTypeName} name '{duplicate.Name}' within {Stmt.ShortTypeName} '{Stmt.Name}', there is already a defintion of a {firstuse.ShortTypeName} with this name at line {firstuse.Line})."));
                 }
             }
         }

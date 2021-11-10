@@ -2,6 +2,8 @@
 using Steadsoft.Novus.Parser.Statements;
 using Steadsoft.Novus.Scanner;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Sandbox
 {
@@ -9,6 +11,7 @@ namespace Sandbox
     internal partial class Program
     {
         private static readonly string parse_types_tests = @"..\..\..\TestFiles\parse_types_tests.nov";
+        private static List<DiagnosticEventArgs> messages = new List<DiagnosticEventArgs>();
 
         static void Main(string[] args)
         {
@@ -24,6 +27,11 @@ namespace Sandbox
 
             parser.TrySemanticPhase(ref root);
 
+            foreach (var msg in messages.OrderBy(m => m.Line))
+            {
+                Console.WriteLine(msg.Message);
+            }
+
             Console.WriteLine();
 
             DumpParseTree(root);
@@ -31,7 +39,7 @@ namespace Sandbox
 
         private static void MsgHandler(object Sender, DiagnosticEventArgs Args)
         {
-            Console.WriteLine(Args.Message);
+            messages.Add(Args);
         }
 
         private static void DumpParseTree(BlockStatement Root)
