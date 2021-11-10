@@ -2,16 +2,15 @@
 
 namespace Steadsoft.Novus.Parser
 {
-    public class NamespaceStatement : Statement, IBlockContainer
+    /// <summary>
+    /// Represents the declaration of a namespace.
+    /// </summary>
+    public class DclNamespaceStatement : DclStatement, IBlockContainer
     {
-        public string Name { get; private set; }
         public BlockStatement Block {get; private set;}
 
-        public string ShortTypeName => "namespace";
-
-        public NamespaceStatement(int Line, int Col, string Name):base(Line, Col)
+        public DclNamespaceStatement(int Line, int Col, string Name):base(Line, Col, Name, "namespace")
         {
-            this.Name = Name;
             this.Block = new BlockStatement(Line, Col);
         }
 

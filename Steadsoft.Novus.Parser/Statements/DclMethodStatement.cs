@@ -2,12 +2,15 @@
 
 namespace Steadsoft.Novus.Parser
 {
-    public class DefMethodStatement : DefStatement
+    /// <summary>
+    /// Represents the declaration of a method or function within a type.
+    /// </summary>
+    public class DclMethodStatement : DclStatement, IBlockContainer
     {
-        public BlockStatement Body { get; private set; }
+        public BlockStatement Block { get; private set; }
         public List<Parameter> Parameters { get; private set; }
         public string Returns { get; internal set; }
-        public DefMethodStatement(DefStatement Stmt) : base(Stmt.Line, Stmt.Col, Stmt.Name)
+        public DclMethodStatement(int Line, int Col, string Name) : base(Line, Col, Name, "method")
         {
             this.Parameters = new List<Parameter>();
             this.Returns = null;
@@ -20,8 +23,8 @@ namespace Steadsoft.Novus.Parser
 
         public void AddBody(BlockStatement Stmt)
         {
-            Body = Stmt ?? throw new ArgumentNullException(nameof(Stmt));
-            Body.Parent = this;
+            Block = Stmt ?? throw new ArgumentNullException(nameof(Stmt));
+            Block.Parent = this;
         }
 
         public override string Dump(int nesting)
@@ -30,7 +33,7 @@ namespace Steadsoft.Novus.Parser
 
             builder.AppendLine($"{Prepad(nesting)}Method: [{Name}] {ParametersText} {ReturnsText} {String.Join<NovusKeywords>(", ", Options.OrderBy(op => op.ToString()))}");
 
-            builder.Append(Body.Dump(nesting));
+            builder.Append(Block.Dump(nesting));
 
             return builder.ToString();
         }
@@ -60,5 +63,6 @@ namespace Steadsoft.Novus.Parser
                 return builder.ToString().Trim(' ').Trim(',') + ")";
             }
         }
+
     }
 }

@@ -2,10 +2,13 @@
 
 namespace Steadsoft.Novus.Parser
 {
-    public class DefFieldStatement : DefStatement
+    /// <summary>
+    /// Represents the declaration of a member field within a type.
+    /// </summary>
+    public class DclFieldStatement : DclStatement
     {
         public string TypeName { get; private set; }
-        public DefFieldStatement(int Line, int Col, string Name, string TypeName) : base(Line, Col, Name)
+        public DclFieldStatement(int Line, int Col, string Name, string TypeName) : base(Line, Col, Name, "field")
         {
             this.TypeName = TypeName;
         }

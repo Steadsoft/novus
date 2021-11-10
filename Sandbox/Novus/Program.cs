@@ -1,7 +1,6 @@
 ﻿using Steadsoft.Novus.Parser;
 using Steadsoft.Novus.Scanner;
 using System;
-using static Sandbox.MySetOfValues;
 
 namespace Sandbox
 {
@@ -43,21 +42,6 @@ namespace Sandbox
             }
         }
 
-    }
-
-    public class Stuff
-    {
-        public void StuffIt()
-        {
-            MySetOfValues X = A;
-        }
-    }
-
-    public enum MySetOfValues
-    {
-        A,
-        B,
-        C
     }
 
 }

@@ -35,7 +35,17 @@
                   return;
                }
 
+               def GetScreenArea (arg1 string)  (string) public override
+               {
+                  return;
+               }
+
                def Name string public readonly; // a field definition
+
+                type GetScreenArea class
+                {
+            
+                }
             }
 
             type Window

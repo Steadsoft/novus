@@ -2,10 +2,12 @@
 
 namespace Steadsoft.Novus.Parser
 {
-    public class TypeStatement : Statement, IBlockContainer
+    /// <summary>
+    /// Represents the declaration of a type like a class, struct, record or singlet
+    /// </summary>
+    public class DclTypeStatement : DclStatement, IBlockContainer
     {
         public NovusKeywords DeclaredKind { get; internal set; }
-        public string Name { get; private set; }
         public BlockStatement Block { get; private set; }
         /// <summary>
         /// Indicates optional keywords encountered while parsing.
@@ -14,11 +16,8 @@ namespace Steadsoft.Novus.Parser
         /// </summary>
         public List<NovusKeywords> Options { get; private set; }
 
-        public string ShortTypeName => "type";
-
-        public TypeStatement(int Line, int Col, string Name) : base(Line, Col)
+        public DclTypeStatement(int Line, int Col, string Name) : base(Line, Col, Name, "type")
         {
-            this.Name = Name;
             this.Block = null;
             this.Options = new List<NovusKeywords>();
         }

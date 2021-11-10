@@ -27,8 +27,6 @@ namespace Steadsoft.Novus.Scanner
         /// <exception cref="ArgumentNullException"></exception>
         public Tokenizer(string TokenData, TokenDefinition TokenSource, Assembly SourceAssembly = null)
         {
-            bool flag;
-
             if (string.IsNullOrWhiteSpace(TokenData)) throw new ArgumentNullException(nameof(TokenData));
 
             table = new();

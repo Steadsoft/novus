@@ -62,7 +62,7 @@ namespace Steadsoft.Novus.Parser
                         {
                             break;
                         }
-                    case NamespaceStatement stmt:
+                    case DclNamespaceStatement stmt:
                         {
                             AnalyzeNamespace(stmt);
                             break;
@@ -73,23 +73,21 @@ namespace Steadsoft.Novus.Parser
             return true;
         }
 
-        private void AnalyzeNamespace (NamespaceStatement Stmt)
+        private void AnalyzeNamespace (DclNamespaceStatement Stmt)
         {
-            ReportDuplicates<NamespaceStatement>(Stmt);
-
-            ReportDuplicates<TypeStatement>(Stmt);
+            ReportDuplicatesDeclarations(Stmt);
 
             if (Stmt.Block != null)
                 foreach (var node in Stmt.Block.Children)
                 {
                     switch (node)
                     {
-                        case NamespaceStatement stmt:
+                        case DclNamespaceStatement stmt:
                             {
                                 AnalyzeNamespace(stmt);
                                 break;
                             }
-                        case TypeStatement stmt:
+                        case DclTypeStatement stmt:
                             {
                                 AnalyzeType(stmt);
                                 break;
@@ -98,10 +96,10 @@ namespace Steadsoft.Novus.Parser
                 }
         }
 
-        private void AnalyzeType (TypeStatement Stmt)
+        private void AnalyzeType (DclTypeStatement Stmt)
         {
 
-            ReportDuplicates<TypeStatement>(Stmt);
+            ReportDuplicatesDeclarations(Stmt);
 
             if (Stmt.Options.ContainsMoreThanOneOf(NovusKeywords.Class, NovusKeywords.Struct, NovusKeywords.Singlet))
             {
@@ -130,12 +128,12 @@ namespace Steadsoft.Novus.Parser
                 {
                     switch (node)
                     {
-                        case TypeStatement stmt:
+                        case DclTypeStatement stmt:
                             {
                                 AnalyzeType(stmt);
                                 break;
                             }
-                        case DefStatement stmt:
+                        case DclStatement stmt:
                             {
                                 AnalyzeDef(stmt);
                                 break;
@@ -143,13 +141,13 @@ namespace Steadsoft.Novus.Parser
                     }
                 }
         }
-        private void AnalyzeDef (DefStatement Stmt)
+        private void AnalyzeDef (DclStatement Stmt)
         {
             switch (Stmt)
             {
-                case DefMethodStatement _:
+                case DclMethodStatement _:
                     {
-                        Stmt = (DefMethodStatement)Stmt;
+                        Stmt = (DclMethodStatement)Stmt;
                         var groups = Stmt.Options.GroupBy(a => a).Where(g => g.Count() > 1);
 
                         if (groups.Any())
@@ -160,7 +158,7 @@ namespace Steadsoft.Novus.Parser
                             }
                         }
 
-                        AnalyzeParameterList(((DefMethodStatement)Stmt).Parameters);
+                        AnalyzeParameterList(((DclMethodStatement)Stmt).Parameters);
                         break;
                     }
             }
@@ -296,7 +294,7 @@ namespace Steadsoft.Novus.Parser
 
             }
         }
-        private bool TryParseNamespace(Token<NovusKeywords> Prior, out NamespaceStatement Stmt, out string DiagMsg)
+        private bool TryParseNamespace(Token<NovusKeywords> Prior, out DclNamespaceStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
             DiagMsg = String.Empty;
@@ -322,7 +320,7 @@ namespace Steadsoft.Novus.Parser
 
                 if (token.TokenCode == SemiColon)
                 {
-                    Stmt = new NamespaceStatement(Prior.LineNumber, Prior.ColNumber, builder.ToString());
+                    Stmt = new DclNamespaceStatement(Prior.LineNumber, Prior.ColNumber, builder.ToString());
                     return true;
                 }
 
@@ -331,7 +329,7 @@ namespace Steadsoft.Novus.Parser
                     TokenSource.PushToken(token);
                     if (TryParseNamespaceBody(out var block, out DiagMsg))
                     {
-                        Stmt = new NamespaceStatement(Prior.LineNumber, Prior.ColNumber, builder.ToString());
+                        Stmt = new DclNamespaceStatement(Prior.LineNumber, Prior.ColNumber, builder.ToString());
                         Stmt.AddBlock(block);
                     }
 
@@ -405,7 +403,7 @@ namespace Steadsoft.Novus.Parser
             return true;
 
         }
-        private bool TryParseType(Token<NovusKeywords> Prior, out TypeStatement Stmt, out string DiagMsg)
+        private bool TryParseType(Token<NovusKeywords> Prior, out DclTypeStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
 
@@ -421,7 +419,7 @@ namespace Steadsoft.Novus.Parser
 
             var name = token.Lexeme;
 
-            Stmt = new TypeStatement(Prior.LineNumber, Prior.ColNumber, name);
+            Stmt = new DclTypeStatement(Prior.LineNumber, Prior.ColNumber, name);
 
             if (TryParseTypeOptions(token, ref Stmt, out DiagMsg))
                 return TryParseTypeBody(token, ref Stmt, out DiagMsg);
@@ -429,7 +427,7 @@ namespace Steadsoft.Novus.Parser
             return false;
 
         }
-        private bool TryParseTypeOptions(Token<NovusKeywords> Prior, ref TypeStatement Stmt, out string DiagMsg)
+        private bool TryParseTypeOptions(Token<NovusKeywords> Prior, ref DclTypeStatement Stmt, out string DiagMsg)
         {
             DiagMsg = String.Empty;
 
@@ -452,7 +450,7 @@ namespace Steadsoft.Novus.Parser
 
             return true;
         }
-        private bool TryParseTypeBody(Token<NovusKeywords> Prior, ref TypeStatement Stmt, out string DiagMsg)
+        private bool TryParseTypeBody(Token<NovusKeywords> Prior, ref DclTypeStatement Stmt, out string DiagMsg)
         {
             DiagMsg = string.Empty;
 
@@ -509,7 +507,7 @@ namespace Steadsoft.Novus.Parser
             return true;
 
         }
-        private bool TryParseDef(Token<NovusKeywords> Prior, out DefStatement Stmt, out string DiagMsg)
+        private bool TryParseDef(Token<NovusKeywords> Prior, out DclStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
             DiagMsg = String.Empty;
@@ -526,7 +524,7 @@ namespace Steadsoft.Novus.Parser
 
             var name = token.Lexeme;
 
-            Stmt = new DefStatement(Prior.LineNumber, Prior.ColNumber, name);
+            Stmt = new DclStatement(Prior.LineNumber, Prior.ColNumber, name);
 
             if (AppearsToBeA.MethodDeclaration(TokenSource))
             {
@@ -542,13 +540,13 @@ namespace Steadsoft.Novus.Parser
             return false;
 
         }
-        private bool TryParseFieldDeclaration(Token<NovusKeywords> Prior, ref DefStatement Stmt, out string DiagMsg)
+        private bool TryParseFieldDeclaration(Token<NovusKeywords> Prior, ref DclStatement Stmt, out string DiagMsg)
         {
             DiagMsg = String.Empty;
 
             var token = TokenSource.GetNextToken();
 
-            DefFieldStatement field = new DefFieldStatement(Stmt.Line, Stmt.Col, Stmt.Name, token.Lexeme);
+            DclFieldStatement field = new DclFieldStatement(Stmt.Line, Stmt.Col, Stmt.Name, token.Lexeme);
 
             token = TokenSource.GetNextToken();
 
@@ -569,7 +567,7 @@ namespace Steadsoft.Novus.Parser
 
             return true;
         }
-        private bool TryParseParameterList(Token<NovusKeywords> Prior, ref DefMethodStatement Stmt, out string DiagMsg)
+        private bool TryParseParameterList(Token<NovusKeywords> Prior, ref DclMethodStatement Stmt, out string DiagMsg)
         {
             DiagMsg = String.Empty;
 
@@ -642,11 +640,11 @@ namespace Steadsoft.Novus.Parser
             return true;
 
         }
-        private bool TryParseMethodDeclaration(Token<NovusKeywords> Prior, ref DefStatement Stmt, out string DiagMsg)
+        private bool TryParseMethodDeclaration(Token<NovusKeywords> Prior, ref DclStatement Stmt, out string DiagMsg)
         {
             Token<NovusKeywords> token;
 
-            DefMethodStatement methodDef;
+            DclMethodStatement methodDef;
 
             DiagMsg = String.Empty;
 
@@ -656,7 +654,7 @@ namespace Steadsoft.Novus.Parser
                 return false;
             }
 
-            methodDef = new DefMethodStatement(Stmt);
+            methodDef = new DclMethodStatement(Stmt.Line, Stmt.Col, Stmt.Name);
 
             TryParseParameterList(Prior, ref methodDef, out DiagMsg);
 
@@ -694,7 +692,7 @@ namespace Steadsoft.Novus.Parser
 
             return true;
         }
-        private bool TryParseMethodBody(Token<NovusKeywords> Prior, ref DefStatement Stmt, out string DiagMsg)
+        private bool TryParseMethodBody(Token<NovusKeywords> Prior, ref DclStatement Stmt, out string DiagMsg)
         {
             DiagMsg = String.Empty;
             var token = TokenSource.GetNextToken();
@@ -704,7 +702,7 @@ namespace Steadsoft.Novus.Parser
 
             TokenSource.SkipToNext("}");
 
-            ((DefMethodStatement)(Stmt)).AddBody(new BlockStatement(Prior.LineNumber, Prior.ColNumber));
+            ((DclMethodStatement)(Stmt)).AddBody(new BlockStatement(Prior.LineNumber, Prior.ColNumber));
 
             return true;
         }
@@ -714,26 +712,27 @@ namespace Steadsoft.Novus.Parser
         }
 
         /// <summary>
-        /// Searches for any duplicate child members of type T within the block container of the supplied statement.
+        /// Seraches for duplicate named declarations within the scope defined by the supplied statement.
         /// </summary>
-        /// <typeparam name="T">The type of the members to be searched for.</typeparam>
-        /// <param name="Stmt">A statement that contains a block.</param>
-
-        private void ReportDuplicates<T>(IBlockContainer Stmt) where T : IBlockContainer
+        /// <remarks>
+        /// Statements that can contain declarations are namespaces and types.
+        /// </remarks>
+        /// <param name="Stmt">A statement that can contain declarations.</param>
+        private void ReportDuplicatesDeclarations(IBlockContainer Stmt) 
         {
-            var dupeTypes = Stmt.Block.Children.
-                Where(c => c is T).
-                Cast<T>().
-                GroupBy(ns => ns.Name).
-                Where(nsc => nsc.Count() > 1);
+            var dupeDeclarations = Stmt.Block.Children.
+                Where(c => c is DclStatement).
+                Cast<DclStatement>().
+                GroupBy(dcl => dcl.Name).
+                Where(dcl => dcl.Count() > 1);
 
-            foreach (var type in dupeTypes)
+            foreach (var declaration in dupeDeclarations)
             {
-                var repeats = type.OrderBy(ns => ns.Line).Skip(1);
+                var duplicates = declaration.OrderBy(ns => ns.Line).Skip(1);
 
-                foreach (var rep in repeats)
+                foreach (var duplicate in duplicates)
                 {
-                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, rep.Line, rep.Col, $"There is already a defintion for a {rep.ShortTypeName} named '{rep.Name}' present at this level within the {Stmt.ShortTypeName} '{Stmt.Name}'."));
+                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"There is already a defintion for a {duplicate.ShortTypeName} named '{duplicate.Name}' present at this level within the {Stmt.ShortTypeName} '{Stmt.Name}'."));
                 }
             }
         }
