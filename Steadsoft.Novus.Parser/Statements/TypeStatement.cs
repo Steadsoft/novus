@@ -2,7 +2,7 @@
 
 namespace Steadsoft.Novus.Parser
 {
-    public class TypeStatement : Statement
+    public class TypeStatement : Statement, IBlockContainer
     {
         public NovusKeywords DeclaredKind { get; internal set; }
         public string Name { get; private set; }
@@ -13,6 +13,9 @@ namespace Steadsoft.Novus.Parser
         /// consistency and applicability at a later step.
         /// </summary>
         public List<NovusKeywords> Options { get; private set; }
+
+        public string ShortTypeName => "type";
+
         public TypeStatement(int Line, int Col, string Name) : base(Line, Col)
         {
             this.Name = Name;

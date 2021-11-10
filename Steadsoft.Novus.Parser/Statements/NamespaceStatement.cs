@@ -2,10 +2,12 @@
 
 namespace Steadsoft.Novus.Parser
 {
-    public class NamespaceStatement : Statement
+    public class NamespaceStatement : Statement, IBlockContainer
     {
         public string Name { get; private set; }
         public BlockStatement Block {get; private set;}
+
+        public string ShortTypeName => "namespace";
 
         public NamespaceStatement(int Line, int Col, string Name):base(Line, Col)
         {

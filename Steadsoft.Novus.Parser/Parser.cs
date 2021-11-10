@@ -52,8 +52,6 @@ namespace Steadsoft.Novus.Parser
         {
             if (Tree == null) throw new ArgumentNullException(nameof(Tree));
 
-            var dupens = Tree.Children.Where(c => c is NamespaceStatement).Cast<NamespaceStatement>().GroupBy(ns => ns.Name).Where(nsc => nsc.Count() > 1);
-
             foreach (var node in Tree.Children)
             {
                 switch (node)
@@ -75,41 +73,9 @@ namespace Steadsoft.Novus.Parser
 
         private void AnalyzeNamespace (NamespaceStatement Stmt)
         {
+            ReportDuplicates<NamespaceStatement>(Stmt);
 
-            var dupeNamespaces = Stmt.Block.Children.
-                Where(c => c is NamespaceStatement).
-                Cast<NamespaceStatement>().
-                GroupBy(ns => ns.Name).
-                Where(nsc => nsc.Count() > 1);
-
-            foreach (var nSpace in dupeNamespaces)
-            {
-                var repeats = nSpace.OrderBy(ns => ns.Line).Skip(1);
-
-                foreach (var rep in repeats)
-                {
-                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, rep.Line, rep.Col, $"There is already a namespace '{rep.Name}' present at this level."));
-                }
-
-            }
-
-            var dupeTypes = Stmt.Block.Children.
-                Where(c => c is TypeStatement).
-                Cast<TypeStatement>().
-                GroupBy(ns => ns.Name).
-                Where(nsc => nsc.Count() > 1);
-
-            foreach (var type in dupeTypes)
-            {
-                var repeats = type.OrderBy(ns => ns.Line).Skip(1);
-
-                foreach (var rep in repeats)
-                {
-                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, rep.Line, rep.Col, $"There is already a type '{rep.Name}' present at this level."));
-                }
-
-            }
-
+            ReportDuplicates<TypeStatement>(Stmt);
 
             if (Stmt.Block != null)
                 foreach (var node in Stmt.Block.Children)
@@ -132,23 +98,8 @@ namespace Steadsoft.Novus.Parser
 
         private void AnalyzeType (TypeStatement Stmt)
         {
-            var dupeTypes = Stmt.Block.Children.
-                Where(c => c is TypeStatement).
-                Cast<TypeStatement>().
-                GroupBy(ns => ns.Name).
-                Where(nsc => nsc.Count() > 1);
 
-            foreach (var type in dupeTypes)
-            {
-                var repeats = type.OrderBy(ns => ns.Line).Skip(1);
-
-                foreach (var rep in repeats)
-                {
-                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, rep.Line, rep.Col, $"There is already a type '{rep.Name}' present at this level."));
-                }
-
-            }
-
+            ReportDuplicates<TypeStatement>(Stmt);
 
             if (Stmt.Options.ContainsMoreThanOneOf(NovusKeywords.Class, NovusKeywords.Struct, NovusKeywords.Singlet))
             {
@@ -760,6 +711,31 @@ namespace Steadsoft.Novus.Parser
         private static DiagnosticEventArgs ParsedBad(Statement Stmt, string Msg)
         {
             return new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $" Failed to parse a {Stmt.GetType().Name} ({Msg})");
+        }
+
+        /// <summary>
+        /// Searches for any duplicate child members of type T within the block container of the supplied statement.
+        /// </summary>
+        /// <typeparam name="T">The type of the members to be searched for.</typeparam>
+        /// <param name="Stmt">A statement that contains a block.</param>
+
+        private void ReportDuplicates<T>(IBlockContainer Stmt) where T : IBlockContainer
+        {
+            var dupeTypes = Stmt.Block.Children.
+                Where(c => c is T).
+                Cast<T>().
+                GroupBy(ns => ns.Name).
+                Where(nsc => nsc.Count() > 1);
+
+            foreach (var type in dupeTypes)
+            {
+                var repeats = type.OrderBy(ns => ns.Line).Skip(1);
+
+                foreach (var rep in repeats)
+                {
+                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, rep.Line, rep.Col, $"There is already a defintion for a {rep.ShortTypeName} named '{rep.Name}' present at this level within the {Stmt.ShortTypeName} '{Stmt.Name}'."));
+                }
+            }
         }
     }
 }
