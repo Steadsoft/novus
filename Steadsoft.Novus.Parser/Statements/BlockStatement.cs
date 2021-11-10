@@ -17,6 +17,9 @@ namespace Steadsoft.Novus.Parser
 
         public void AddChild(Statement Stmt)
         {
+            if (Stmt == null)
+                return;
+
             Children.Add(Stmt);
         }
 

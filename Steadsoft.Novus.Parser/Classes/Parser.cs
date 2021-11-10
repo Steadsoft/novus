@@ -22,6 +22,7 @@ namespace Steadsoft.Novus.Parser
         private Parser(TokenEnumerator<NovusKeywords> Source)
         {
             TokenSource = Source;
+            OnDiagnostic = delegate { };
         }
         /// <summary>
         /// Creates a parser instance that includes a lexical analyzer instance.
@@ -252,7 +253,7 @@ namespace Steadsoft.Novus.Parser
         private bool TryParseUsing(Token<NovusKeywords> Prior, out UsingStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
-            DiagMsg = null;
+            DiagMsg = String.Empty;
 
             StringBuilder builder = new();
 
@@ -569,8 +570,6 @@ namespace Steadsoft.Novus.Parser
         }
         private bool TryParseParameterList(Token<NovusKeywords> Prior, ref DefMethodStatement Stmt, out string DiagMsg)
         {
-            Parameter param;
-
             DiagMsg = String.Empty;
 
             Token<NovusKeywords> token;
@@ -646,7 +645,7 @@ namespace Steadsoft.Novus.Parser
         {
             Token<NovusKeywords> token;
 
-            DefMethodStatement methodDef = null; ;
+            DefMethodStatement methodDef;
 
             DiagMsg = String.Empty;
 
