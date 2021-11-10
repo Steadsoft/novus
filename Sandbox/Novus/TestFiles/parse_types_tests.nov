@@ -25,7 +25,7 @@
                   return;
                }
 
-               def Name string public readonly;
+               def Name string public readonly; // a field definition
             }
          }
       }

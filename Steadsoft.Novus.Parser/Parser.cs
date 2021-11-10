@@ -60,13 +60,13 @@ namespace Steadsoft.Novus.Parser
             {
                 switch (node)
                 {
-                    case BlockStatement st:
+                    case BlockStatement stmt:
                         {
                             break;
                         }
-                    case NamespaceStatement st:
+                    case NamespaceStatement stmt:
                         {
-                            AnalyzeNamespace(st);
+                            AnalyzeNamespace(stmt);
                             break;
                         }
                 }
