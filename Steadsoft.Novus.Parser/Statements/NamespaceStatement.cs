@@ -10,6 +10,7 @@ namespace Steadsoft.Novus.Parser
         public NamespaceStatement(int Line, int Col, string Name):base(Line, Col)
         {
             this.Name = Name;
+            this.Block = new BlockStatement(Line, Col);
         }
 
         public void AddBlock (BlockStatement Stmt)

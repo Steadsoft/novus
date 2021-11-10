@@ -51,7 +51,7 @@ namespace UnitTesting
             Assert.IsTrue(root.Children[5] is TypeStatement);
 
             Assert.IsTrue(root.Children[6] is TypeStatement);
-                Assert.IsTrue(((TypeStatement)(root.Children[6])).Body.Children.Count == 1);
+                Assert.IsTrue(((TypeStatement)(root.Children[6])).Block.Children.Count == 1);
         }
     }
 }

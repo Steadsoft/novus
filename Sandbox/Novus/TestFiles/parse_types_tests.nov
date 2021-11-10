@@ -1,5 +1,15 @@
 ﻿namespace a.x.rere
 {
+   type aa
+   {
+   
+   }
+
+   type aa
+   {
+   
+   }
+
    namespace b
    {
       namespace namespace
@@ -27,9 +37,18 @@
 
                def Name string public readonly; // a field definition
             }
+
+            type Window
+            {
+            }
          }
       }
    } 
+
+   namespace b
+   {
+   
+   }
 }
 
 /*

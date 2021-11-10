@@ -5,7 +5,7 @@ using System.Text;
 namespace Steadsoft.Novus.Parser
 {
     /// <summary>
-    /// This class implements a recursive descent parser.
+    /// This class implements a recursive descent parser and semantic analyzer.
     /// </summary>
     /// <remarks>
     /// This class contains the methods needed to parse the language recursively. Each parse method conforms to a basic
@@ -52,6 +52,8 @@ namespace Steadsoft.Novus.Parser
         {
             if (Tree == null) throw new ArgumentNullException(nameof(Tree));
 
+            var dupens = Tree.Children.Where(c => c is NamespaceStatement).Cast<NamespaceStatement>().GroupBy(ns => ns.Name).Where(nsc => nsc.Count() > 1);
+
             foreach (var node in Tree.Children)
             {
                 switch (node)
@@ -73,6 +75,42 @@ namespace Steadsoft.Novus.Parser
 
         private void AnalyzeNamespace (NamespaceStatement Stmt)
         {
+
+            var dupeNamespaces = Stmt.Block.Children.
+                Where(c => c is NamespaceStatement).
+                Cast<NamespaceStatement>().
+                GroupBy(ns => ns.Name).
+                Where(nsc => nsc.Count() > 1);
+
+            foreach (var nSpace in dupeNamespaces)
+            {
+                var repeats = nSpace.OrderBy(ns => ns.Line).Skip(1);
+
+                foreach (var rep in repeats)
+                {
+                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, rep.Line, rep.Col, $"There is already a namespace '{rep.Name}' present at this level."));
+                }
+
+            }
+
+            var dupeTypes = Stmt.Block.Children.
+                Where(c => c is TypeStatement).
+                Cast<TypeStatement>().
+                GroupBy(ns => ns.Name).
+                Where(nsc => nsc.Count() > 1);
+
+            foreach (var type in dupeTypes)
+            {
+                var repeats = type.OrderBy(ns => ns.Line).Skip(1);
+
+                foreach (var rep in repeats)
+                {
+                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, rep.Line, rep.Col, $"There is already a type '{rep.Name}' present at this level."));
+                }
+
+            }
+
+
             if (Stmt.Block != null)
                 foreach (var node in Stmt.Block.Children)
                 {
@@ -94,9 +132,27 @@ namespace Steadsoft.Novus.Parser
 
         private void AnalyzeType (TypeStatement Stmt)
         {
+            var dupeTypes = Stmt.Block.Children.
+                Where(c => c is TypeStatement).
+                Cast<TypeStatement>().
+                GroupBy(ns => ns.Name).
+                Where(nsc => nsc.Count() > 1);
+
+            foreach (var type in dupeTypes)
+            {
+                var repeats = type.OrderBy(ns => ns.Line).Skip(1);
+
+                foreach (var rep in repeats)
+                {
+                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, rep.Line, rep.Col, $"There is already a type '{rep.Name}' present at this level."));
+                }
+
+            }
+
+
             if (Stmt.Options.ContainsMoreThanOneOf(NovusKeywords.Class, NovusKeywords.Struct, NovusKeywords.Singlet))
             {
-                OnDiagnostic(this, new DiagnosticEventArgs($"Line {Stmt.Line} a type must have only one of the keywords 'class', 'struct' or 'singlet'."));
+                OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"A type must have only one of the keywords 'class', 'struct' or 'singlet'."));
             }
             else
             {
@@ -112,12 +168,12 @@ namespace Steadsoft.Novus.Parser
             {
                 foreach (var group in groups)
                 {
-                    OnDiagnostic(this, new DiagnosticEventArgs($"Line {Stmt.Line} duplicate options '{group.Key.ToString().ToLower()}' in {Stmt.DeclaredKind.ToString().ToLower()} '{Stmt.Name}'."));
+                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Duplicate options '{group.Key.ToString().ToLower()}' in {Stmt.DeclaredKind.ToString().ToLower()} '{Stmt.Name}'."));
                 }
             }
 
-            if (Stmt.Body != null)
-                foreach (var node in Stmt.Body.Children)
+            if (Stmt.Block != null)
+                foreach (var node in Stmt.Block.Children)
                 {
                     switch (node)
                     {
@@ -147,7 +203,7 @@ namespace Steadsoft.Novus.Parser
                         {
                             foreach (var group in groups)
                             {
-                                OnDiagnostic(this, new DiagnosticEventArgs($"Line {Stmt.Line} duplicate options '{group.Key.ToString().ToLower()}' in method '{Stmt.Name}'."));
+                                OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Duplicate options '{group.Key.ToString().ToLower()}' in method '{Stmt.Name}'."));
                             }
                         }
 
@@ -233,7 +289,7 @@ namespace Steadsoft.Novus.Parser
                     default:
                         {
                             errors++;
-                            OnDiagnostic(this, new DiagnosticEventArgs("Expected one of 'using', 'namespace' or 'type"));
+                            OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, "Expected one of 'using', 'namespace' or 'type"));
                             break;
                         }
                 }
@@ -388,7 +444,7 @@ namespace Steadsoft.Novus.Parser
                         continue;
 
                     default:
-                        OnDiagnostic(this, new DiagnosticEventArgs($"Unexpected token '{token.Lexeme}' found."));
+                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, $"Unexpected token '{token.Lexeme}' found."));
                         break;
                 }
             }
@@ -489,7 +545,7 @@ namespace Steadsoft.Novus.Parser
                         token = TokenSource.GetNextToken();
                         continue;
                     default:
-                        OnDiagnostic(this, new DiagnosticEventArgs("Unexpected token {} found."));
+                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, "Unexpected token {} found."));
                         break;
                 }
             }
@@ -703,7 +759,7 @@ namespace Steadsoft.Novus.Parser
         }
         private static DiagnosticEventArgs ParsedBad(Statement Stmt, string Msg)
         {
-            return new DiagnosticEventArgs($" Failed to parse a {Stmt.GetType().Name} on line {Stmt.Line} at column {Stmt.Col} ({Msg})");
+            return new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $" Failed to parse a {Stmt.GetType().Name} ({Msg})");
         }
     }
 }
