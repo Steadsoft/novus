@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using static Steadsoft.Novus.Scanner.TokenType;
 
 namespace Steadsoft.Novus.Scanner
 {
@@ -25,7 +26,7 @@ namespace Steadsoft.Novus.Scanner
 
             T keyword;
 
-            if (TokenCode == TokenType.Identifier && Enum.TryParse<T>(Lexeme, true, out keyword))
+            if (TokenCode == Identifier && Enum.TryParse<T>(Lexeme, true, out keyword))
                 Keyword = keyword;
             else
                 Keyword = Enum.Parse<T>("0");

@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using static Steadsoft.Novus.Scanner.LexicalClass;
+using static Steadsoft.Novus.Scanner.TokenType;
 
 namespace Steadsoft.Novus.Scanner
 {
@@ -133,7 +134,7 @@ namespace Steadsoft.Novus.Scanner
             StringBuilder lexeme = new();
             State state = State.INITIAL;
 
-            var tuple = (Step: Step.AppendReturn, State: State.INITIAL, TokenType: TokenType.Undecided);
+            var tuple = (Step: Step.AppendReturn, State: State.INITIAL, TokenType: Undecided);
 
             for (int I = 0; I < source.Chars.Count; I++)
             {

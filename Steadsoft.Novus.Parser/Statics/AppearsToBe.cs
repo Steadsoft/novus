@@ -1,4 +1,5 @@
 ﻿using Steadsoft.Novus.Scanner;
+using static Steadsoft.Novus.Scanner.TokenType;
 
 namespace Steadsoft.Novus.Parser
 {
@@ -9,12 +10,12 @@ namespace Steadsoft.Novus.Parser
     {
         public static bool MethodDeclaration(TokenEnumerator<NovusKeywords> TokenSource)
         {
-            return TokenSource.NextTokensAre(TokenType.LPar, TokenType.Identifier, TokenType.Identifier);
+            return TokenSource.NextTokensAre(LPar, Identifier, Identifier);
         }
 
         public static bool FunctionReturnType(TokenEnumerator<NovusKeywords> TokenSource)
         {
-            return TokenSource.NextTokensAre(TokenType.LPar, TokenType.Identifier, TokenType.RPar);
+            return TokenSource.NextTokensAre(LPar, Identifier, RPar);
         }
 
         public static bool FieldDeclaration(TokenEnumerator<NovusKeywords> TokenSource)
@@ -23,13 +24,13 @@ namespace Steadsoft.Novus.Parser
 
             var token = TokenSource.GetNextToken();
 
-            while (token.TokenCode != TokenType.LBrace && token.TokenCode != TokenType.SemiColon)
+            while (token.TokenCode != LBrace && token.TokenCode != SemiColon)
             {
                 tokens.Add(token);
                 token = TokenSource.GetNextToken();
             }
 
-            if (token.TokenCode == TokenType.SemiColon)
+            if (token.TokenCode == SemiColon)
             {
                 TokenSource.PushToken(token);
                 TokenSource.PushTokens(tokens);

@@ -1,6 +1,7 @@
 ﻿using Steadsoft.Novus.Scanner;
 using System.Reflection;
 using System.Text;
+using static Steadsoft.Novus.Scanner.TokenType;
 
 namespace Steadsoft.Novus.Parser
 {
@@ -46,7 +47,7 @@ namespace Steadsoft.Novus.Parser
             }
 
             var tokenizer = new Tokenizer<NovusKeywords>(Tokens, Definition, Assembly.GetExecutingAssembly());
-            var source = new TokenEnumerator<NovusKeywords>(tokenizer.Tokenize(sourceFile), TokenType.BlockComment, TokenType.LineComment);
+            var source = new TokenEnumerator<NovusKeywords>(tokenizer.Tokenize(sourceFile), BlockComment, LineComment);
             return new Parser(source);
         }
         public bool TrySemanticPhase(ref BlockStatement Tree)
@@ -184,7 +185,7 @@ namespace Steadsoft.Novus.Parser
             // namespace <qualified-name> { }
             // zero or more of: type <identifier>  [<type-options>] { <type-body> }
 
-            while (token.TokenCode != TokenType.NoMoreTokens)
+            while (token.TokenCode != NoMoreTokens)
             {
                 if (Tree == null)
                 {
@@ -269,7 +270,7 @@ namespace Steadsoft.Novus.Parser
 
             while (true)
             {
-                if (token.TokenCode != TokenType.Identifier)
+                if (token.TokenCode != Identifier)
                 {
                     DiagMsg = $"Unexpected token {token.Lexeme}";
                     TokenSource.PushToken(token);
@@ -280,7 +281,7 @@ namespace Steadsoft.Novus.Parser
 
                 token = TokenSource.GetNextToken();
 
-                if (token.TokenCode == TokenType.SemiColon)
+                if (token.TokenCode == SemiColon)
                 {
                     Stmt = new UsingStatement(Prior.LineNumber, Prior.ColNumber, builder.ToString());
                     return true;
@@ -306,9 +307,9 @@ namespace Steadsoft.Novus.Parser
 
             var token = TokenSource.GetNextToken();
 
-            while (token.TokenCode != TokenType.NoMoreTokens)
+            while (token.TokenCode != NoMoreTokens)
             {
-                if (token.TokenCode != TokenType.Identifier)
+                if (token.TokenCode != Identifier)
                 {
                     DiagMsg = $"Unexpected token {token.Lexeme}";
                     TokenSource.PushToken(token);
@@ -319,13 +320,13 @@ namespace Steadsoft.Novus.Parser
 
                 token = TokenSource.GetNextToken();
 
-                if (token.TokenCode == TokenType.SemiColon)
+                if (token.TokenCode == SemiColon)
                 {
                     Stmt = new NamespaceStatement(Prior.LineNumber, Prior.ColNumber, builder.ToString());
                     return true;
                 }
 
-                if (token.TokenCode == TokenType.LBrace)
+                if (token.TokenCode == LBrace)
                 {
                     TokenSource.PushToken(token);
                     if (TryParseNamespaceBody(out var block, out DiagMsg))
@@ -356,14 +357,14 @@ namespace Steadsoft.Novus.Parser
 
             var token = TokenSource.GetNextToken();
 
-            if (token.TokenCode != TokenType.LBrace)
+            if (token.TokenCode != LBrace)
                 throw new InvalidOperationException("Expected token '{' has not been pushed.");
 
             Block = new BlockStatement(token.LineNumber, token.ColNumber);
 
             token = TokenSource.GetNextToken();
 
-            while (token.TokenCode != TokenType.NoMoreTokens && token.TokenCode != TokenType.RBrace)
+            while (token.TokenCode != NoMoreTokens && token.TokenCode != RBrace)
             {
                 switch (token.Keyword)
                 {
@@ -412,7 +413,7 @@ namespace Steadsoft.Novus.Parser
 
             var token = TokenSource.GetNextToken();
 
-            if (token.TokenCode != TokenType.Identifier)
+            if (token.TokenCode != Identifier)
             {
                 DiagMsg = $"Unexpected token {token.Lexeme}";
                 return false;
@@ -457,7 +458,7 @@ namespace Steadsoft.Novus.Parser
 
             var token = TokenSource.GetNextToken();
 
-            if (token.TokenCode != TokenType.LBrace)
+            if (token.TokenCode != LBrace)
                 throw new InvalidOperationException("Expected token '{' has not been pushed.");
 
             BlockStatement body = new(token.LineNumber, token.ColNumber);
@@ -466,7 +467,7 @@ namespace Steadsoft.Novus.Parser
 
             token = TokenSource.GetNextToken();
 
-            while (token.TokenCode != TokenType.NoMoreTokens && token.TokenCode != TokenType.RBrace)
+            while (token.TokenCode != NoMoreTokens && token.TokenCode != RBrace)
             {
                 switch (token.Keyword)
                 {
@@ -517,7 +518,7 @@ namespace Steadsoft.Novus.Parser
 
             var token = TokenSource.GetNextToken();
 
-            if (token.TokenCode != TokenType.Identifier)
+            if (token.TokenCode != Identifier)
             {
                 DiagMsg = $"Unexpected token {token.Lexeme}";
                 return false;
@@ -551,7 +552,7 @@ namespace Steadsoft.Novus.Parser
 
             token = TokenSource.GetNextToken();
 
-            while (token.TokenCode != TokenType.SemiColon)
+            while (token.TokenCode != SemiColon)
             {
                 if (token.Keyword != NovusKeywords.IsNotKeyword)
                 {
@@ -576,7 +577,7 @@ namespace Steadsoft.Novus.Parser
 
             token = TokenSource.GetNextToken();
 
-            if (token.TokenCode != TokenType.LPar)
+            if (token.TokenCode != LPar)
             {
                 DiagMsg = $"Unexpected token {token.Lexeme}";
                 return false;
@@ -584,9 +585,9 @@ namespace Steadsoft.Novus.Parser
 
             token = TokenSource.GetNextToken();
 
-            while (token.TokenCode != TokenType.RPar)
+            while (token.TokenCode != RPar)
             {
-                if (token.TokenCode != TokenType.Identifier)
+                if (token.TokenCode != Identifier)
                 {
                     DiagMsg = $"Unexpected token in parameter declaration '{token.Lexeme}'";
                     continue;
@@ -596,7 +597,7 @@ namespace Steadsoft.Novus.Parser
 
                 token = TokenSource.GetNextToken();
 
-                if (token.TokenCode != TokenType.Identifier)
+                if (token.TokenCode != Identifier)
                 {
                     DiagMsg = $"Unexpected token in parameter declaration '{token.Lexeme}'";
                     continue;
@@ -631,7 +632,7 @@ namespace Steadsoft.Novus.Parser
 
                 token = TokenSource.GetNextToken();
 
-                if (token.TokenCode == TokenType.Comma)
+                if (token.TokenCode == Comma)
                 {
                     token = TokenSource.GetNextToken();
                     continue;
@@ -677,7 +678,7 @@ namespace Steadsoft.Novus.Parser
 
             token = TokenSource.GetNextToken(); 
 
-            while (token.TokenCode != TokenType.LBrace)
+            while (token.TokenCode != LBrace)
             {
                 if (token.Keyword == NovusKeywords.IsNotKeyword)
                 {
@@ -698,7 +699,7 @@ namespace Steadsoft.Novus.Parser
             DiagMsg = String.Empty;
             var token = TokenSource.GetNextToken();
 
-            if (token.TokenCode != TokenType.LBrace)
+            if (token.TokenCode != LBrace)
                 throw new InvalidOperationException("Expected token '{' has not been pushed.");
 
             TokenSource.SkipToNext("}");

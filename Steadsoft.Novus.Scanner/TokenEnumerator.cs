@@ -1,4 +1,6 @@
-﻿namespace Steadsoft.Novus.Scanner
+﻿using static Steadsoft.Novus.Scanner.TokenType;
+
+namespace Steadsoft.Novus.Scanner
 {
     public class TokenEnumerator<T> where T : struct, System.Enum
     {
@@ -75,7 +77,7 @@
                     return enumerator.Current;
             }
 
-            return new Token<T>(TokenType.NoMoreTokens, "", 0, 0);
+            return new Token<T>(NoMoreTokens, "", 0, 0);
         }
 
         /// <summary>
@@ -99,7 +101,7 @@
         {
             var token = GetNextToken();
 
-            while (token.Lexeme != Lexeme && token.TokenCode != TokenType.NoMoreTokens)
+            while (token.Lexeme != Lexeme && token.TokenCode != NoMoreTokens)
             {
                 token = GetNextToken();
             }
