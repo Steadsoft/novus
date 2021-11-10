@@ -1,5 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Steadsoft.Novus.Parser;
+using Steadsoft.Novus.Parser.Classes;
+using Steadsoft.Novus.Parser.Enums;
+using Steadsoft.Novus.Parser.Statements;
 using Steadsoft.Novus.Scanner;
 
 namespace UnitTesting

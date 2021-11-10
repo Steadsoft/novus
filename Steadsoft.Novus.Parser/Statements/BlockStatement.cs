@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Steadsoft.Novus.Parser
+namespace Steadsoft.Novus.Parser.Statements
 {
     /// <summary>
     /// Represents any bracketed code block surrounded by { and }
@@ -29,7 +29,7 @@ namespace Steadsoft.Novus.Parser
 
             foreach (var child in Children)
             {
-                builder.Append(child.Dump(nesting+1));
+                builder.Append(child.Dump(nesting + 1));
             }
 
             return builder.ToString();

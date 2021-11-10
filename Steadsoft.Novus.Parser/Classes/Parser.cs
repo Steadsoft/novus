@@ -1,9 +1,12 @@
-﻿using Steadsoft.Novus.Scanner;
+﻿using Steadsoft.Novus.Parser.Enums;
+using Steadsoft.Novus.Parser.Statements;
+using Steadsoft.Novus.Parser.Statics;
+using Steadsoft.Novus.Scanner;
 using System.Reflection;
 using System.Text;
 using static Steadsoft.Novus.Scanner.TokenType;
 
-namespace Steadsoft.Novus.Parser
+namespace Steadsoft.Novus.Parser.Classes
 {
     /// <summary>
     /// This class implements a recursive descent parser and semantic analyzer.
@@ -73,7 +76,7 @@ namespace Steadsoft.Novus.Parser
             return true;
         }
 
-        private void AnalyzeNamespace (DclNamespaceStatement Stmt)
+        private void AnalyzeNamespace(DclNamespaceStatement Stmt)
         {
             ReportDuplicatesDeclarations(Stmt);
 
@@ -96,7 +99,7 @@ namespace Steadsoft.Novus.Parser
                 }
         }
 
-        private void AnalyzeType (DclTypeStatement Stmt)
+        private void AnalyzeType(DclTypeStatement Stmt)
         {
 
             ReportDuplicatesDeclarations(Stmt);
@@ -141,7 +144,7 @@ namespace Steadsoft.Novus.Parser
                     }
                 }
         }
-        private void AnalyzeDef (DclStatement Stmt)
+        private void AnalyzeDef(DclStatement Stmt)
         {
             switch (Stmt)
             {
@@ -252,7 +255,7 @@ namespace Steadsoft.Novus.Parser
         private bool TryParseUsing(Token<NovusKeywords> Prior, out UsingStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
-            DiagMsg = String.Empty;
+            DiagMsg = string.Empty;
 
             StringBuilder builder = new();
 
@@ -297,7 +300,7 @@ namespace Steadsoft.Novus.Parser
         private bool TryParseNamespace(Token<NovusKeywords> Prior, out DclNamespaceStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
-            DiagMsg = String.Empty;
+            DiagMsg = string.Empty;
 
             StringBuilder builder = new();
 
@@ -429,7 +432,7 @@ namespace Steadsoft.Novus.Parser
         }
         private bool TryParseTypeOptions(Token<NovusKeywords> Prior, ref DclTypeStatement Stmt, out string DiagMsg)
         {
-            DiagMsg = String.Empty;
+            DiagMsg = string.Empty;
 
             var token = TokenSource.GetNextToken();
 
@@ -510,7 +513,7 @@ namespace Steadsoft.Novus.Parser
         private bool TryParseDef(Token<NovusKeywords> Prior, out DclStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
-            DiagMsg = String.Empty;
+            DiagMsg = string.Empty;
 
             TokenSource.CheckExpectedToken(NovusKeywords.Def);
 
@@ -542,7 +545,7 @@ namespace Steadsoft.Novus.Parser
         }
         private bool TryParseFieldDeclaration(Token<NovusKeywords> Prior, ref DclStatement Stmt, out string DiagMsg)
         {
-            DiagMsg = String.Empty;
+            DiagMsg = string.Empty;
 
             var token = TokenSource.GetNextToken();
 
@@ -569,7 +572,7 @@ namespace Steadsoft.Novus.Parser
         }
         private bool TryParseParameterList(Token<NovusKeywords> Prior, ref DclMethodStatement Stmt, out string DiagMsg)
         {
-            DiagMsg = String.Empty;
+            DiagMsg = string.Empty;
 
             Token<NovusKeywords> token;
 
@@ -646,7 +649,7 @@ namespace Steadsoft.Novus.Parser
 
             DclMethodStatement methodDef;
 
-            DiagMsg = String.Empty;
+            DiagMsg = string.Empty;
 
             if (!AppearsToBeA.MethodDeclaration(TokenSource))
             {
@@ -674,7 +677,7 @@ namespace Steadsoft.Novus.Parser
 
             // OK now look for any additional keywords (options like public, abstract etc)
 
-            token = TokenSource.GetNextToken(); 
+            token = TokenSource.GetNextToken();
 
             while (token.TokenCode != LBrace)
             {
@@ -694,7 +697,7 @@ namespace Steadsoft.Novus.Parser
         }
         private bool TryParseMethodBody(Token<NovusKeywords> Prior, ref DclStatement Stmt, out string DiagMsg)
         {
-            DiagMsg = String.Empty;
+            DiagMsg = string.Empty;
             var token = TokenSource.GetNextToken();
 
             if (token.TokenCode != LBrace)
@@ -702,7 +705,7 @@ namespace Steadsoft.Novus.Parser
 
             TokenSource.SkipToNext("}");
 
-            ((DclMethodStatement)(Stmt)).AddBody(new BlockStatement(Prior.LineNumber, Prior.ColNumber));
+            ((DclMethodStatement)Stmt).AddBody(new BlockStatement(Prior.LineNumber, Prior.ColNumber));
 
             return true;
         }
@@ -718,7 +721,7 @@ namespace Steadsoft.Novus.Parser
         /// Statements that can contain declarations are namespaces and types.
         /// </remarks>
         /// <param name="Stmt">A statement that can contain declarations.</param>
-        private void ReportDuplicatesDeclarations(IBlockContainer Stmt) 
+        private void ReportDuplicatesDeclarations(IBlockContainer Stmt)
         {
             var dupeDeclarations = Stmt.Block.Children.
                 Where(c => c is DclStatement).

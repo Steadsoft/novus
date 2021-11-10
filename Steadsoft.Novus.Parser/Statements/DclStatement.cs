@@ -1,4 +1,6 @@
-﻿namespace Steadsoft.Novus.Parser
+﻿using Steadsoft.Novus.Parser.Enums;
+
+namespace Steadsoft.Novus.Parser.Statements
 {
     public class DclStatement : Statement
     {
@@ -12,7 +14,7 @@
         /// consistency and applicability at a later step.
         /// </summary>
         public List<NovusKeywords> Options { get; private set; }
-        public DclStatement(int Line, int Col, string Name) : this (Line, Col, Name, "undefined")
+        public DclStatement(int Line, int Col, string Name) : this(Line, Col, Name, "undefined")
         {
 
         }
@@ -22,7 +24,7 @@
             this.Col = Col;
             this.Name = Name;
             this.ShortTypeName = ShortTypeName;
-            this.Options = new List<NovusKeywords>();
+            Options = new List<NovusKeywords>();
         }
 
         public void AddOption(NovusKeywords Option)

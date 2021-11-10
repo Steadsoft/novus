@@ -1,6 +1,6 @@
-﻿namespace Steadsoft.Novus.Parser
+﻿namespace Steadsoft.Novus.Parser.Statements
 {
-    
+
     /// <summary>
     /// Defines the interface that must be implemented by statements that can contain subordinate statements blocks.
     /// </summary>

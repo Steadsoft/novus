@@ -1,4 +1,4 @@
-﻿namespace Steadsoft.Novus.Parser
+﻿namespace Steadsoft.Novus.Parser.Statements
 {
     public abstract class Statement
     {
@@ -13,7 +13,7 @@
 
         public abstract string Dump(int nesting);
 
-        public static string Prepad (int N)
+        public static string Prepad(int N)
         {
             return new string(' ', N);
         }

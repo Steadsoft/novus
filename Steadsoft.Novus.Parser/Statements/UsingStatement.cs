@@ -1,11 +1,11 @@
-﻿namespace Steadsoft.Novus.Parser
+﻿namespace Steadsoft.Novus.Parser.Statements
 {
 
     public class UsingStatement : Statement
     {
         public string Name { get; private set; }
-        
-        public UsingStatement(int Line, int Col, string Name):base(Line, Col)
+
+        public UsingStatement(int Line, int Col, string Name) : base(Line, Col)
         {
             this.Name = Name;
         }

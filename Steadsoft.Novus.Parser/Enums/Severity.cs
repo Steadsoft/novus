@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Steadsoft.Novus.Parser
+namespace Steadsoft.Novus.Parser.Enums
 {
     public enum Severity
     {

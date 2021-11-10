@@ -1,20 +1,20 @@
 ﻿using System.Text;
 
-namespace Steadsoft.Novus.Parser
+namespace Steadsoft.Novus.Parser.Statements
 {
     /// <summary>
     /// Represents the declaration of a namespace.
     /// </summary>
     public class DclNamespaceStatement : DclStatement, IBlockContainer
     {
-        public BlockStatement Block {get; private set;}
+        public BlockStatement Block { get; private set; }
 
-        public DclNamespaceStatement(int Line, int Col, string Name):base(Line, Col, Name, "namespace")
+        public DclNamespaceStatement(int Line, int Col, string Name) : base(Line, Col, Name, "namespace")
         {
-            this.Block = new BlockStatement(Line, Col);
+            Block = new BlockStatement(Line, Col);
         }
 
-        public void AddBlock (BlockStatement Stmt)
+        public void AddBlock(BlockStatement Stmt)
         {
             if (Stmt == null) throw new ArgumentNullException(nameof(Stmt));
 
@@ -32,9 +32,9 @@ namespace Steadsoft.Novus.Parser
             StringBuilder builder = new();
 
             builder.AppendLine($"{Prepad(nesting)}Namespace: [{Name}]");
-            
+
             if (Block != null)
-               builder.Append(Block.Dump(nesting));
+                builder.Append(Block.Dump(nesting));
 
             return builder.ToString();
         }

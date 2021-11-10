@@ -1,7 +1,8 @@
-﻿using Steadsoft.Novus.Scanner;
+﻿using Steadsoft.Novus.Parser.Enums;
+using Steadsoft.Novus.Scanner;
 using static Steadsoft.Novus.Scanner.TokenType;
 
-namespace Steadsoft.Novus.Parser
+namespace Steadsoft.Novus.Parser.Statics
 {
     /// <summary>
     /// Set of functions that try to determine if the next few tokens are compatible with some grammatical non-terminal.

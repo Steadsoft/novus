@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Steadsoft.Novus.Parser
+namespace Steadsoft.Novus.Parser.Statements
 {
     /// <summary>
     /// Represents the declaration of a member field within a type.
@@ -17,7 +17,7 @@ namespace Steadsoft.Novus.Parser
         {
             StringBuilder builder = new();
 
-            builder.AppendLine($"{Prepad(nesting)}Field: [{Name}] {TypeName} {String.Join<NovusKeywords>(", ", Options.OrderBy(op => op.ToString()))}");
+            builder.AppendLine($"{Prepad(nesting)}Field: [{Name}] {TypeName} {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
 
             return builder.ToString();
         }

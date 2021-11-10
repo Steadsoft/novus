@@ -1,6 +1,7 @@
-﻿using System.Text;
+﻿using Steadsoft.Novus.Parser.Enums;
+using System.Text;
 
-namespace Steadsoft.Novus.Parser
+namespace Steadsoft.Novus.Parser.Statements
 {
     /// <summary>
     /// Represents the declaration of a method or function within a type.
@@ -12,8 +13,8 @@ namespace Steadsoft.Novus.Parser
         public string Returns { get; internal set; }
         public DclMethodStatement(int Line, int Col, string Name) : base(Line, Col, Name, "method")
         {
-            this.Parameters = new List<Parameter>();
-            this.Returns = null;
+            Parameters = new List<Parameter>();
+            Returns = null;
         }
 
         public void AddParameter(Parameter Parameter)
@@ -31,7 +32,7 @@ namespace Steadsoft.Novus.Parser
         {
             StringBuilder builder = new();
 
-            builder.AppendLine($"{Prepad(nesting)}Method: [{Name}] {ParametersText} {ReturnsText} {String.Join<NovusKeywords>(", ", Options.OrderBy(op => op.ToString()))}");
+            builder.AppendLine($"{Prepad(nesting)}Method: [{Name}] {ParametersText} {ReturnsText} {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
 
             builder.Append(Block.Dump(nesting));
 

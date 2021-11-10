@@ -1,4 +1,4 @@
-﻿namespace Steadsoft.Novus.Parser
+﻿namespace Steadsoft.Novus.Parser.Statements
 {
     public enum AccessType
     {

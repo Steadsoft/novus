@@ -1,4 +1,5 @@
-﻿using Steadsoft.Novus.Parser;
+﻿using Steadsoft.Novus.Parser.Classes;
+using Steadsoft.Novus.Parser.Statements;
 using Steadsoft.Novus.Scanner;
 using System;
 

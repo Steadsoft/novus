@@ -1,4 +1,4 @@
-﻿namespace Steadsoft.Novus.Parser
+﻿namespace Steadsoft.Novus.Parser.Statics
 {
     public static class ListExtensions
     {
@@ -12,7 +12,7 @@
         public static bool ContainsMoreThanOneOf<T>(this List<T> List, params T[] Set) //where T : class
         {
             int count = 0;
-            
+
             foreach (var member in Set)
             {
                 if (List.Contains(member))
