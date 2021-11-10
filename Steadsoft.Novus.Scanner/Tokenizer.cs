@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using static Steadsoft.Novus.Scanner.LexicalClass; 
+using static Steadsoft.Novus.Scanner.LexicalClass;
 
 namespace Steadsoft.Novus.Scanner
 {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Steadsoft.Novus.Scanner
+﻿namespace Steadsoft.Novus.Scanner
 {
     /// <summary>
     /// Represents a 2D "array" of objects where space is only used as items are added.

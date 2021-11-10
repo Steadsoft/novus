@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Steadsoft.Novus.Scanner
+﻿namespace Steadsoft.Novus.Scanner
 {
     public class TokenEnumerator<T> where T : struct, System.Enum
     {

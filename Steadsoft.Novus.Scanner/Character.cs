@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Steadsoft.Novus.Scanner
+﻿namespace Steadsoft.Novus.Scanner
 {
     public record Character
     {

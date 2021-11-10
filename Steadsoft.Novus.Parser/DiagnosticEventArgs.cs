@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Steadsoft.Novus.Parser
+﻿namespace Steadsoft.Novus.Parser
 {
     public class DiagnosticEventArgs : EventArgs
     {
