@@ -6,7 +6,7 @@
     /// </summary>
     public interface IBlockContainer
     {
-        public string ShortTypeName { get; }
+        public string ShortStatementTypeName { get; }
         BlockStatement Block { get; }
         string Name { get; }
         int Line { get; }

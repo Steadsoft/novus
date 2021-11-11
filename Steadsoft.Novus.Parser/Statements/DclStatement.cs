@@ -7,7 +7,7 @@ namespace Steadsoft.Novus.Parser.Statements
     public class DclStatement : Statement
     {
         public string Name { get; private set; }
-        public string ShortTypeName { get; private set; }
+        public string ShortStatementTypeName { get; private set; }
         /// <summary>
         /// Indicates optional keywords encountered while parsing.
         /// These are blindly added during parsing and checked for
@@ -18,10 +18,10 @@ namespace Steadsoft.Novus.Parser.Statements
         {
 
         }
-        public DclStatement(int Line, int Col, string Name, string ShortTypeName) : base(Line, Col)
+        public DclStatement(int Line, int Col, string Name, string ShortStatementTypeName) : base(Line, Col)
         {
             this.Name = Name;
-            this.ShortTypeName = ShortTypeName;
+            this.ShortStatementTypeName = ShortStatementTypeName;
             Options = new List<NovusKeywords>();
         }
 
