@@ -554,7 +554,7 @@ namespace Steadsoft.Novus.Parser.Classes
             return true;
 
         }
-        private bool TryParseAccessorBlock(Token<NovusKeywords> Prior, out Statement Stmt, DclTypeStatement Parent, out string DiagMsg)
+        private bool TryParseAccessorBlock(Token<NovusKeywords> Prior, out BlockStatement Stmt, DclTypeStatement Parent, out string DiagMsg)
         {
             Stmt = new AccessibilityBlock(Prior.LineNumber, Prior.ColNumber, Accessibility.Unknown);
 
@@ -624,7 +624,7 @@ namespace Steadsoft.Novus.Parser.Classes
             }
             else
             {
-                var ordered = terms.OrderBy(t => t).ToList();
+                var ordered = terms.OrderBy(t => t.ToString()).ToList();
 
                 if ((ordered[0] != Internal || ordered[1] != Protected) && (ordered[0] != Private || ordered[1] != Protected))
                 {
