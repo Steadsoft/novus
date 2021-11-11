@@ -4,6 +4,10 @@ namespace Steadsoft.Novus.Parser.Statics
 {
     public static class ListExtensions
     {
+        public static bool DoesntContain<T>(this List<T> List, T Item)
+        {
+            return ! List.Contains(Item);
+        }
         /// <summary>
         /// Returns true if any of the values supplied in 'Set' appear more than once in the list.
         /// </summary>

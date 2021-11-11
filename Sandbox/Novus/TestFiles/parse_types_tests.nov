@@ -2,7 +2,25 @@
 {
    type aa
    {
+      public private
+      {
    
+      }
+
+      internal
+      {
+   
+      }
+
+      public 
+      {
+   
+      }
+
+      internal
+      {
+   
+      }
    }
 
    type aa
@@ -45,7 +63,26 @@
 
                 type GetScreenArea class
                 {
-            
+                   // We can't really begin to work on actual statements yet because we must
+                   // deal with parsing expressions and we can't do that much until we have
+                   // a more solid set of ideas for operators and so on.
+
+                   /* but lets play a little..
+
+                   call some_method; // no args, so no parens
+
+                   call some_other_method (<expression>,<expression>...);
+
+                   goto label;
+
+                   while (<expression>)
+                      <statement>
+
+                   until (<expression>)
+                      <statement>
+
+
+                   */
                 }
             }
 

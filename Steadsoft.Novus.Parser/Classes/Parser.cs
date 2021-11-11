@@ -7,6 +7,7 @@ using System.Text;
 using static Steadsoft.Novus.Scanner.TokenType;
 using static Steadsoft.Novus.Parser.Enums.NovusKeywords;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Steadsoft.Novus.Parser.Classes
 {
@@ -22,6 +23,14 @@ namespace Steadsoft.Novus.Parser.Classes
     /// </remarks>
     public class Parser
     {
+        private static List<NovusKeywords> accessibilities = new List<NovusKeywords>()
+        { 
+            Public, 
+            Private, 
+            Protected, 
+            Internal
+        };
+
         public delegate void DiagnosticEventHandler(object Sender, DiagnosticEventArgs Args);
         public TokenEnumerator<NovusKeywords> TokenSource { get; private set; }
         public event DiagnosticEventHandler OnDiagnostic;
@@ -220,6 +229,10 @@ namespace Steadsoft.Novus.Parser.Classes
                         case DclStatement stmt:
                             {
                                 AnalyzeDef(stmt);
+                                break;
+                            }
+                        case AccessibilityBlock stmt:
+                            {
                                 break;
                             }
                         default:
@@ -513,6 +526,22 @@ namespace Steadsoft.Novus.Parser.Classes
                         }
                         token = TokenSource.GetNextToken();
                         continue;
+                    case Public:
+                    case Internal:
+                    case Protected:
+                    case Private:
+                        TokenSource.PushToken(token);
+                        if (TryParseAccessorBlock(token, out var accessorStatement, Stmt, out DiagMsg))
+                        {
+                            body.AddChild(accessorStatement);
+                        }
+                        else
+                        {
+                            OnDiagnostic(this, ParsedBad(accessorStatement, DiagMsg));
+                            TokenSource.SkipToNext("}");
+                        }
+                        token = TokenSource.GetNextToken();
+                        continue;
                     default:
                         OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, "Unexpected token {} found."));
                         break;
@@ -524,6 +553,96 @@ namespace Steadsoft.Novus.Parser.Classes
 
             return true;
 
+        }
+        private bool TryParseAccessorBlock(Token<NovusKeywords> Prior, out Statement Stmt, DclTypeStatement Parent, out string DiagMsg)
+        {
+            Stmt = new AccessibilityBlock(Prior.LineNumber, Prior.ColNumber, Accessibility.Unknown);
+
+            DiagMsg = string.Empty;
+            List<NovusKeywords> terms = new List<NovusKeywords>();
+
+            var token = TokenSource.GetNextToken();
+
+            if (token.Keyword == IsNotKeyword)
+            {
+                DiagMsg = $"Unexpected token {token.Lexeme}";
+                TokenSource.SkipToNext("}");
+                return false;
+            }
+
+            if (accessibilities.DoesntContain(token.Keyword))
+            {
+                DiagMsg = $"Unexpected token {token.Lexeme}";
+                TokenSource.SkipToNext("}");
+                return false;
+            }
+
+            terms.Add(token.Keyword);
+
+            token = TokenSource.GetNextToken();
+
+            if (token.TokenCode != LBrace)
+            {
+                if (token.Keyword == IsNotKeyword)
+                {
+                    DiagMsg = $"Unexpected token {token.Lexeme}";
+                    TokenSource.SkipToNext("}");
+                    return false;
+                }
+
+                if (accessibilities.DoesntContain(token.Keyword))
+                {
+                    DiagMsg = $"Unexpected token {token.Lexeme}";
+                    TokenSource.SkipToNext("}");
+                    return false;
+                }
+
+                terms.Add(token.Keyword);
+                token = TokenSource.GetNextToken();
+            }
+
+            if (token.TokenCode != LBrace)
+            {
+                DiagMsg = $"Unexpected token {token.Lexeme}";
+                TokenSource.SkipToNext("}");
+                return false;
+            }
+
+            TokenSource.PushToken(token);
+
+            Accessibility acc;
+
+            if (terms.Count == 1)
+            {
+                if (terms[0] != Public && terms[0] != Private && terms[0] != Internal && terms[0] != Protected)
+                {
+                    DiagMsg = $"The accessibility level '{terms[0].ToString().ToLower()}' must not appear alone.";
+                    return false;
+                }
+
+                acc = (Accessibility)System.Enum.Parse(typeof(Accessibility), terms[0].ToString());
+            }
+            else
+            {
+                var ordered = terms.OrderBy(t => t).ToList();
+
+                if ((ordered[0] != Internal || ordered[1] != Protected) && (ordered[0] != Private || ordered[1] != Protected))
+                {
+                    DiagMsg = $"The accessibilities '{ordered[0].ToString().ToLower()}' and '{ordered[1].ToString().ToLower()}' must not appear together.";
+                    return false;
+                }
+
+                if (ordered[0] == Internal)
+                    acc = Accessibility.Protected_Internal;
+                else
+                    acc = Accessibility.Private_Protected;
+            }
+
+            TokenSource.SkipToNext("}");
+
+            Stmt = new AccessibilityBlock(Prior.LineNumber, Prior.ColNumber, acc);
+
+            return true;
         }
         private bool TryParseDef(Token<NovusKeywords> Prior, out DclStatement Stmt, DclTypeStatement Parent, out string DiagMsg)
         {
@@ -726,7 +845,7 @@ namespace Steadsoft.Novus.Parser.Classes
         }
         private static DiagnosticEventArgs ParsedBad(Statement Stmt, string Msg)
         {
-            return new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $" Failed to parse a {Stmt.GetType().Name} ({Msg})");
+            return new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Failed to parse {Stmt.GetType().Name} ({Msg})");
         }
         /// <summary>
         /// Seraches for duplicate named declarations within the scope defined by the supplied statement.

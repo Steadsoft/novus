@@ -23,6 +23,8 @@
         Ref,
         Out,
         While,
+        Until,
+        Goto,
         Call
     }
 }
