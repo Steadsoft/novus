@@ -141,31 +141,49 @@ namespace Steadsoft.Novus.Parser.Classes
                                 AnalyzeDef(stmt);
                                 break;
                             }
+                        default:
+                            throw new NotImplementedException("Fix me.");
+
                     }
                 }
         }
         private void AnalyzeDef(DclStatement Stmt)
         {
+            var groups = Stmt.Options.GroupBy(a => a).Where(g => g.Count() > 1);
+
             switch (Stmt)
             {
-                case DclMethodStatement _:
+                case DclFieldStatement declaration:
                     {
-                        Stmt = (DclMethodStatement)Stmt;
-                        var groups = Stmt.Options.GroupBy(a => a).Where(g => g.Count() > 1);
-
                         if (groups.Any())
                         {
                             foreach (var group in groups)
                             {
-                                OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Duplicate options '{group.Key.ToString().ToLower()}' in method '{Stmt.Name}'."));
+                                OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, declaration.Line, declaration.Col, $"The option '{group.Key.ToString().ToLower()}' appears more than once in the declaration of field '{declaration.Name}'."));
                             }
                         }
 
-                        AnalyzeParameterList(((DclMethodStatement)Stmt).Parameters);
                         break;
                     }
+                case DclMethodStatement declaration:
+                    {
+                        if (groups.Any())
+                        {
+                            foreach (var group in groups)
+                            {
+                                OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, declaration.Line, declaration.Col, $"The option '{group.Key.ToString().ToLower()}' appears more than once in the declaration of method '{declaration.Name}'."));
+                            }
+                        }
+
+                        AnalyzeParameterList(declaration.Parameters);
+                        break;
+                    }
+                default:
+                    throw new NotImplementedException("Fix me.");
             }
         }
+
+        
         private void AnalyzeParameterList(List<Parameter> Params)
         {
             ;

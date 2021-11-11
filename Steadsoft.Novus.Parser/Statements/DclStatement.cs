@@ -4,8 +4,6 @@ namespace Steadsoft.Novus.Parser.Statements
 {
     public class DclStatement : Statement
     {
-        public int Line { get; }
-        public int Col { get; }
         public string Name { get; private set; }
         public string ShortTypeName { get; private set; }
         /// <summary>
@@ -20,8 +18,6 @@ namespace Steadsoft.Novus.Parser.Statements
         }
         public DclStatement(int Line, int Col, string Name, string ShortTypeName) : base(Line, Col)
         {
-            this.Line = Line;
-            this.Col = Col;
             this.Name = Name;
             this.ShortTypeName = ShortTypeName;
             Options = new List<NovusKeywords>();

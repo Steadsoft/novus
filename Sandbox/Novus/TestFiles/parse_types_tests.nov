@@ -35,12 +35,13 @@
                   return;
                }
 
-               def GetScreenArea (arg1 string)  (string) public override
+               def GetScreenArea (arg1 string)  (string) public override public
                {
                   return;
                }
 
-               def Name string public readonly; // a field definition
+               def Name string public readonly public; // a field definition
+               def Name double private readonly public; // a field definition
 
                 type GetScreenArea class
                 {

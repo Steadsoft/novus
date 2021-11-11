@@ -50,7 +50,5 @@ namespace Sandbox
                 Console.Write(text);
             }
         }
-
     }
-
 }

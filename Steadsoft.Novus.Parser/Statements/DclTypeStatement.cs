@@ -15,22 +15,15 @@ namespace Steadsoft.Novus.Parser.Statements
         /// These are blindly added during parsing and checked for
         /// consistency and applicability at a later step.
         /// </summary>
-        public List<NovusKeywords> Options { get; private set; }
 
         public DclTypeStatement(int Line, int Col, string Name) : base(Line, Col, Name, "type")
         {
             Block = null;
-            Options = new List<NovusKeywords>();
         }
         public void AddBody(BlockStatement Stmt)
         {
             Block = Stmt ?? throw new ArgumentNullException(nameof(Stmt));
             Block.Parent = this;
-        }
-
-        public void AddOption(NovusKeywords Option)
-        {
-            Options.Add(Option);
         }
 
         public override string ToString()
