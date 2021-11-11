@@ -736,7 +736,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
                 foreach (var duplicate in duplicates)
                 {
-                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortTypeName} name '{duplicate.Name}' within {Stmt.ShortTypeName} '{Stmt.Name}', there is already a defintion of a {firstuse.ShortTypeName} with this name at line {firstuse.Line})."));
+                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortTypeName} name '{duplicate.Name}' within {Stmt.ShortTypeName} '{Stmt.Name}', there is already a defintion of a {firstuse.ShortTypeName} with this name at line {firstuse.Line}."));
                 }
             }
         }
