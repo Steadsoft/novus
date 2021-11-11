@@ -1,4 +1,6 @@
-﻿namespace Steadsoft.Novus.Parser.Statements
+﻿using System;
+
+namespace Steadsoft.Novus.Parser.Statements
 {
     public class ComputeStatement : Statement
     {

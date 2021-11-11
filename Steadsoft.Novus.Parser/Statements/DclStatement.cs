@@ -1,4 +1,6 @@
 ﻿using Steadsoft.Novus.Parser.Enums;
+using System;
+using System.Collections.Generic;
 
 namespace Steadsoft.Novus.Parser.Statements
 {

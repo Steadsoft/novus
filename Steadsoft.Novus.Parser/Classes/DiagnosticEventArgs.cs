@@ -2,7 +2,7 @@
 
 namespace Steadsoft.Novus.Parser.Classes
 {
-    public class DiagnosticEventArgs : EventArgs
+    public class DiagnosticEventArgs : System.EventArgs
     {
         public Severity Severity { get; private set; }
         public int Line { get; private set; }

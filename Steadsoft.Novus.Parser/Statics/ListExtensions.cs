@@ -1,4 +1,6 @@
-﻿namespace Steadsoft.Novus.Parser.Statics
+﻿using System.Collections.Generic;
+
+namespace Steadsoft.Novus.Parser.Statics
 {
     public static class ListExtensions
     {

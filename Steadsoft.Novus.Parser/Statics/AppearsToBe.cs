@@ -1,5 +1,6 @@
 ﻿using Steadsoft.Novus.Parser.Enums;
 using Steadsoft.Novus.Scanner;
+using System.Collections.Generic;
 using static Steadsoft.Novus.Scanner.TokenType;
 
 namespace Steadsoft.Novus.Parser.Statics

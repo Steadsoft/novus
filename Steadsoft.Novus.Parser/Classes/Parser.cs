@@ -5,6 +5,8 @@ using Steadsoft.Novus.Scanner;
 using System.Reflection;
 using System.Text;
 using static Steadsoft.Novus.Scanner.TokenType;
+using static Steadsoft.Novus.Parser.Enums.NovusKeywords;
+using System.Linq;
 
 namespace Steadsoft.Novus.Parser.Classes
 {
@@ -53,9 +55,91 @@ namespace Steadsoft.Novus.Parser.Classes
             var source = new TokenEnumerator<NovusKeywords>(tokenizer.Tokenize(sourceFile), BlockComment, LineComment);
             return new Parser(source);
         }
+        public bool TrySyntaxPhase(out BlockStatement Tree)
+        {
+            int errors = 0;
+
+            Tree = null;
+
+            string message;
+
+            var token = TokenSource.GetNextToken();
+
+            // We expect any of the following
+
+            // using <qualified-name> ;
+            // namespace <qualified-name> { }
+            // zero or more of: type <identifier>  [<type-options>] { <type-body> }
+
+            while (token.TokenCode != NoMoreTokens)
+            {
+                if (Tree == null)
+                {
+                    Tree = new BlockStatement(token.LineNumber, token.ColNumber);
+                }
+
+                switch (token.Keyword)
+                {
+                    case Using:
+                        TokenSource.PushToken(token);
+                        if (TryParseUsing(token, out var usingStatement, out message))
+                        {
+                            Tree.AddChild(usingStatement);
+                        }
+                        else
+                        {
+                            errors++;
+                            OnDiagnostic(this, ParsedBad(usingStatement, message));
+                            TokenSource.SkipToNext(";");
+                        }
+                        token = TokenSource.GetNextToken();
+                        continue;
+
+                    case Namespace:
+                        TokenSource.PushToken(token);
+                        if (TryParseNamespace(token, out var namespaceStatement, out message))
+                        {
+                            Tree.AddChild(namespaceStatement);
+                        }
+                        else
+                        {
+                            errors++;
+                            OnDiagnostic(this, ParsedBad(namespaceStatement, message));
+                            TokenSource.SkipToNext(";");
+                        }
+                        token = TokenSource.GetNextToken();
+                        continue;
+
+                    case Type:
+                        TokenSource.PushToken(token);
+                        if (TryParseType(token, out var typeStatement, out message))
+                        {
+                            Tree.AddChild(typeStatement);
+                        }
+                        else
+                        {
+                            errors++;
+                            OnDiagnostic(this, ParsedBad(typeStatement, message));
+                            TokenSource.SkipToNext("}");
+                        }
+                        token = TokenSource.GetNextToken();
+                        continue;
+
+                    default:
+                        {
+                            errors++;
+                            OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, "Expected one of 'using', 'namespace' or 'type"));
+                            break;
+                        }
+                }
+            }
+
+            return errors == 0;
+
+        }
         public bool TrySemanticPhase(ref BlockStatement Tree)
         {
-            if (Tree == null) throw new ArgumentNullException(nameof(Tree));
+            if (Tree == null) throw new System.ArgumentNullException(nameof(Tree));
 
             foreach (var node in Tree.Children)
             {
@@ -75,7 +159,6 @@ namespace Steadsoft.Novus.Parser.Classes
 
             return true;
         }
-
         private void AnalyzeNamespace(DclNamespaceStatement Stmt)
         {
             ReportDuplicateDeclarations(Stmt);
@@ -98,19 +181,17 @@ namespace Steadsoft.Novus.Parser.Classes
                     }
                 }
         }
-
         private void AnalyzeType(DclTypeStatement Stmt)
         {
-
             ReportDuplicateDeclarations(Stmt);
 
-            if (Stmt.Options.ContainsMoreThanOneOf(NovusKeywords.Class, NovusKeywords.Struct, NovusKeywords.Singlet))
+            if (Stmt.Options.ContainsMoreThanOneOf(Class, Struct, Singlet))
             {
                 OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"A type must have only one of the keywords 'class', 'struct' or 'singlet'."));
             }
             else
             {
-                if (Stmt.Options.TryGetUnique(out var Item, NovusKeywords.Class, NovusKeywords.Struct, NovusKeywords.Singlet))
+                if (Stmt.Options.TryGetUnique(out var Item, Class, Struct, Singlet))
                 {
                     Stmt.DeclaredKind = Item;
                 }
@@ -142,7 +223,7 @@ namespace Steadsoft.Novus.Parser.Classes
                                 break;
                             }
                         default:
-                            throw new NotImplementedException("Fix me.");
+                            throw new System.NotImplementedException("Fix me.");
 
                     }
                 }
@@ -179,96 +260,12 @@ namespace Steadsoft.Novus.Parser.Classes
                         break;
                     }
                 default:
-                    throw new NotImplementedException("Fix me.");
+                    throw new System.NotImplementedException("Fix me.");
             }
         }
-
-        
-        private void AnalyzeParameterList(List<Parameter> Params)
+        private void AnalyzeParameterList(System.Collections.Generic.List<Parameter> Params)
         {
             ;
-        }
-        public bool TrySyntaxPhase(out BlockStatement Tree)
-        {
-            int errors = 0;
-
-            Tree = null;
-
-            string message;
-
-            var token = TokenSource.GetNextToken();
-
-            // We expect any of the following
-
-            // using <qualified-name> ;
-            // namespace <qualified-name> { }
-            // zero or more of: type <identifier>  [<type-options>] { <type-body> }
-
-            while (token.TokenCode != NoMoreTokens)
-            {
-                if (Tree == null)
-                {
-                    Tree = new BlockStatement(token.LineNumber, token.ColNumber);
-                }
-
-                switch (token.Keyword)
-                {
-                    case NovusKeywords.Using:
-                        TokenSource.PushToken(token);
-                        if (TryParseUsing(token, out var usingStatement, out message))
-                        {
-                            Tree.AddChild(usingStatement);
-                        }
-                        else
-                        {
-                            errors++;
-                            OnDiagnostic(this, ParsedBad(usingStatement, message));
-                            TokenSource.SkipToNext(";");
-                        }
-                        token = TokenSource.GetNextToken();
-                        continue;
-
-                    case NovusKeywords.Namespace:
-                        TokenSource.PushToken(token);
-                        if (TryParseNamespace(token, out var namespaceStatement, out message))
-                        {
-                            Tree.AddChild(namespaceStatement);
-                        }
-                        else
-                        {
-                            errors++;
-                            OnDiagnostic(this, ParsedBad(namespaceStatement, message));
-                            TokenSource.SkipToNext(";");
-                        }
-                        token = TokenSource.GetNextToken();
-                        continue;
-
-                    case NovusKeywords.Type:
-                        TokenSource.PushToken(token);
-                        if (TryParseType(token, out var typeStatement, out message))
-                        {
-                            Tree.AddChild(typeStatement);
-                        }
-                        else
-                        {
-                            errors++;
-                            OnDiagnostic(this, ParsedBad(typeStatement, message));
-                            TokenSource.SkipToNext("}");
-                        }
-                        token = TokenSource.GetNextToken();
-                        continue;
-
-                    default:
-                        {
-                            errors++;
-                            OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, "Expected one of 'using', 'namespace' or 'type"));
-                            break;
-                        }
-                }
-            }
-
-            return errors == 0;
-
         }
         private bool TryParseUsing(Token<NovusKeywords> Prior, out UsingStatement Stmt, out string DiagMsg)
         {
@@ -283,7 +280,7 @@ namespace Steadsoft.Novus.Parser.Classes
             // <ident>.<ident>.
             // <ident>.<ident>.<ident>;
 
-            TokenSource.CheckExpectedToken(NovusKeywords.Using);
+            TokenSource.CheckExpectedToken(Using);
 
             var token = TokenSource.GetNextToken();
 
@@ -322,7 +319,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             StringBuilder builder = new();
 
-            TokenSource.CheckExpectedToken(NovusKeywords.Namespace);
+            TokenSource.CheckExpectedToken(Namespace);
 
             var token = TokenSource.GetNextToken();
 
@@ -377,7 +374,7 @@ namespace Steadsoft.Novus.Parser.Classes
             var token = TokenSource.GetNextToken();
 
             if (token.TokenCode != LBrace)
-                throw new InvalidOperationException("Expected token '{' has not been pushed.");
+                throw new System.InvalidOperationException("Expected token '{' has not been pushed.");
 
             Block = new BlockStatement(token.LineNumber, token.ColNumber);
 
@@ -387,7 +384,7 @@ namespace Steadsoft.Novus.Parser.Classes
             {
                 switch (token.Keyword)
                 {
-                    case NovusKeywords.Namespace:
+                    case Namespace:
                         TokenSource.PushToken(token);
                         if (TryParseNamespace(token, out var namespaceStatement, out DiagMsg))
                         {
@@ -401,7 +398,7 @@ namespace Steadsoft.Novus.Parser.Classes
                         token = TokenSource.GetNextToken();
                         continue;
 
-                    case NovusKeywords.Type:
+                    case Type:
                         TokenSource.PushToken(token);
                         if (TryParseType(token, out var typeStatement, out DiagMsg))
                         {
@@ -428,7 +425,7 @@ namespace Steadsoft.Novus.Parser.Classes
         {
             Stmt = null;
 
-            TokenSource.CheckExpectedToken(NovusKeywords.Type);
+            TokenSource.CheckExpectedToken(Type);
 
             var token = TokenSource.GetNextToken();
 
@@ -456,7 +453,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             while (token.Lexeme != "{")
             {
-                if (token.Keyword == NovusKeywords.IsNotKeyword)
+                if (token.Keyword == IsNotKeyword)
                 {
                     DiagMsg = $"Unexpected token in type declaration '{token.Lexeme}'";
                     continue;
@@ -478,7 +475,7 @@ namespace Steadsoft.Novus.Parser.Classes
             var token = TokenSource.GetNextToken();
 
             if (token.TokenCode != LBrace)
-                throw new InvalidOperationException("Expected token '{' has not been pushed.");
+                throw new System.InvalidOperationException("Expected token '{' has not been pushed.");
 
             BlockStatement body = new(token.LineNumber, token.ColNumber);
 
@@ -490,7 +487,7 @@ namespace Steadsoft.Novus.Parser.Classes
             {
                 switch (token.Keyword)
                 {
-                    case NovusKeywords.Type:
+                    case Type:
                         TokenSource.PushToken(token);
                         if (TryParseType(token, out var typeStatement, out DiagMsg))
                         {
@@ -503,7 +500,7 @@ namespace Steadsoft.Novus.Parser.Classes
                         }
                         token = TokenSource.GetNextToken();
                         continue;
-                    case NovusKeywords.Def:
+                    case Def:
                         TokenSource.PushToken(token);
                         if (TryParseDef(token, out var defStatement, Stmt, out DiagMsg))
                         {
@@ -533,7 +530,7 @@ namespace Steadsoft.Novus.Parser.Classes
             Stmt = null;
             DiagMsg = string.Empty;
 
-            TokenSource.CheckExpectedToken(NovusKeywords.Def);
+            TokenSource.CheckExpectedToken(Def);
 
             var token = TokenSource.GetNextToken();
 
@@ -573,7 +570,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             while (token.TokenCode != SemiColon)
             {
-                if (token.Keyword != NovusKeywords.IsNotKeyword)
+                if (token.Keyword != IsNotKeyword)
                 {
                     field.AddOption(token.Keyword);
                     token = TokenSource.GetNextToken();
@@ -628,12 +625,12 @@ namespace Steadsoft.Novus.Parser.Classes
 
                 switch (token.Keyword)
                 {
-                    case NovusKeywords.Ref:
+                    case Ref:
                         {
                             Stmt.AddParameter(new Parameter(pname, typename, PassBy.Ref));
                             break;
                         }
-                    case NovusKeywords.Out:
+                    case Out:
                         {
                             Stmt.AddParameter(new Parameter(pname, typename, PassBy.Out));
                             break;
@@ -699,7 +696,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             while (token.TokenCode != LBrace)
             {
-                if (token.Keyword == NovusKeywords.IsNotKeyword)
+                if (token.Keyword == IsNotKeyword)
                 {
                     ; // error
                 }
@@ -719,7 +716,7 @@ namespace Steadsoft.Novus.Parser.Classes
             var token = TokenSource.GetNextToken();
 
             if (token.TokenCode != LBrace)
-                throw new InvalidOperationException("Expected token '{' has not been pushed.");
+                throw new System.InvalidOperationException("Expected token '{' has not been pushed.");
 
             TokenSource.SkipToNext("}");
 
@@ -731,7 +728,6 @@ namespace Steadsoft.Novus.Parser.Classes
         {
             return new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $" Failed to parse a {Stmt.GetType().Name} ({Msg})");
         }
-
         /// <summary>
         /// Seraches for duplicate named declarations within the scope defined by the supplied statement.
         /// </summary>

@@ -1,10 +1,11 @@
 ﻿using Steadsoft.Novus.Parser.Enums;
+using static Steadsoft.Novus.Parser.Enums.NovusKeywords;
 
 namespace Steadsoft.Novus.Parser.Statements
 {
     public class WhileStatement : KeywordStatement
     {
-        public WhileStatement(int Line, int Col) : base(Line, Col, NovusKeywords.While)
+        public WhileStatement(int Line, int Col) : base(Line, Col, While)
         {
 
         }

@@ -1,4 +1,6 @@
-﻿namespace Steadsoft.Novus.Parser.Classes
+﻿using System;
+
+namespace Steadsoft.Novus.Parser.Classes
 {
     public class InternalErrorException : InvalidOperationException
     {
