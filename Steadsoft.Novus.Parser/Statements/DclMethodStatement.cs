@@ -8,13 +8,15 @@ namespace Steadsoft.Novus.Parser.Statements
     /// </summary>
     public class DclMethodStatement : DclStatement, IBlockContainer
     {
+        public DclTypeStatement Parent { get; private set; }
         public BlockStatement Block { get; private set; }
         public List<Parameter> Parameters { get; private set; }
         public string Returns { get; internal set; }
-        public DclMethodStatement(int Line, int Col, string Name) : base(Line, Col, Name, "method")
+        public DclMethodStatement(int Line, int Col, string Name, DclTypeStatement Parent) : base(Line, Col, Name, "method")
         {
-            Parameters = new List<Parameter>();
-            Returns = null;
+            this.Parameters = new List<Parameter>();
+            this.Returns = null;
+            this.Parent = Parent;
         }
 
         public void AddParameter(Parameter Parameter)

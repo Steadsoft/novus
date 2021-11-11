@@ -487,7 +487,7 @@ namespace Steadsoft.Novus.Parser.Classes
                         continue;
                     case NovusKeywords.Def:
                         TokenSource.PushToken(token);
-                        if (TryParseDef(token, out var defStatement, out DiagMsg))
+                        if (TryParseDef(token, out var defStatement, Stmt, out DiagMsg))
                         {
                             body.AddChild(defStatement);
                         }
@@ -510,7 +510,7 @@ namespace Steadsoft.Novus.Parser.Classes
             return true;
 
         }
-        private bool TryParseDef(Token<NovusKeywords> Prior, out DclStatement Stmt, out string DiagMsg)
+        private bool TryParseDef(Token<NovusKeywords> Prior, out DclStatement Stmt, DclTypeStatement Parent, out string DiagMsg)
         {
             Stmt = null;
             DiagMsg = string.Empty;
@@ -531,25 +531,25 @@ namespace Steadsoft.Novus.Parser.Classes
 
             if (AppearsToBeA.MethodDeclaration(TokenSource))
             {
-                if (TryParseMethodDeclaration(token, ref Stmt, out DiagMsg))
+                if (TryParseMethodDeclaration(token, ref Stmt, Parent, out DiagMsg))
                     return TryParseMethodBody(token, ref Stmt, out DiagMsg);
             }
             else
             {
                 if (AppearsToBeA.FieldDeclaration(TokenSource))
-                    return TryParseFieldDeclaration(token, ref Stmt, out DiagMsg);
+                    return TryParseFieldDeclaration(token, ref Stmt, Parent, out DiagMsg);
             }
 
             return false;
 
         }
-        private bool TryParseFieldDeclaration(Token<NovusKeywords> Prior, ref DclStatement Stmt, out string DiagMsg)
+        private bool TryParseFieldDeclaration(Token<NovusKeywords> Prior, ref DclStatement Stmt, DclTypeStatement Parent, out string DiagMsg)
         {
             DiagMsg = string.Empty;
 
             var token = TokenSource.GetNextToken();
 
-            DclFieldStatement field = new DclFieldStatement(Stmt.Line, Stmt.Col, Stmt.Name, token.Lexeme);
+            DclFieldStatement field = new DclFieldStatement(Stmt.Line, Stmt.Col, Stmt.Name, token.Lexeme, Parent);
 
             token = TokenSource.GetNextToken();
 
@@ -643,7 +643,7 @@ namespace Steadsoft.Novus.Parser.Classes
             return true;
 
         }
-        private bool TryParseMethodDeclaration(Token<NovusKeywords> Prior, ref DclStatement Stmt, out string DiagMsg)
+        private bool TryParseMethodDeclaration(Token<NovusKeywords> Prior, ref DclStatement Stmt, DclTypeStatement Parent, out string DiagMsg)
         {
             Token<NovusKeywords> token;
 
@@ -657,7 +657,7 @@ namespace Steadsoft.Novus.Parser.Classes
                 return false;
             }
 
-            methodDef = new DclMethodStatement(Stmt.Line, Stmt.Col, Stmt.Name);
+            methodDef = new DclMethodStatement(Stmt.Line, Stmt.Col, Stmt.Name, Parent);
 
             TryParseParameterList(Prior, ref methodDef, out DiagMsg);
 

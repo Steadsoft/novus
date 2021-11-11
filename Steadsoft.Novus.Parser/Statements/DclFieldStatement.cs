@@ -7,10 +7,12 @@ namespace Steadsoft.Novus.Parser.Statements
     /// </summary>
     public class DclFieldStatement : DclStatement
     {
+        public DclTypeStatement Parent { get; private set; }
         public string TypeName { get; private set; }
-        public DclFieldStatement(int Line, int Col, string Name, string TypeName) : base(Line, Col, Name, "field")
+        public DclFieldStatement(int Line, int Col, string Name, string TypeName, DclTypeStatement Parent) : base(Line, Col, Name, "field")
         {
             this.TypeName = TypeName;
+            this.Parent = Parent;
         }
 
         public override string Dump(int nesting)
