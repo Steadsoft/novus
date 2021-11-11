@@ -21,6 +21,8 @@
         Sealed,
         Override,
         Ref,
-        Out
+        Out,
+        While,
+        Call
     }
 }

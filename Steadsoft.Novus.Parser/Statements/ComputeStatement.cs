@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Steadsoft.Novus.Parser.Statements
+﻿namespace Steadsoft.Novus.Parser.Statements
 {
     public class ComputeStatement : Statement
     {

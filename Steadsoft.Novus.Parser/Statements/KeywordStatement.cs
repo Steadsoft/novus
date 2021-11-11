@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Steadsoft.Novus.Parser.Enums;
 
 namespace Steadsoft.Novus.Parser.Statements
 {
     public class KeywordStatement : ComputeStatement
     {
-        public KeywordStatement(int Line, int Col) : base(Line, Col)
+        public NovusKeywords Keyword { get; private set; }
+        public KeywordStatement(int Line, int Col, NovusKeywords Keyword) : base(Line, Col)
         {
+            this.Keyword = Keyword;
         }
     }
 }
