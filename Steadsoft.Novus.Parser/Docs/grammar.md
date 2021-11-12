@@ -25,3 +25,7 @@ namespace-member-declaration:
 namespace-declaration:
     "namespace" qualified-identifier [namespace-body] ";"?
 ```    
+```
+namespace-body:
+    "{" using-directive* namespace-member-declaration* "}"
+```
