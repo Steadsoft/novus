@@ -11,10 +11,12 @@ namespace Steadsoft.Novus.Parser.Classes
 
         public DiagnosticEventArgs(Severity Severity, int Line, int Col, string Msg)
         {
+            var location = $"(at {Line}, {Col})";
+
             this.Severity = Severity;
             this.Line = Line;
             this.Col = Col;
-            this.Message = $"{Severity} at {Line,2}, {Col,2} - {Msg}";
+            this.Message = $"{Severity} {location, -12} {Msg}";
         }
     }
 }
