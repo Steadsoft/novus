@@ -6,12 +6,14 @@ The grammar bears some resemblance to C# but is not as granular and the names of
 This [document](https://www.cs.vu.nl/grammarware/browsable/CSharp/grammar.html) was found helpful too.
 
 `*` - Denotes zero or more occurences
+
 `+` - Denotes one or more occurences
+
 `?` - Denotes an optional term
 
-compilation-unit:
+`compilation-unit:
    using-directive*  
-   namespace-member-declaration*
+   namespace-member-declaration*`
 
 namespace-member-declaration:
    namespace-declaration
