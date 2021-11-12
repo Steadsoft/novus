@@ -30,7 +30,7 @@ namespace-body:
     "{" using-directive* namespace-member-declaration* "}"
 ```
 
-The `type-declaration` is where we differ from C#:
+The `type-declaration` is one area where we differ from C#:
 
 ```
 type-declaration:
