@@ -52,4 +52,23 @@ type-options
    "sealed"
 ```
 
-The rules regarding what options can be combined and any ordering of them, is not defined in this grammar (it is defined but not in this doc)
+The rules regarding what options can be combined and any ordering of them, is not defined in this grammar (it is defined but not in this doc).
+
+Examples:
+
+type Window class internal sealed
+{
+
+}
+
+type Window sealed class internal
+{
+
+}
+
+type Window record struct internal sealed
+{
+
+}
+
+The `record` must be followed by either `struct` or `class`, that is `record` is optional and if present must immediately precede the `struct` or `class`.
