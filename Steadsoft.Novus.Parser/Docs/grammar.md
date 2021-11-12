@@ -29,3 +29,27 @@ namespace-declaration:
 namespace-body:
     "{" using-directive* namespace-member-declaration* "}"
 ```
+
+The `type-declaration` is where we differ from C#:
+
+```
+type-declaration:
+   "type"  [type-options] type-body
+```
+
+```
+type-options
+   "class"
+   "struct"
+   "record"
+   "singlet"
+   "new"
+   "public"
+   "protected"
+   "internal"
+   "private"
+   "abstract"
+   "sealed"
+```
+
+The rules regarding what options can be combined and any ordering of them, is not defined in this grammar (it is defined but not in this doc)
