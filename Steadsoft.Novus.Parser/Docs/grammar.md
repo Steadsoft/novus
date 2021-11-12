@@ -84,14 +84,18 @@ type Window record struct internal sealed
 {
     public
     {
+        // a function 
 
+        def Volume (X double, Y double, Z double) (double) 
+        {
+
+        }
     }
 
     private
     {
 
     }
-
 }
 ```
 The `record` must be followed by either `struct` or `class`, that is `record` is optional and if present must immediately precede the `struct` or `class`.
