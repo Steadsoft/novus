@@ -1,0 +1,36 @@
+﻿namespace Steadsoft.Novus.Scanner.Enums
+{
+    public enum TokenType
+    {
+        NoMoreTokens,
+        Undecided,
+        Identifier,
+        LineComment,
+        BlockComment,
+        Integer,
+        Punctuator,
+        Symbol,
+        PointsTo,
+        Equals,
+        Equality,
+        Greater,
+        ShiftRight,
+        Lesser,
+        ShiftLeft,
+        QString,
+        AString,
+        LBrace,
+        RBrace,
+        LBrack,
+        RBrack,
+        LPar,
+        RPar,
+        SemiColon,
+        Minus,
+        Plus,
+        Times,
+        Call,
+        GoesTo,
+        Comma
+    }
+}

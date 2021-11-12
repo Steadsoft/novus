@@ -1,5 +1,5 @@
 ﻿using Steadsoft.Novus.Parser.Enums;
-using static Steadsoft.Novus.Parser.Enums.NovusKeywords;
+using static Steadsoft.Novus.Scanner.Enums.Keywords;
 
 namespace Steadsoft.Novus.Parser.Statements
 {

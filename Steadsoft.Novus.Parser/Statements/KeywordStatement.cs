@@ -1,11 +1,11 @@
-﻿using Steadsoft.Novus.Parser.Enums;
+﻿using Steadsoft.Novus.Scanner.Enums;
 
 namespace Steadsoft.Novus.Parser.Statements
 {
     public class KeywordStatement : ComputeStatement
     {
-        public NovusKeywords Keyword { get; private set; }
-        public KeywordStatement(int Line, int Col, NovusKeywords Keyword) : base(Line, Col)
+        public Keywords Keyword { get; private set; }
+        public KeywordStatement(int Line, int Col, Keywords Keyword) : base(Line, Col)
         {
             this.Keyword = Keyword;
         }

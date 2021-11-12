@@ -1,19 +1,20 @@
-﻿using static Steadsoft.Novus.Scanner.TokenType;
+﻿using Steadsoft.Novus.Scanner.Enums;
+using static Steadsoft.Novus.Scanner.Enums.TokenType;
 
-namespace Steadsoft.Novus.Scanner
+namespace Steadsoft.Novus.Scanner.Classes
 {
-    public class TokenEnumerator<T> where T : struct, System.Enum
+    public class TokenEnumerator<T> where T : struct, Enum
     {
-        private readonly IEnumerator<Token<T>> enumerator;
+        private readonly IEnumerator<Token> enumerator;
         private readonly TokenType[] Skips;
-        private readonly Stack<Token<T>> pushed = new();
-        public TokenEnumerator(IEnumerable<Token<T>> Source, params TokenType[] Skips)
+        private readonly Stack<Token> pushed = new();
+        public TokenEnumerator(IEnumerable<Token> Source, params TokenType[] Skips)
         {
             enumerator = Source.GetEnumerator();
             this.Skips = Skips;
         }
 
-        public void CheckExpectedToken(T Type) 
+        public void CheckExpectedToken(T Type)
         {
             var token = GetNextToken();
 
@@ -27,9 +28,9 @@ namespace Steadsoft.Novus.Scanner
         {
             var list = PeekNextTokens(Tokens.Length).ToArray();
 
-            for (int I=0; I < Tokens.Length; I++)
+            for (int I = 0; I < Tokens.Length; I++)
             {
-                if (Tokens[I] != list[I].TokenCode)
+                if (Tokens[I] != list[I].TokenType)
                     return false;
             }
 
@@ -41,11 +42,11 @@ namespace Steadsoft.Novus.Scanner
         /// </summary>
         /// <param name="N"></param>
         /// <returns></returns>
-        public List<Token<T>> PeekNextTokens(int N)
+        public List<Token> PeekNextTokens(int N)
         {
-            var list = new List<Token<T>>();
+            var list = new List<Token>();
 
-            for (int I=0; I < N; I++)
+            for (int I = 0; I < N; I++)
             {
                 list.Add(GetNextToken());
             }
@@ -59,7 +60,7 @@ namespace Steadsoft.Novus.Scanner
         /// Consume and returns the next token.
         /// </summary>
         /// <returns></returns>
-        public Token<T> GetNextToken()
+        public Token GetNextToken()
         {
             // Once a token has been consumed it is in the past, can't be re-read.
             // But we can 'push' a token at any point and the next time we get a
@@ -73,23 +74,23 @@ namespace Steadsoft.Novus.Scanner
 
             while (enumerator.MoveNext())
             {
-                if (Skips.Contains(enumerator.Current.TokenCode) == false)
+                if (Skips.Contains(enumerator.Current.TokenType) == false)
                     return enumerator.Current;
             }
 
-            return new Token<T>(NoMoreTokens, "", 0, 0);
+            return new Token(NoMoreTokens, "", 0, 0);
         }
 
         /// <summary>
         /// Returns the supplied token to the input, no check is made so be careful!
         /// </summary>
         /// <param name="Token"></param>
-        public void PushToken(Token<T> Token)
+        public void PushToken(Token Token)
         {
             pushed.Push(Token);
         }
 
-        public void PushTokens(List<Token<T>> Tokens)
+        public void PushTokens(List<Token> Tokens)
         {
             for (int I = Tokens.Count - 1; I >= 0; I--)
             {
@@ -101,7 +102,7 @@ namespace Steadsoft.Novus.Scanner
         {
             var token = GetNextToken();
 
-            while (token.Lexeme != Lexeme && token.TokenCode != NoMoreTokens)
+            while (token.Lexeme != Lexeme && token.TokenType != NoMoreTokens)
             {
                 token = GetNextToken();
             }

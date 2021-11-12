@@ -1,6 +1,6 @@
 ﻿namespace a.x.rere
 {
-   type aa
+   type aa 
    {
       public private
       {
@@ -24,7 +24,7 @@
 
       private protected
       {
-   
+            
       }
 
    }
@@ -43,8 +43,9 @@
 
          type Category class sealed sealed abstract static public private
          {
-            type Window class public struct abstract sealed
+            type Window class public struct abstract sealed 
             {
+               
                // This is a method defintion, it has no return type, so its not a 'function'
 
                def ClearScreen (arg1 int, arg2 string, arg3 float) private protected internal public

@@ -1,4 +1,4 @@
-﻿namespace Steadsoft.Novus.Scanner
+﻿namespace Steadsoft.Novus.Scanner.Enums
 {
     public enum TokenDefinition
     {
@@ -12,18 +12,6 @@
         Resource,
         /// <summary>
         /// A plain text token defintion.
-        /// </summary>
-        Text
-    }
-
-    public enum SourceOrigin
-    {
-        /// <summary>
-        /// A pathname of a source file.
-        /// </summary>
-        Pathname,
-        /// <summary>
-        /// Plain text source code.
         /// </summary>
         Text
     }

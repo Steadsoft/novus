@@ -1,4 +1,4 @@
-﻿using Steadsoft.Novus.Parser.Enums;
+﻿using Steadsoft.Novus.Scanner.Enums;
 using System;
 using System.Linq;
 using System.Text;
@@ -10,7 +10,7 @@ namespace Steadsoft.Novus.Parser.Statements
     /// </summary>
     public class DclTypeStatement : DclStatement, IBlockContainer
     {
-        public NovusKeywords DeclaredKind { get; internal set; }
+        public Keywords DeclaredKind { get; internal set; }
         public BlockStatement Block { get; private set; }
         /// <summary>
         /// Indicates optional keywords encountered while parsing.

@@ -1,5 +1,6 @@
 ﻿// This is the token defintions for the the Novus language is based on C#
 
+INITIAL  '*'    AppendReturn     INITIAL     Times
 INITIAL  ','    AppendReturn     INITIAL     Comma
 INITIAL  ';'    AppendReturn     INITIAL     SemiColon
 INITIAL  '{'    AppendReturn     INITIAL     LBrace 
@@ -11,6 +12,7 @@ INITIAL  ')'    AppendReturn     INITIAL     RPar
 INITIAL  '\''   AppendContinue   APOSTROPHE  Undecided 
 INITIAL  '/'    AppendContinue   SLASH       Undecided 
 INITIAL  '-'    AppendContinue   HYPHEN      Undecided 
+INITIAL  '+'    AppendContinue   INITIAL     Plus
 INITIAL  '='    AppendContinue   EQUALS      Undecided 
 INITIAL  '>'    AppendContinue   GREATER     Undecided 
 INITIAL  '<'    AppendContinue   LESSER      Undecided 
@@ -42,7 +44,7 @@ INTEGER  Digit   AppendContinue  INTEGER  Undecided
 INTEGER  Any     RewindReturn  INITIAL  Integer 
 
 HYPHEN  '>'   AppendReturn  INITIAL  PointsTo 
-HYPHEN  Any   RewindReturn  INITIAL  Symbol 
+HYPHEN  Any   RewindReturn  INITIAL  Minus 
 
 EQUALS  '='   AppendReturn  INITIAL  Equality 
 EQUALS  '>'   AppendReturn  INITIAL  GoesTo
@@ -60,8 +62,6 @@ QUOTATION  Any   AppendContinue  QUOTATION  Undecided
 APOSTROPHE  '\''   AppendReturn  INITIAL  AString 
 APOSTROPHE  Any   AppendContinue  APOSTROPHE  Undecided 
 
-HYPHEN  '>'  AppendReturn  INITIAL  PointsTo
-HYPHEN  Any  AppendContinue  INITIAL  Minus
 
 // Novus does not support operators that are both expressions and assignments combined.
 // This means there's no ++ or -- for example.

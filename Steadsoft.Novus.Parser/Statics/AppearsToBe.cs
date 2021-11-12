@@ -1,7 +1,7 @@
-﻿using Steadsoft.Novus.Parser.Enums;
-using Steadsoft.Novus.Scanner;
+﻿using Steadsoft.Novus.Scanner.Enums;
 using System.Collections.Generic;
-using static Steadsoft.Novus.Scanner.TokenType;
+using static Steadsoft.Novus.Scanner.Enums.TokenType;
+using Steadsoft.Novus.Scanner.Classes;
 
 namespace Steadsoft.Novus.Parser.Statics
 {
@@ -10,29 +10,29 @@ namespace Steadsoft.Novus.Parser.Statics
     /// </summary>
     public static class AppearsToBeA
     {
-        public static bool MethodDeclaration(TokenEnumerator<NovusKeywords> TokenSource)
+        public static bool MethodDeclaration(TokenEnumerator<Keywords> TokenSource)
         {
             return TokenSource.NextTokensAre(LPar, Identifier, Identifier);
         }
 
-        public static bool FunctionReturnType(TokenEnumerator<NovusKeywords> TokenSource)
+        public static bool FunctionReturnType(TokenEnumerator<Keywords> TokenSource)
         {
             return TokenSource.NextTokensAre(LPar, Identifier, RPar);
         }
 
-        public static bool FieldDeclaration(TokenEnumerator<NovusKeywords> TokenSource)
+        public static bool FieldDeclaration(TokenEnumerator<Keywords> TokenSource)
         {
-            var tokens = new List<Token<NovusKeywords>>();
+            var tokens = new List<Token>();
 
             var token = TokenSource.GetNextToken();
 
-            while (token.TokenCode != LBrace && token.TokenCode != SemiColon)
+            while (token.TokenType != LBrace && token.TokenType != SemiColon)
             {
                 tokens.Add(token);
                 token = TokenSource.GetNextToken();
             }
 
-            if (token.TokenCode == SemiColon)
+            if (token.TokenType == SemiColon)
             {
                 TokenSource.PushToken(token);
                 TokenSource.PushTokens(tokens);

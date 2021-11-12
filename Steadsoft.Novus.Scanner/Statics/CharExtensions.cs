@@ -1,4 +1,6 @@
-﻿namespace Steadsoft.Novus.Scanner
+﻿using Steadsoft.Novus.Scanner.Enums;
+
+namespace Steadsoft.Novus.Scanner.Statics
 {
     public static class CharExtensions
     {

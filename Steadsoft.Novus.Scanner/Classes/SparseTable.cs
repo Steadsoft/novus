@@ -1,4 +1,4 @@
-﻿namespace Steadsoft.Novus.Scanner
+﻿namespace Steadsoft.Novus.Scanner.Classes
 {
     /// <summary>
     /// Represents a 2D "array" of objects where space is only used as items are added.
@@ -19,7 +19,7 @@
                 table[t].Add(u, f);
         }
 
-        public void Add<V>(T t, V u, F f) where V : System.Enum
+        public void Add<V>(T t, V u, F f) where V : Enum
         {
             Add(t, (U)Convert.ChangeType(u, typeof(U)), f);
         }
@@ -37,7 +37,7 @@
             return false;
         }
 
-        public bool TryGet<V>(T t, V u, out F f) where V : System.Enum
+        public bool TryGet<V>(T t, V u, out F f) where V : Enum
         {
             return TryGet(t, (U)Convert.ChangeType(u, typeof(U)), out f);
         }

@@ -1,6 +1,6 @@
 ﻿using Steadsoft.Novus.Parser.Classes;
 using Steadsoft.Novus.Parser.Statements;
-using Steadsoft.Novus.Scanner;
+using Steadsoft.Novus.Scanner.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

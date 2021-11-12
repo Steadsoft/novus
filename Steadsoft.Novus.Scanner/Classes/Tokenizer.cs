@@ -1,10 +1,12 @@
-﻿using System.Reflection;
+﻿using Steadsoft.Novus.Scanner.Enums;
+using Steadsoft.Novus.Scanner.Statics;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using static Steadsoft.Novus.Scanner.LexicalClass;
-using static Steadsoft.Novus.Scanner.TokenType;
+using static Steadsoft.Novus.Scanner.Enums.LexicalClass;
+using static Steadsoft.Novus.Scanner.Enums.TokenType;
 
-namespace Steadsoft.Novus.Scanner
+namespace Steadsoft.Novus.Scanner.Classes
 {
     /// <summary>
     /// Represents a mechanism which can consume source and emit language tokens.
@@ -14,9 +16,9 @@ namespace Steadsoft.Novus.Scanner
     /// language and then its 'Toeknize' method can be called with a source file to
     /// transform that source into a token stream.
     /// </remarks>
-    public class Tokenizer<T> where T : struct, System.Enum
+    public class Tokenizer<T> where T : struct, Enum
     {
-        private readonly SparseTable<State, Char, (Step, State, TokenType)> table;
+        private readonly SparseTable<State, char, (Step, State, TokenType)> table;
         private SourceFile source;
 
         /// <summary>
@@ -57,7 +59,7 @@ namespace Steadsoft.Novus.Scanner
 
         }
 
-        private void PopulateTable (StreamReader sr)
+        private void PopulateTable(StreamReader sr)
         {
             bool flag;
 
@@ -68,7 +70,7 @@ namespace Steadsoft.Novus.Scanner
                 if (text == null)
                     break;
 
-                if (String.IsNullOrWhiteSpace(text))
+                if (string.IsNullOrWhiteSpace(text))
                     continue;
 
                 if (text.Contains("//"))
@@ -87,14 +89,14 @@ namespace Steadsoft.Novus.Scanner
 
                     parts[1] = parts[1].Substring(1).Substring(0, len - 2);
 
-                    flag = Char.TryParse(parts[1], out char code);
+                    flag = char.TryParse(parts[1], out char code);
 
                     if (flag)
                         table.Add(curstate, code, (step, newstate, token));
                     else
                     {
                         parts[1] = Regex.Unescape(parts[1]);
-                        flag = Char.TryParse(parts[1], out code);
+                        flag = char.TryParse(parts[1], out code);
 
                         if (flag)
                             table.Add(curstate, code, (step, newstate, token));
@@ -110,7 +112,7 @@ namespace Steadsoft.Novus.Scanner
         }
         public Tokenizer(SourceFile File)
         {
-            this.source = File;
+            source = File;
         }
 
         /// <summary>
@@ -120,7 +122,7 @@ namespace Steadsoft.Novus.Scanner
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
-        public IEnumerable<Token<T>> Tokenize(SourceFile Source)
+        public IEnumerable<Token> Tokenize(SourceFile Source)
         {
             if (Source == null) throw new ArgumentNullException(nameof(Source));
 
@@ -161,14 +163,14 @@ namespace Steadsoft.Novus.Scanner
                     case Step.AppendReturn:
                         {
                             lexeme.Append(character.Char);
-                            yield return new Token<T>(tuple.TokenType, lexeme.ToString(), start_line, start_col);
+                            yield return new Token(tuple.TokenType, lexeme.ToString(), start_line, start_col);
                             lexeme.Clear();
                             break;
                         }
                     case Step.RewindReturn:
                         {
                             I--;
-                            yield return new Token<T>(tuple.TokenType, lexeme.ToString(), start_line, start_col);
+                            yield return new Token(tuple.TokenType, lexeme.ToString(), start_line, start_col);
                             lexeme.Clear();
                             break;
                         }

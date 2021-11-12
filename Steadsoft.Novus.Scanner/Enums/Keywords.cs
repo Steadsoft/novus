@@ -1,6 +1,6 @@
-﻿namespace Steadsoft.Novus.Parser.Enums
+﻿namespace Steadsoft.Novus.Scanner.Enums
 {
-    public enum NovusKeywords
+    public enum Keywords
     {
         IsNotKeyword = 0,
         Using,

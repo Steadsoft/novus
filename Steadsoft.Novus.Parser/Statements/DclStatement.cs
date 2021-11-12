@@ -1,4 +1,4 @@
-﻿using Steadsoft.Novus.Parser.Enums;
+﻿using Steadsoft.Novus.Scanner.Enums;
 using System;
 using System.Collections.Generic;
 
@@ -13,7 +13,7 @@ namespace Steadsoft.Novus.Parser.Statements
         /// These are blindly added during parsing and checked for
         /// consistency and applicability at a later step.
         /// </summary>
-        public List<NovusKeywords> Options { get; private set; }
+        public List<Keywords> Options { get; private set; }
         public DclStatement(int Line, int Col, string Name) : this(Line, Col, Name, "undefined")
         {
 
@@ -22,10 +22,10 @@ namespace Steadsoft.Novus.Parser.Statements
         {
             this.Name = Name;
             this.ShortStatementTypeName = ShortStatementTypeName;
-            Options = new List<NovusKeywords>();
+            Options = new List<Keywords>();
         }
 
-        public void AddOption(NovusKeywords Option)
+        public void AddOption(Keywords Option)
         {
             Options.Add(Option);
         }

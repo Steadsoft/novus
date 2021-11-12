@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Steadsoft.Novus.Scanner
+namespace Steadsoft.Novus.Scanner.Classes
 {
     /// <summary>
     /// Represents a source file as a collection of individual character items.
@@ -31,9 +31,9 @@ namespace Steadsoft.Novus.Scanner
                     using StreamReader sr = new(fs, Encoding.UTF8);
                     while (!sr.EndOfStream)
                     {
-                        var C = (char)(sr.Read());
+                        var C = (char)sr.Read();
 
-                        var ch = (new Character(C, line, col));
+                        var ch = new Character(C, line, col);
 
                         source.Add(ch);
 

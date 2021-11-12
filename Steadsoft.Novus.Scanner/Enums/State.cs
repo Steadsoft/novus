@@ -1,4 +1,4 @@
-﻿namespace Steadsoft.Novus.Scanner
+﻿namespace Steadsoft.Novus.Scanner.Enums
 {
     /// <summary>
     /// Represents the distinct states that arise as character are read.
