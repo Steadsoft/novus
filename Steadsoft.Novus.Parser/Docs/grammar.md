@@ -34,7 +34,7 @@ The `type-declaration` is where we differ from C#:
 
 ```
 type-declaration:
-   "type"  [type-options] type-body
+   "type" simple-identifier [type-options] type-body
 ```
 
 ```
