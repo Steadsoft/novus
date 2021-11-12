@@ -52,6 +52,22 @@ type-options
    "sealed"
 ```
 
+```
+type-body
+   "{" accesibility-block* | member-declaration* "}"
+```
+
+```
+accesibility-block
+   accessibility-type* "{" member-declaration* "}"
+
+
+accessibility-type
+   "public"
+   "privated"
+   "protected"
+   "internal"
+
 The rules regarding what options can be combined and any ordering of them, is not defined in this grammar (it is defined but not in this doc).
 
 Examples:
@@ -68,6 +84,15 @@ type Window sealed class internal
 
 type Window record struct internal sealed
 {
+    public
+    {
+
+    }
+
+    private
+    {
+
+    }
 
 }
 ```
