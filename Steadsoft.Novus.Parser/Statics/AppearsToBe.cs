@@ -10,23 +10,23 @@ namespace Steadsoft.Novus.Parser.Statics
     /// </summary>
     public static class AppearsToBeA
     {
-        public static bool MethodDeclaration(TokenEnumerator<Keywords> TokenSource)
+        public static bool MethodDeclaration(TokenEnumerator TokenSource)
         {
-            return TokenSource.NextTokensAre(LPar, Identifier, Identifier);
+            return TokenSource.NextTokensAre(ParenOpen, Identifier, Identifier);
         }
 
-        public static bool FunctionReturnType(TokenEnumerator<Keywords> TokenSource)
+        public static bool FunctionReturnType(TokenEnumerator TokenSource)
         {
-            return TokenSource.NextTokensAre(LPar, Identifier, RPar);
+            return TokenSource.NextTokensAre(ParenOpen, Identifier, ParenClose);
         }
 
-        public static bool FieldDeclaration(TokenEnumerator<Keywords> TokenSource)
+        public static bool FieldDeclaration(TokenEnumerator TokenSource)
         {
             var tokens = new List<Token>();
 
             var token = TokenSource.GetNextToken();
 
-            while (token.TokenType != LBrace && token.TokenType != SemiColon)
+            while (token.TokenType != BraceOpen && token.TokenType != SemiColon)
             {
                 tokens.Add(token);
                 token = TokenSource.GetNextToken();

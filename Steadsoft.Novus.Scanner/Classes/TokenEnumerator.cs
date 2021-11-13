@@ -3,7 +3,7 @@ using static Steadsoft.Novus.Scanner.Enums.TokenType;
 
 namespace Steadsoft.Novus.Scanner.Classes
 {
-    public class TokenEnumerator<T> where T : struct, Enum
+    public class TokenEnumerator 
     {
         private readonly IEnumerator<Token> enumerator;
         private readonly TokenType[] Skips;
@@ -14,15 +14,30 @@ namespace Steadsoft.Novus.Scanner.Classes
             this.Skips = Skips;
         }
 
-        public void CheckExpectedToken(T Type)
+        public void VerifyExpectedToken(TokenType Type, out Token Token)
         {
             var token = GetNextToken();
 
-            if (Convert.ToInt32(token.Keyword) != Convert.ToInt32(Type))
-                throw new InternalErrorException($"Expected keyword token '{Type}' has not been pushed.");
+            if (token.TokenType != Type)
+                throw new InternalErrorException($"Expected token (token type) '{Type}' has not been pushed by caller!");
+
+            Token = token;
 
             return;
         }
+
+        public void VerifyExpectedToken(Keywords Keyword, out Token Token)
+        {
+            var token = GetNextToken();
+
+            if (token.Keyword != Keyword)
+                throw new InternalErrorException($"Expected token (keyword) '{Keyword}' has not been pushed by caller!");
+
+            Token = token;
+
+            return;
+        }
+
 
         public bool NextTokensAre(params TokenType[] Tokens)
         {
