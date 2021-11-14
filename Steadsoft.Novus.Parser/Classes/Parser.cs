@@ -575,6 +575,138 @@ namespace Steadsoft.Novus.Parser.Classes
 
             return true;
         }
+        private bool TryParseSingletBody(Token Prior, ref DclTypeStatement Stmt, out string DiagMsg)
+        {
+            DiagMsg = string.Empty;
+
+            TokenSource.VerifyExpectedToken(TokenType.BraceOpen, out var token);
+
+            BlockStatement body = new(token.LineNumber, token.ColNumber);
+
+            Stmt.AddBody(body);
+
+            token = TokenSource.GetNextToken();
+
+            while (token.TokenType != NoMoreTokens && token.TokenType != BraceClose)
+            {
+                switch (token.Keyword)
+                {
+                    case Type:
+                        TokenSource.PushToken(token);
+                        if (TryParseType(token, out var typeStatement, out DiagMsg))
+                        {
+                            body.AddChild(typeStatement);
+                        }
+                        else
+                        {
+                            OnDiagnostic(this, ParsedBad(typeStatement, DiagMsg));
+                            TokenSource.SkipToNext("}");
+                        }
+                        token = TokenSource.GetNextToken();
+                        continue;
+                    case Def:
+                        TokenSource.PushToken(token);
+                        if (TryParseDef(token, out var defStatement, Stmt, out DiagMsg))
+                        {
+                            body.AddChild(defStatement);
+                        }
+                        else
+                        {
+                            OnDiagnostic(this, ParsedBad(defStatement, DiagMsg));
+                            TokenSource.SkipToNext("}");
+                        }
+                        token = TokenSource.GetNextToken();
+                        continue;
+                    case Public:
+                    case Internal:
+                    case Protected:
+                    case Private:
+                        TokenSource.PushToken(token);
+                        if (TryParseAccessorBlock(token, out var accessorStatement, Stmt, out DiagMsg))
+                        {
+                            body.AddChild(accessorStatement);
+                        }
+                        else
+                        {
+                            OnDiagnostic(this, ParsedBad(accessorStatement, DiagMsg));
+                            TokenSource.SkipToNext("}");
+                        }
+                        token = TokenSource.GetNextToken();
+                        continue;
+                    default:
+                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, "Unexpected token {} found."));
+                        break;
+                }
+            }
+
+            return true;
+        }
+        private bool TryParseInterfaceBody(Token Prior, ref DclTypeStatement Stmt, out string DiagMsg)
+        {
+            DiagMsg = string.Empty;
+
+            TokenSource.VerifyExpectedToken(TokenType.BraceOpen, out var token);
+
+            BlockStatement body = new(token.LineNumber, token.ColNumber);
+
+            Stmt.AddBody(body);
+
+            token = TokenSource.GetNextToken();
+
+            while (token.TokenType != NoMoreTokens && token.TokenType != BraceClose)
+            {
+                switch (token.Keyword)
+                {
+                    case Type:
+                        TokenSource.PushToken(token);
+                        if (TryParseType(token, out var typeStatement, out DiagMsg))
+                        {
+                            body.AddChild(typeStatement);
+                        }
+                        else
+                        {
+                            OnDiagnostic(this, ParsedBad(typeStatement, DiagMsg));
+                            TokenSource.SkipToNext("}");
+                        }
+                        token = TokenSource.GetNextToken();
+                        continue;
+                    case Def:
+                        TokenSource.PushToken(token);
+                        if (TryParseDef(token, out var defStatement, Stmt, out DiagMsg))
+                        {
+                            body.AddChild(defStatement);
+                        }
+                        else
+                        {
+                            OnDiagnostic(this, ParsedBad(defStatement, DiagMsg));
+                            TokenSource.SkipToNext("}");
+                        }
+                        token = TokenSource.GetNextToken();
+                        continue;
+                    case Public:
+                    case Internal:
+                    case Protected:
+                    case Private:
+                        TokenSource.PushToken(token);
+                        if (TryParseAccessorBlock(token, out var accessorStatement, Stmt, out DiagMsg))
+                        {
+                            body.AddChild(accessorStatement);
+                        }
+                        else
+                        {
+                            OnDiagnostic(this, ParsedBad(accessorStatement, DiagMsg));
+                            TokenSource.SkipToNext("}");
+                        }
+                        token = TokenSource.GetNextToken();
+                        continue;
+                    default:
+                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, "Unexpected token {} found."));
+                        break;
+                }
+            }
+
+            return true;
+        }
         private bool TryParseClassBody(Token Prior, ref DclTypeStatement Stmt, out string DiagMsg)
         {
             DiagMsg = string.Empty;
@@ -703,6 +835,14 @@ namespace Steadsoft.Novus.Parser.Classes
                 case Struct:
                     {
                         return TryParseStructBody(Prior, ref Stmt, out DiagMsg);
+                    }
+                case Singlet:
+                    {
+                        return TryParseSingletBody(Prior, ref Stmt, out DiagMsg);
+                    }
+                case Interface:
+                    {
+                        return TryParseInterfaceBody(Prior, ref Stmt, out DiagMsg);
                     }
                 default:
                     {
