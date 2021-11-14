@@ -192,17 +192,24 @@ namespace Steadsoft.Novus.Parser.Classes
                     }
                 }
         }
-        private void AnalyzeType(DclTypeStatement Stmt)
+        private void AnalyzeTypeOptions(DclTypeStatement Stmt, bool ReportErrors = true)
         {
-            ReportDuplicateDeclarations(Stmt);
+            // This method is called by both the parser and the semantic checker.
+            // It is called by the parser because we must know the specific kind
+            // of type that's being declared in order to parse it, for example an enum
+            // contains a fundamentally different kind of members.
 
-            if (Stmt.Options.ContainsMoreThanOneOf(Class, Struct, Singlet))
+            if (Stmt.Options.ContainsMoreThanOneOf(Class, Struct, Singlet, Enum))
             {
-                OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"A type must have only one of the keywords 'class', 'struct' or 'singlet'."));
+                if (ReportErrors)
+                {
+                   OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"A type must have only one of the keywords 'class', 'struct' or 'singlet'."));
+                }
+
             }
             else
             {
-                if (Stmt.Options.TryGetUnique(out var Item, Class, Struct, Singlet))
+                if (Stmt.Options.TryGetUnique(out var Item, Class, Struct, Singlet, Enum))
                 {
                     Stmt.DeclaredKind = Item;
                 }
@@ -214,9 +221,20 @@ namespace Steadsoft.Novus.Parser.Classes
             {
                 foreach (var group in groups)
                 {
-                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Duplicate options '{group.Key.ToString().ToLower()}' in {Stmt.DeclaredKind.ToString().ToLower()} '{Stmt.Name}'."));
+                    if (ReportErrors)
+                    {
+                       OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Duplicate options '{group.Key.ToString().ToLower()}' in {Stmt.DeclaredKind.ToString().ToLower()} '{Stmt.Name}'."));
+                    }
+
                 }
             }
+
+        }
+        private void AnalyzeType(DclTypeStatement Stmt)
+        {
+            ReportDuplicateDeclarations(Stmt);
+
+            AnalyzeTypeOptions(Stmt);
 
             if (Stmt.Block != null)
                 foreach (var node in Stmt.Block.Children)
@@ -447,6 +465,8 @@ namespace Steadsoft.Novus.Parser.Classes
 
             if (TryParseTypeOptions(token, ref Stmt, out DiagMsg))
                 return TryParseTypeBody(token, ref Stmt, out DiagMsg);
+            else
+                TokenSource.SkipToNext("}");
 
             return false;
 
@@ -476,6 +496,8 @@ namespace Steadsoft.Novus.Parser.Classes
 
             TokenSource.PushToken(token); // put the brace { back.
 
+            AnalyzeTypeOptions(Stmt, false);
+
             return parsed;
         }
         private bool TryParseTypeBody(Token Prior, ref DclTypeStatement Stmt, out string DiagMsg)
@@ -492,53 +514,85 @@ namespace Steadsoft.Novus.Parser.Classes
 
             while (token.TokenType != NoMoreTokens && token.TokenType != BraceClose)
             {
-                switch (token.Keyword)
+                if (Stmt.DeclaredKind == Enum)
                 {
-                    case Type:
-                        TokenSource.PushToken(token);
-                        if (TryParseType(token, out var typeStatement, out DiagMsg))
-                        {
-                            body.AddChild(typeStatement);
-                        }
-                        else
-                        {
-                            OnDiagnostic(this, ParsedBad(typeStatement, DiagMsg));
-                            TokenSource.SkipToNext("}");
-                        }
+                    // The members of an enum are never other types or defintions, we must parse this differently
+                    
+                    if (token.TokenType != Identifier)
+                    {
+                        OnDiagnostic(this, ParsedBad(Stmt, DiagMsg));
                         token = TokenSource.GetNextToken();
                         continue;
-                    case Def:
-                        TokenSource.PushToken(token);
-                        if (TryParseDef(token, out var defStatement, Stmt, out DiagMsg))
-                        {
-                            body.AddChild(defStatement);
-                        }
-                        else
-                        {
-                            OnDiagnostic(this, ParsedBad(defStatement, DiagMsg));
-                            TokenSource.SkipToNext("}");
-                        }
+                    }
+
+                    token = TokenSource.GetNextToken();
+
+                    if (token.TokenType != Comma && token.TokenType != BraceClose)
+                    {
+                        OnDiagnostic(this, ParsedBad(Stmt, DiagMsg));
                         token = TokenSource.GetNextToken();
                         continue;
-                    case Public:
-                    case Internal:
-                    case Protected:
-                    case Private:
-                        TokenSource.PushToken(token);
-                        if (TryParseAccessorBlock(token, out var accessorStatement, Stmt, out DiagMsg))
-                        {
-                            body.AddChild(accessorStatement);
-                        }
-                        else
-                        {
-                            OnDiagnostic(this, ParsedBad(accessorStatement, DiagMsg));
-                            TokenSource.SkipToNext("}");
-                        }
-                        token = TokenSource.GetNextToken();
-                        continue;
-                    default:
-                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, "Unexpected token {} found."));
-                        break;
+                    }
+
+                    // store the enum member as a child
+
+                    ;
+
+                    if (token.TokenType == Comma)
+                       token = TokenSource.GetNextToken();
+
+                    continue;
+                }
+                else
+                {
+                    switch (token.Keyword)
+                    {
+                        case Type:
+                            TokenSource.PushToken(token);
+                            if (TryParseType(token, out var typeStatement, out DiagMsg))
+                            {
+                                body.AddChild(typeStatement);
+                            }
+                            else
+                            {
+                                OnDiagnostic(this, ParsedBad(typeStatement, DiagMsg));
+                                TokenSource.SkipToNext("}");
+                            }
+                            token = TokenSource.GetNextToken();
+                            continue;
+                        case Def:
+                            TokenSource.PushToken(token);
+                            if (TryParseDef(token, out var defStatement, Stmt, out DiagMsg))
+                            {
+                                body.AddChild(defStatement);
+                            }
+                            else
+                            {
+                                OnDiagnostic(this, ParsedBad(defStatement, DiagMsg));
+                                TokenSource.SkipToNext("}");
+                            }
+                            token = TokenSource.GetNextToken();
+                            continue;
+                        case Public:
+                        case Internal:
+                        case Protected:
+                        case Private:
+                            TokenSource.PushToken(token);
+                            if (TryParseAccessorBlock(token, out var accessorStatement, Stmt, out DiagMsg))
+                            {
+                                body.AddChild(accessorStatement);
+                            }
+                            else
+                            {
+                                OnDiagnostic(this, ParsedBad(accessorStatement, DiagMsg));
+                                TokenSource.SkipToNext("}");
+                            }
+                            token = TokenSource.GetNextToken();
+                            continue;
+                        default:
+                            OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, "Unexpected token {} found."));
+                            break;
+                    }
                 }
             }
 

@@ -17,7 +17,7 @@ namespace Steadsoft.Novus.Scanner.Classes
         public Operators Operator { get; private set; }
         static Token()
         {
-            keywords = Enum.GetNames(typeof(Keywords)).ToList().Select(k => k.ToLower()).ToList();
+            keywords = System.Enum.GetNames(typeof(Keywords)).ToList().Select(k => k.ToLower()).ToList();
         }
         public Token(TokenType TokenType, string Lexeme, int LineNumber, int ColNumber)
         {
@@ -29,15 +29,15 @@ namespace Steadsoft.Novus.Scanner.Classes
             Keywords keyword;
             Operators operater;
 
-            if (TokenType == Identifier && Enum.TryParse(Lexeme, true, out keyword))
+            if (TokenType == Identifier && System.Enum.TryParse(Lexeme, true, out keyword))
                 Keyword = keyword;
             else
-                Keyword = Enum.Parse<Keywords>("0");
+                Keyword = System.Enum.Parse<Keywords>("0");
 
-            if (TokenType != Identifier && Enum.TryParse(TokenType.ToString(), true, out operater))
+            if (TokenType != Identifier && System.Enum.TryParse(TokenType.ToString(), true, out operater))
                 Operator = operater;
             else
-                Operator = Enum.Parse<Operators>("0");
+                Operator = System.Enum.Parse<Operators>("0");
         }
     }
 }

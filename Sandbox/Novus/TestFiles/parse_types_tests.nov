@@ -1,5 +1,12 @@
 ﻿namespace a.x.rere
 {
+   type ee enum public
+   {
+        A,
+        B,
+        C
+   }
+
    type aa 
    {
       public private

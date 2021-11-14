@@ -14,6 +14,17 @@ namespace Steadsoft.Novus.Scanner.Classes
             this.Skips = Skips;
         }
 
+        /// <summary>
+        /// Performs a parser correctness check.
+        /// </summary>
+        /// <remarks>
+        /// Several parsing methods will, when they encounter certain tokens, push that token back into the
+        /// token source and then call another parsing method to continue the parse. This method ensures that 
+        /// this has been done correctly, a failure is not a source error but is a perser code/logic error.
+        /// </remarks>
+        /// <param name="Type">The token type of the expected next token.</param>
+        /// <param name="Token">If successful, the next token.</param>
+        /// <exception cref="InternalErrorException"></exception>
         public void VerifyExpectedToken(TokenType Type, out Token Token)
         {
             var token = GetNextToken();
@@ -26,6 +37,17 @@ namespace Steadsoft.Novus.Scanner.Classes
             return;
         }
 
+        /// <summary>
+        /// Performs a parser correctness check.
+        /// </summary>
+        /// <remarks>
+        /// Several parsing methods will, when they encounter certain tokens, push that token back into the
+        /// token source and then call another parsing method to continue the parse. This method ensures that 
+        /// this has been done correctly, a failure is not a source error but is a perser code/logic error.
+        /// </remarks>
+        /// <param name="Keyword">The token type of the expected next token.</param>
+        /// <param name="Token">If successful, the next token.</param>
+        /// <exception cref="InternalErrorException"></exception>
         public void VerifyExpectedToken(Keywords Keyword, out Token Token)
         {
             var token = GetNextToken();
@@ -39,6 +61,11 @@ namespace Steadsoft.Novus.Scanner.Classes
         }
 
 
+        /// <summary>
+        /// Indicates of the next tokens match the set of supplied token types.
+        /// </summary>
+        /// <param name="Tokens">One or more token types in lexical order.</param>
+        /// <returns></returns>
         public bool NextTokensAre(params TokenType[] Tokens)
         {
             var list = PeekNextTokens(Tokens.Length).ToArray();
@@ -113,6 +140,15 @@ namespace Steadsoft.Novus.Scanner.Classes
             }
         }
 
+        /// <summary>
+        /// Consumes tokens until a token matching the specified lexeme is encountered.
+        /// </summary>
+        /// <remarks>
+        /// This method repeatedly consumes tokens until a match is encountered. At that point 
+        /// the method returns and the token that was sought will have been consumed, it will not be
+        /// seen when the next token is retrieved.
+        /// </remarks>
+        /// <param name="Lexeme"></param>
         public void SkipToNext(string Lexeme)
         {
             var token = GetNextToken();

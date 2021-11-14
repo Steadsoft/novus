@@ -11,6 +11,7 @@
         Struct,
         Record,
         Singlet,
+        Enum,
         Readonly,
         Public,
         Internal,
