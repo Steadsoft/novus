@@ -292,6 +292,10 @@ namespace Steadsoft.Novus.Parser.Classes
                         AnalyzeParameterList(declaration.Parameters);
                         break;
                     }
+                case DclEnumMemberStatement declaration:
+                    {
+                        break;
+                    }
                 default:
                     throw new System.NotImplementedException("Fix me.");
             }
@@ -525,6 +529,8 @@ namespace Steadsoft.Novus.Parser.Classes
                         continue;
                     }
 
+                    var name = token.Lexeme;
+
                     token = TokenSource.GetNextToken();
 
                     if (token.TokenType != Comma && token.TokenType != BraceClose)
@@ -536,7 +542,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
                     // store the enum member as a child
 
-                    ;
+                    Stmt.Block.AddChild(new DclEnumMemberStatement(Prior.LineNumber, Prior.ColNumber, name, Stmt));
 
                     if (token.TokenType == Comma)
                        token = TokenSource.GetNextToken();
@@ -903,6 +909,22 @@ namespace Steadsoft.Novus.Parser.Classes
         /// <param name="Stmt">A statement that can contain declarations.</param>
         private void ReportDuplicateDeclarations(IBlockContainer Stmt)
         {
+            string containerName = "";
+
+            if (Stmt is DclTypeStatement)
+            {
+                var stmt = (DclTypeStatement)(Stmt);
+
+                if (stmt.DeclaredKind != IsNotKeyword)
+                    containerName = stmt.DeclaredKind.ToString();
+                else
+                    containerName = Stmt.ShortStatementTypeName;
+            }
+            else
+            {
+                containerName = Stmt.ShortStatementTypeName;
+            }
+
             var dupeDeclarations = Stmt.Block.Children.
                 Where(c => c is DclStatement).
                 Cast<DclStatement>().
@@ -916,7 +938,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
                 foreach (var duplicate in duplicates)
                 {
-                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortStatementTypeName} name '{duplicate.Name}' within {Stmt.ShortStatementTypeName} '{Stmt.Name}', there is already a defintion of a {firstuse.ShortStatementTypeName} with this name at line {firstuse.Line}."));
+                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortStatementTypeName} name '{duplicate.Name}' within {containerName} '{Stmt.Name}', there is already a defintion of a {firstuse.ShortStatementTypeName} with this name at line {firstuse.Line}."));
                 }
             }
         }
