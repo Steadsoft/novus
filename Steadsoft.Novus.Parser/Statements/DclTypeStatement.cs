@@ -10,7 +10,7 @@ namespace Steadsoft.Novus.Parser.Statements
     /// </summary>
     public class DclTypeStatement : DclStatement, IBlockContainer
     {
-        public Keywords DeclaredKind { get; internal set; }
+        public Keywords TypeKind { get; internal set; }
         public BlockStatement Block { get; private set; }
         /// <summary>
         /// Indicates optional keywords encountered while parsing.

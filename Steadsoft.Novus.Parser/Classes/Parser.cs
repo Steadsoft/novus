@@ -32,7 +32,6 @@ namespace Steadsoft.Novus.Parser.Classes
             Protected, 
             Internal
         };
-
         public delegate void DiagnosticEventHandler(object Sender, DiagnosticEventArgs Args);
         public TokenEnumerator TokenSource { get; private set; }
         public event DiagnosticEventHandler OnDiagnostic;
@@ -203,7 +202,7 @@ namespace Steadsoft.Novus.Parser.Classes
             {
                 if (ReportErrors)
                 {
-                   OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"A type must have only one of the keywords 'class', 'struct' or 'singlet'."));
+                   OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Unable to determine type-kind, a type must have only one of the kinds 'class', 'struct', 'singlet' or 'enum'."));
                 }
 
             }
@@ -211,7 +210,7 @@ namespace Steadsoft.Novus.Parser.Classes
             {
                 if (Stmt.Options.TryGetUnique(out var Item, Class, Struct, Singlet, Enum))
                 {
-                    Stmt.DeclaredKind = Item;
+                    Stmt.TypeKind = Item;
                 }
             }
 
@@ -223,7 +222,7 @@ namespace Steadsoft.Novus.Parser.Classes
                 {
                     if (ReportErrors)
                     {
-                       OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Duplicate options '{group.Key.ToString().ToLower()}' in {Stmt.DeclaredKind.ToString().ToLower()} '{Stmt.Name}'."));
+                       OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Duplicate options '{group.Key.ToString().ToLower()}' in {Stmt.TypeKind.ToString().ToLower()} '{Stmt.Name}'."));
                     }
 
                 }
@@ -518,7 +517,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             while (token.TokenType != NoMoreTokens && token.TokenType != BraceClose)
             {
-                if (Stmt.DeclaredKind == Enum)
+                if (Stmt.TypeKind == Enum)
                 {
                     // The members of an enum are never other types or defintions, we must parse this differently
                     
@@ -915,8 +914,8 @@ namespace Steadsoft.Novus.Parser.Classes
             {
                 var stmt = (DclTypeStatement)(Stmt);
 
-                if (stmt.DeclaredKind != IsNotKeyword)
-                    containerName = stmt.DeclaredKind.ToString();
+                if (stmt.TypeKind != IsNotKeyword)
+                    containerName = stmt.TypeKind.ToString();
                 else
                     containerName = Stmt.ShortStatementTypeName;
             }
