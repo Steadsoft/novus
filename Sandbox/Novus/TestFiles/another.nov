@@ -1,0 +1,19 @@
+﻿namespace a.b.c
+{
+
+	type Window class
+	{
+		def ClearScreen (arg1 int, arg2 string, arg3 float) private protected internal public
+		{
+			return;
+		}
+
+			type Keyboard class
+			{
+	
+			}
+
+	}
+
+
+}

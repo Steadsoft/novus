@@ -212,6 +212,11 @@ namespace Steadsoft.Novus.Parser.Classes
                 {
                     Stmt.TypeKind = Item;
                 }
+                else
+                {
+                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"No type-kind specified for type '{Stmt.Name}', assuming 'class'."));
+                    Stmt.TypeKind = Class;
+                }
             }
 
             var groups = Stmt.Options.GroupBy(a => a).Where(g => g.Count() > 1);

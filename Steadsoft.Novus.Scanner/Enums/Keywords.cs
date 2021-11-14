@@ -12,6 +12,7 @@
         Record,
         Singlet,
         Enum,
+        Interface,
         Readonly,
         Public,
         Internal,
