@@ -27,9 +27,34 @@ namespace Sandbox
 
             parser.TrySemanticPhase(ref root);
 
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.White;
+
+            Console.Clear();
+
+            var saved = Console.ForegroundColor;
+
             foreach (var msg in messages.OrderBy(m => m.Line))
             {
-                Console.WriteLine(msg.Message);
+                try
+                {
+                    if (msg.Severity == Steadsoft.Novus.Parser.Enums.Severity.Error)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                    }
+
+                    if (msg.Severity == Steadsoft.Novus.Parser.Enums.Severity.Warning)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                    }
+
+                    Console.WriteLine(msg.Message);
+
+                }
+                finally
+                {
+                    Console.ForegroundColor = saved;
+                }
             }
 
             Console.WriteLine();

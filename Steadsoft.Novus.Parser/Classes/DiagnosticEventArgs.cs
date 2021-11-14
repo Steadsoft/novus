@@ -16,7 +16,7 @@ namespace Steadsoft.Novus.Parser.Classes
             this.Severity = Severity;
             this.Line = Line;
             this.Col = Col;
-            this.Message = $"{Severity} {location, -12} {Msg}";
+            this.Message = $"{Severity, -8} {location, -12} {Msg}";
         }
     }
 }

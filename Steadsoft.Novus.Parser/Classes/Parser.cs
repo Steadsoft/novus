@@ -214,7 +214,8 @@ namespace Steadsoft.Novus.Parser.Classes
                 }
                 else
                 {
-                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"No type-kind specified for type '{Stmt.Name}', assuming 'class'."));
+                    if (ReportErrors)
+                       OnDiagnostic(this, new DiagnosticEventArgs(Severity.Warning, Stmt.Line, Stmt.Col, $"No type-kind specified for type '{Stmt.Name}', assuming 'class'."));
                     Stmt.TypeKind = Class;
                 }
             }
@@ -698,6 +699,10 @@ namespace Steadsoft.Novus.Parser.Classes
                 case Class:
                     {
                         return TryParseClassBody(Prior, ref Stmt, out DiagMsg);
+                    }
+                case Struct:
+                    {
+                        return TryParseStructBody(Prior, ref Stmt, out DiagMsg);
                     }
                 default:
                     {
