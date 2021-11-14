@@ -472,7 +472,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             Stmt = new DclTypeStatement(Prior.LineNumber, Prior.ColNumber, name);
 
-            if (TryParseTypeOptions(token, ref Stmt, out DiagMsg))
+            if (TryParseDclOptions(token, ref Stmt, out DiagMsg))
                 return TryParseTypeBody(token, ref Stmt, out DiagMsg);
             else
                 TokenSource.SkipToNext("}");
@@ -480,7 +480,7 @@ namespace Steadsoft.Novus.Parser.Classes
             return false;
 
         }
-        private bool TryParseTypeOptions(Token Prior, ref DclTypeStatement Stmt, out string DiagMsg)
+        private bool TryParseDclOptions(Token Prior, ref DclTypeStatement Stmt, out string DiagMsg)
         {
             bool parsed = true;
 
