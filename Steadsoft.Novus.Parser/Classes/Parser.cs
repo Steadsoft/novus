@@ -508,7 +508,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             return parsed;
         }
-        private bool TryParseTypeBody(Token Prior, ref DclTypeStatement Stmt, out string DiagMsg)
+        private bool TryParseStructBody(Token Prior, ref DclTypeStatement Stmt, out string DiagMsg)
         {
             DiagMsg = string.Empty;
 
@@ -522,39 +522,72 @@ namespace Steadsoft.Novus.Parser.Classes
 
             while (token.TokenType != NoMoreTokens && token.TokenType != BraceClose)
             {
-                if (Stmt.TypeKind == Enum)
+                switch (token.Keyword)
                 {
-                    // The members of an enum are never other types or defintions, we must parse this differently
-                    
-                    if (token.TokenType != Identifier)
-                    {
-                        OnDiagnostic(this, ParsedBad(Stmt, DiagMsg));
+                    case Type:
+                        TokenSource.PushToken(token);
+                        if (TryParseType(token, out var typeStatement, out DiagMsg))
+                        {
+                            body.AddChild(typeStatement);
+                        }
+                        else
+                        {
+                            OnDiagnostic(this, ParsedBad(typeStatement, DiagMsg));
+                            TokenSource.SkipToNext("}");
+                        }
                         token = TokenSource.GetNextToken();
                         continue;
-                    }
-
-                    var name = token.Lexeme;
-
-                    token = TokenSource.GetNextToken();
-
-                    if (token.TokenType != Comma && token.TokenType != BraceClose)
-                    {
-                        OnDiagnostic(this, ParsedBad(Stmt, DiagMsg));
+                    case Def:
+                        TokenSource.PushToken(token);
+                        if (TryParseDef(token, out var defStatement, Stmt, out DiagMsg))
+                        {
+                            body.AddChild(defStatement);
+                        }
+                        else
+                        {
+                            OnDiagnostic(this, ParsedBad(defStatement, DiagMsg));
+                            TokenSource.SkipToNext("}");
+                        }
                         token = TokenSource.GetNextToken();
                         continue;
-                    }
-
-                    // store the enum member as a child
-
-                    Stmt.Block.AddChild(new DclEnumMemberStatement(Prior.LineNumber, Prior.ColNumber, name, Stmt));
-
-                    if (token.TokenType == Comma)
-                       token = TokenSource.GetNextToken();
-
-                    continue;
+                    case Public:
+                    case Internal:
+                    case Protected:
+                    case Private:
+                        TokenSource.PushToken(token);
+                        if (TryParseAccessorBlock(token, out var accessorStatement, Stmt, out DiagMsg))
+                        {
+                            body.AddChild(accessorStatement);
+                        }
+                        else
+                        {
+                            OnDiagnostic(this, ParsedBad(accessorStatement, DiagMsg));
+                            TokenSource.SkipToNext("}");
+                        }
+                        token = TokenSource.GetNextToken();
+                        continue;
+                    default:
+                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, "Unexpected token {} found."));
+                        break;
                 }
-                else
-                {
+            }
+
+            return true;
+        }
+        private bool TryParseClassBody(Token Prior, ref DclTypeStatement Stmt, out string DiagMsg)
+        {
+            DiagMsg = string.Empty;
+
+            TokenSource.VerifyExpectedToken(TokenType.BraceOpen, out var token);
+
+            BlockStatement body = new(token.LineNumber, token.ColNumber);
+
+            Stmt.AddBody(body);
+
+            token = TokenSource.GetNextToken();
+
+            while (token.TokenType != NoMoreTokens && token.TokenType != BraceClose)
+            {
                     switch (token.Keyword)
                     {
                         case Type:
@@ -603,13 +636,74 @@ namespace Steadsoft.Novus.Parser.Classes
                             OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, "Unexpected token {} found."));
                             break;
                     }
-                }
             }
 
-            //source.SkipToNext("}");
+            return true;
+        }
+        private bool TryParseEnumBody(Token Prior, ref DclTypeStatement Stmt, out string DiagMsg)
+        {
+            DiagMsg = string.Empty;
+
+            TokenSource.VerifyExpectedToken(TokenType.BraceOpen, out var token);
+
+            BlockStatement body = new(token.LineNumber, token.ColNumber);
+
+            Stmt.AddBody(body);
+
+            token = TokenSource.GetNextToken();
+
+            while (token.TokenType != NoMoreTokens && token.TokenType != BraceClose)
+            {
+                    // The members of an enum are never other types or defintions, we must parse this differently
+
+                    if (token.TokenType != Identifier)
+                    {
+                        OnDiagnostic(this, ParsedBad(Stmt, DiagMsg));
+                        token = TokenSource.GetNextToken();
+                        continue;
+                    }
+
+                    var name = token.Lexeme;
+
+                    token = TokenSource.GetNextToken();
+
+                    if (token.TokenType != Comma && token.TokenType != BraceClose)
+                    {
+                        OnDiagnostic(this, ParsedBad(Stmt, DiagMsg));
+                        token = TokenSource.GetNextToken();
+                        continue;
+                    }
+
+                    // store the enum member as a child
+
+                    Stmt.Block.AddChild(new DclEnumMemberStatement(Prior.LineNumber, Prior.ColNumber, name, Stmt));
+
+                    if (token.TokenType == Comma)
+                        token = TokenSource.GetNextToken();
+
+                    continue;
+            }
 
             return true;
 
+        }
+        private bool TryParseTypeBody(Token Prior, ref DclTypeStatement Stmt, out string DiagMsg)
+        {
+            switch (Stmt.TypeKind)
+            {
+                case Enum:
+                    {
+                        return TryParseEnumBody(Prior, ref Stmt, out DiagMsg);
+                    }
+                case Class:
+                    {
+                        return TryParseClassBody(Prior, ref Stmt, out DiagMsg);
+                    }
+                default:
+                    {
+                        return TryParseClassBody(Prior, ref Stmt, out DiagMsg);
+                    }
+            }
         }
         private bool TryParseAccessorBlock(Token Prior, out BlockStatement Stmt, DclTypeStatement Parent, out string DiagMsg)
         {
