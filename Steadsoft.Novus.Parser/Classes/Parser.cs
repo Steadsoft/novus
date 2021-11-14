@@ -191,55 +191,65 @@ namespace Steadsoft.Novus.Parser.Classes
                     }
                 }
         }
-        private void AnalyzeTypeOptions(DclTypeStatement Stmt, bool ReportErrors = true)
+        /// <summary>
+        /// Analyzes and reports errors that are discovered within the optional keywords that can appear in various types of declarations.
+        /// </summary>
+        /// <param name="Stmt"></param>
+        /// <param name="ReportErrors"></param>
+        private void AnalyzeDclOptions(DclStatement Stmt, bool ReportErrors = true)
         {
             // This method is called by both the parser and the semantic checker.
             // It is called by the parser because we must know the specific kind
             // of type that's being declared in order to parse it, for example an enum
-            // contains a fundamentally different kind of members.
+            // contains fundamentally different kinds of members.
 
-            if (Stmt.Options.ContainsMoreThanOneOf(Class, Struct, Singlet, Enum, Interface))
+            switch (Stmt)
             {
-                if (ReportErrors)
-                {
-                   OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Unable to determine type-kind, a type must have only one of the kinds 'class', 'struct', 'singlet' or 'enum'."));
-                }
-
-            }
-            else
-            {
-                if (Stmt.Options.TryGetUnique(out var Item, Class, Struct, Singlet, Enum, Interface))
-                {
-                    Stmt.TypeKind = Item;
-                }
-                else
-                {
-                    if (ReportErrors)
-                       OnDiagnostic(this, new DiagnosticEventArgs(Severity.Warning, Stmt.Line, Stmt.Col, $"No type-kind specified for type '{Stmt.Name}', assuming 'class'."));
-                    Stmt.TypeKind = Class;
-                }
-            }
-
-            var groups = Stmt.Options.GroupBy(a => a).Where(g => g.Count() > 1);
-
-            if (groups.Any())
-            {
-                foreach (var group in groups)
-                {
-                    if (ReportErrors)
+                case DclTypeStatement dclTypeStatement:
                     {
-                       OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Duplicate options '{group.Key.ToString().ToLower()}' in {Stmt.TypeKind.ToString().ToLower()} '{Stmt.Name}'."));
+                        if (Stmt.Options.ContainsMoreThanOneOf(Class, Struct, Singlet, Enum, Interface))
+                        {
+                            if (ReportErrors)
+                            {
+                                OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Unable to determine type-kind, a type must have only one of the kinds 'class', 'struct', 'singlet' or 'enum'."));
+                            }
+                        }
+                        else
+                        {
+                            if (Stmt.Options.TryGetUnique(out var Item, Class, Struct, Singlet, Enum, Interface))
+                            {
+                                dclTypeStatement.TypeKind = Item;
+                            }
+                            else
+                            {
+                                if (ReportErrors)
+                                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Warning, Stmt.Line, Stmt.Col, $"No type-kind specified for type '{Stmt.Name}', assuming 'class'."));
+                                dclTypeStatement.TypeKind = Class;
+                            }
+                        }
+
+                        var groups = Stmt.Options.GroupBy(a => a).Where(g => g.Count() > 1);
+
+                        if (groups.Any())
+                        {
+                            foreach (var group in groups)
+                            {
+                                if (ReportErrors)
+                                {
+                                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Duplicate options '{group.Key.ToString().ToLower()}' in {dclTypeStatement.TypeKind.ToString().ToLower()} '{Stmt.Name}'."));
+                                }
+                            }
+                        }
+
+                        break;
                     }
-
-                }
             }
-
         }
         private void AnalyzeType(DclTypeStatement Stmt)
         {
             ReportDuplicateDeclarations(Stmt);
 
-            AnalyzeTypeOptions(Stmt);
+            AnalyzeDclOptions(Stmt);
 
             if (Stmt.Block != null)
                 foreach (var node in Stmt.Block.Children)
@@ -472,7 +482,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             Stmt = new DclTypeStatement(Prior.LineNumber, Prior.ColNumber, name);
 
-            if (TryParseDclOptions(token, ref Stmt, out DiagMsg))
+            if (TryParseDclOptions(token, Stmt, out DiagMsg))
                 return TryParseTypeBody(token, ref Stmt, out DiagMsg);
             else
                 TokenSource.SkipToNext("}");
@@ -480,7 +490,7 @@ namespace Steadsoft.Novus.Parser.Classes
             return false;
 
         }
-        private bool TryParseDclOptions(Token Prior, ref DclTypeStatement Stmt, out string DiagMsg)
+        private bool TryParseDclOptions(Token Prior, DclStatement Stmt, out string DiagMsg)
         {
             bool parsed = true;
 
@@ -488,7 +498,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             var token = TokenSource.GetNextToken();
 
-            while (token.TokenType !=  BraceOpen)
+            while (token.TokenType !=  BraceOpen && token.TokenType != SemiColon)
             {
                 if (token.Keyword == IsNotKeyword)
                 {
@@ -503,9 +513,16 @@ namespace Steadsoft.Novus.Parser.Classes
                 token = TokenSource.GetNextToken();
             }
 
-            TokenSource.PushToken(token); // put the brace { back.
+            if (token.TokenType == BraceOpen)
+            {
+               TokenSource.PushToken(token); // put the brace { back.
+                if (Stmt is DclMethodStatement)
+                {
+                    (Stmt as DclMethodStatement).HasBody = true;
+                }
+            }
 
-            AnalyzeTypeOptions(Stmt, false);
+            AnalyzeDclOptions(Stmt, false);
 
             return parsed;
         }
@@ -766,7 +783,7 @@ namespace Steadsoft.Novus.Parser.Classes
                             token = TokenSource.GetNextToken();
                             continue;
                         default:
-                            OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, "Unexpected token {} found."));
+                            OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, $"Unexpected token '{token.Lexeme}' found."));
                             break;
                     }
             }
@@ -1124,21 +1141,23 @@ namespace Steadsoft.Novus.Parser.Classes
                 TokenSource.GetNextToken(); // Consume the closing rpar
             }
 
-            token = TokenSource.GetNextToken();
+            TryParseDclOptions(Prior, methodDef, out DiagMsg);
 
-            while (token.TokenType != SemiColon && token.TokenType != BraceOpen)
-            {
-                if (token.Keyword != IsNotKeyword)
-                    methodDef.Options.Add(token.Keyword);
+            //token = TokenSource.GetNextToken();
 
-                token = TokenSource.GetNextToken();
-            }
+            //while (token.TokenType != SemiColon && token.TokenType != BraceOpen)
+            //{
+            //    if (token.Keyword != IsNotKeyword)
+            //        methodDef.Options.Add(token.Keyword);
 
-            if (token.TokenType == BraceOpen)
-            {
-                TokenSource.PushToken(token);
-                methodDef.HasBody = true;
-            }
+            //    token = TokenSource.GetNextToken();
+            //}
+
+            //if (token.TokenType == BraceOpen)
+            //{
+            //    TokenSource.PushToken(token);
+            //    methodDef.HasBody = true;
+            //}
 
             Stmt = methodDef;
 
