@@ -12,7 +12,10 @@ namespace Steadsoft.Novus.Parser.Statics
     {
         public static bool MethodDeclaration(TokenEnumerator TokenSource)
         {
-            return TokenSource.NextTokensAre(ParenOpen, Identifier, Identifier);
+            return
+                TokenSource.NextTokensAre(SemiColon) ||
+                TokenSource.NextTokensAre(ParenOpen, Identifier, Identifier) ||
+                FunctionReturnType(TokenSource);
         }
 
         public static bool FunctionReturnType(TokenEnumerator TokenSource)

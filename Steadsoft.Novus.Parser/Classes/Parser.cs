@@ -198,7 +198,7 @@ namespace Steadsoft.Novus.Parser.Classes
             // of type that's being declared in order to parse it, for example an enum
             // contains a fundamentally different kind of members.
 
-            if (Stmt.Options.ContainsMoreThanOneOf(Class, Struct, Singlet, Enum))
+            if (Stmt.Options.ContainsMoreThanOneOf(Class, Struct, Singlet, Enum, Interface))
             {
                 if (ReportErrors)
                 {
@@ -208,7 +208,7 @@ namespace Steadsoft.Novus.Parser.Classes
             }
             else
             {
-                if (Stmt.Options.TryGetUnique(out var Item, Class, Struct, Singlet, Enum))
+                if (Stmt.Options.TryGetUnique(out var Item, Class, Struct, Singlet, Enum, Interface))
                 {
                     Stmt.TypeKind = Item;
                 }
@@ -1081,6 +1081,16 @@ namespace Steadsoft.Novus.Parser.Classes
 
             DiagMsg = string.Empty;
 
+            // A method declaration is any of:
+            // def <identifier> ;
+            // def <identifier> (<typename>) ;
+            // def <identifier> (<identifier> <typename> ...);
+            // def <identifier> { ... }
+            // def <identifier> (<typename>) { ... }
+            // def <identifier> (<identifier> <typename> ...) { ... }
+
+            // At the 'def' <identifier> has already been consumed.
+
             if (!AppearsToBeA.MethodDeclaration(TokenSource))
             {
                 DiagMsg = "Invalid parser method called.";
@@ -1089,45 +1099,61 @@ namespace Steadsoft.Novus.Parser.Classes
 
             methodDef = new DclMethodStatement(Stmt.Line, Stmt.Col, Stmt.Name, Parent);
 
-            TryParseParameterList(Prior, ref methodDef, out DiagMsg);
+            token = TokenSource.PeekNextTokens(1).First();
 
-            Stmt = methodDef;
+            if (token.TokenType == SemiColon || token.TokenType == BraceOpen)
+            {
+                if (token.TokenType == SemiColon)
+                    methodDef.HasBody = false;
+                else
+                    methodDef.HasBody = true;
 
-            var tokens = TokenSource.PeekNextTokens(3);
+                return true;
+            }
 
-            // Is the next sequence a method return type?
+            if (TokenSource.NextTokensAre(ParenOpen, Identifier, Identifier))
+            {
+                TryParseParameterList(Prior, ref methodDef, out DiagMsg);
+            }
 
-            if (AppearsToBeA.FunctionReturnType(TokenSource))
+            if (TokenSource.NextTokensAre(ParenOpen, Identifier, ParenClose))
             {
                 TokenSource.GetNextToken();
-                TokenSource.GetNextToken();
-                methodDef.Returns = tokens[1].Lexeme;
+                var retToken = TokenSource.GetNextToken();
+                methodDef.Returns = retToken.Lexeme;
                 TokenSource.GetNextToken(); // Consume the closing rpar
             }
 
-            // OK now look for any additional keywords (options like public, abstract etc)
-
             token = TokenSource.GetNextToken();
 
-            while (token.TokenType != BraceOpen)
+            while (token.TokenType != SemiColon && token.TokenType != BraceOpen)
             {
-                if (token.Keyword == IsNotKeyword)
-                {
-                    ; // error
-                }
-
-                methodDef.AddOption(token.Keyword);
+                if (token.Keyword != IsNotKeyword)
+                    methodDef.Options.Add(token.Keyword);
 
                 token = TokenSource.GetNextToken();
             }
 
-            TokenSource.PushToken(token);
+            if (token.TokenType == BraceOpen)
+            {
+                TokenSource.PushToken(token);
+                methodDef.HasBody = true;
+            }
+
+            Stmt = methodDef;
 
             return true;
+
         }
         private bool TryParseMethodBody(Token Prior, ref DclStatement Stmt, out string DiagMsg)
         {
+            var method = (DclMethodStatement)(Stmt);
+
             DiagMsg = string.Empty;
+
+            if (method.HasBody == false)
+                return true;
+
             var token = TokenSource.GetNextToken();
 
             if (token.TokenType != BraceOpen)

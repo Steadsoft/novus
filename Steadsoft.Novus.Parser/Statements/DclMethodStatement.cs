@@ -15,6 +15,7 @@ namespace Steadsoft.Novus.Parser.Statements
         public BlockStatement Block { get; private set; }
         public List<Parameter> Parameters { get; private set; }
         public string Returns { get; internal set; }
+        public bool HasBody { get; internal set; }
         public DclMethodStatement(int Line, int Col, string Name, DclTypeStatement Parent) : base(Line, Col, Name, "method")
         {
             this.Parameters = new List<Parameter>();
@@ -39,7 +40,8 @@ namespace Steadsoft.Novus.Parser.Statements
 
             builder.AppendLine($"{Prepad(nesting)}Method: [{Name}] {ParametersText} {ReturnsText} {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
 
-            builder.Append(Block.Dump(nesting));
+            if (HasBody)
+                builder.Append(Block.Dump(nesting));
 
             return builder.ToString();
         }

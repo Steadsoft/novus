@@ -8,6 +8,11 @@
         A
    }
 
+   type IAmAnInterface interface
+   {
+        def Reboot (a int) (int);
+   }
+
    type aa 
    {
       public private
