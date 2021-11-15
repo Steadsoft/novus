@@ -26,6 +26,7 @@ namespace Steadsoft.Novus.Parser.Classes
     /// </remarks>
     public class Parser
     {
+        private Tokenizer<Keywords> tokenizer;
         public string SourceName { get; private set; }
         private static List<Keywords> accessibilities = new List<Keywords>()
         {
@@ -37,9 +38,10 @@ namespace Steadsoft.Novus.Parser.Classes
         public delegate void DiagnosticEventHandler(object Sender, DiagnosticEventArgs Args);
         public TokenEnumerator TokenSource { get; private set; }
         public event DiagnosticEventHandler OnDiagnostic;
-        private Parser(TokenEnumerator Source)
+        private Parser(TokenEnumerator Source, Tokenizer<Keywords> Tokenizer)
         {
             TokenSource = Source;
+            this.tokenizer = Tokenizer;
             OnDiagnostic = delegate { };
         }
         /// <summary>
@@ -65,7 +67,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             var tokenizer = new Tokenizer<Keywords>(Tokens, Definition, Assembly.GetExecutingAssembly());
             var source = new TokenEnumerator(tokenizer.Tokenize(sourceFile), BlockComment, LineComment);
-            var p = new Parser(source);
+            var p = new Parser(source, tokenizer);
 
             if (SourceText == SourceOrigin.Pathname)
                 p.SourceName = Path.GetFullPath(Input);
@@ -143,7 +145,6 @@ namespace Steadsoft.Novus.Parser.Classes
                         }
                         token = TokenSource.GetNextToken();
                         continue;
-
                     default:
                         {
                             errors++;
@@ -401,6 +402,29 @@ namespace Steadsoft.Novus.Parser.Classes
 
             }
         }
+        private bool TryParseDelimiter(Token Prior, out DclDelimiterStatement Stmt, out string DiagMsg)
+        {
+            Stmt = null;
+            DiagMsg = string.Empty;
+            Character c;
+            StringBuilder delimiter = new();
+
+            TokenSource.VerifyExpectedToken(Delimiter, out var token);
+
+            var t = TokenSource.GetNextToken();
+                
+            c = tokenizer.GetNextRawChar();
+
+            while (c.Char != ')')
+            {
+                delimiter.Append(c.Char);
+                c = tokenizer.GetNextRawChar();
+            }
+                
+            t = TokenSource.GetNextToken(); // closing semicolon
+
+            return true;
+        }
         private bool TryParseNamespace(Token Prior, out DclNamespaceStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
@@ -498,6 +522,19 @@ namespace Steadsoft.Novus.Parser.Classes
                         token = TokenSource.GetNextToken();
                         continue;
 
+                    case Delimiter:
+                        TokenSource.PushToken(token);
+                        if (TryParseDelimiter(token, out var delimiterStatement, out DiagMsg))
+                        {
+                            ;// Tree.AddChild(typeStatement);
+                        }
+                        else
+                        {
+                            OnDiagnostic(this, ParsedBad(delimiterStatement, DiagMsg));
+                            TokenSource.SkipToNext(";");
+                        }
+                        token = TokenSource.GetNextToken();
+                        continue;
                     default:
                         OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, $"Unexpected token '{token.Lexeme}' found."));
                         break;

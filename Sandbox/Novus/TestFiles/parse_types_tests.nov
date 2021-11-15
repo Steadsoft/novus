@@ -1,5 +1,7 @@
 ﻿namespace a.x.rere
 {
+   delimiter(|||);
+
    type ee enum public static
    {
         A,
@@ -13,6 +15,9 @@
         def Reboot (a int) (int);
         def Reboot (b int) (int);
    }
+
+
+   // |||this is some text inside which we can embed " or "" or ' or ' or whatever was want|||;
 
    type aa 
    {
@@ -97,11 +102,11 @@
 
                    /* but lets play a little..
 
-                   call some_method; // no args, so no parens
+                   call some_method; // no args, so no parens, optional parens ?
 
                    call some_other_method (<expression>,<expression>...);
 
-                   result = some_function; // no args, so no parens
+                   result = some_function; // no args, so no parens, optional parens ?
 
                    result = some_other_function (<expression>,<expression>...)
 
@@ -199,3 +204,50 @@ type Category1 class sealed sealed abstract static
         }
     }
 }
+
+/*
+
+arrays do not need to use [ and ]. These are reserved for the language's builtin functions.
+
+here is an array:
+
+type class Window
+{
+
+   def table(7) string; array 0 - 6 of string
+
+   def table(9,9,9) double; 3D array 0 - 9 = 1,000 elements.
+
+   def table(*) int; array of int's no compile time dimension.
+
+   def names(*,*) string;  2D array of strings no compile time dimensions.
+}
+
+Loops:
+
+   for I = 0 to 100 by 9
+   {
+   
+   }
+
+   for I = 100 to 0 by -1
+   {
+   
+   }
+
+   while a > b
+   {
+   
+   }
+
+   while (a > b)
+   {
+   
+   }
+
+   until x = y
+   {
+   
+   }
+
+*/

@@ -20,7 +20,7 @@ namespace Steadsoft.Novus.Scanner.Classes
     {
         private readonly SparseTable<State, char, (Step, State, TokenType)> table;
         private SourceFile source;
-
+        private int I; // used to index character stream.
         /// <summary>
         /// Creates a new instance of a tokenizer and initialises its state machine
         /// from the CSV file that you supply.
@@ -115,6 +115,11 @@ namespace Steadsoft.Novus.Scanner.Classes
             source = File;
         }
 
+        public Character GetNextRawChar()
+        {
+            return source.Chars[++I];
+        }
+
         /// <summary>
         /// Transforms the supplied source into a stream of tokens.
         /// </summary>
@@ -136,7 +141,7 @@ namespace Steadsoft.Novus.Scanner.Classes
 
             var tuple = (Step: Step.AppendReturn, State: State.INITIAL, TokenType: Undecided);
 
-            for (int I = 0; I < source.Chars.Count; I++)
+            for (I = 0; I < source.Chars.Count; I++)
             {
                 var character = source.Chars[I];
                 var charclass = character.Char.GetLexicalClass();
