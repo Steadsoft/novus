@@ -241,6 +241,39 @@ namespace Steadsoft.Novus.Parser.Classes
                             }
                         }
 
+                        // Now analyze each specific type according to their own specific rules.
+
+                        switch (dclTypeStatement.TypeKind)
+                        {
+                            case Enum:
+                            case Interface:
+                            case Struct:
+                            case Singlet:
+                               {
+                                    if (dclTypeStatement.Options.ContainsOnly(dclTypeStatement.TypeKind, New, Public, Protected, Internal, Private) == false)
+                                    {
+                                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Only the options 'new, public, protected, internal and private' may appear in the declaration of the {dclTypeStatement.TypeKind.ToString().ToLower()} '{Stmt.Name}'."));
+                                    }
+                                    break;
+                                }
+                            case Class:
+                                {
+                                    if (dclTypeStatement.Options.ContainsOnly(Class, New, Public, Protected, Internal, Private, Abstract, Sealed) == false)
+                                    {
+                                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Only the options 'new, public, protected, internal, private and abstract' may appear in the declaration of the {dclTypeStatement.TypeKind.ToString().ToLower()} '{Stmt.Name}'."));
+                                    }
+                                    break;
+                                }
+                            case IsNotKeyword:
+                                {
+                                    break;
+                                }
+                            default:
+                                {
+                                    break;
+                                }
+                        }
+
                         break;
                     }
             }

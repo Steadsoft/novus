@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Steadsoft.Novus.Parser.Statics
 {
@@ -58,6 +59,26 @@ namespace Steadsoft.Novus.Parser.Statics
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Returns false if any of the values supplied in 'List' are not members of 'Set'
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="List"></param>
+        /// <param name="Set"></param>
+        /// <returns></returns>
+        public static bool ContainsOnly<T>(this List<T> List, params T[] Set) 
+        {
+            foreach (var member in List)
+            {
+                if (Set.Contains(member) == false)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

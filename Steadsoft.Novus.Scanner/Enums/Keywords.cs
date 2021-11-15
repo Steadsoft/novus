@@ -7,6 +7,7 @@
         Namespace,
         Def,
         Type,
+        New,
         Class,
         Struct,
         Record,
