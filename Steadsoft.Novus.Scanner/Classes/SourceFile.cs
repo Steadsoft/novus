@@ -19,6 +19,8 @@ namespace Steadsoft.Novus.Scanner.Classes
         }
         private SourceFile(string Path, bool FromFile = true)
         {
+            
+
             int line = 1;
             int col = 1;
 

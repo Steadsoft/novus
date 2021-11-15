@@ -10,6 +10,7 @@ using static Steadsoft.Novus.Scanner.Enums.Keywords;
 using System.Linq;
 using System.Collections.Generic;
 using Steadsoft.Novus.Scanner.Classes;
+using System.IO;
 
 namespace Steadsoft.Novus.Parser.Classes
 {
@@ -25,6 +26,7 @@ namespace Steadsoft.Novus.Parser.Classes
     /// </remarks>
     public class Parser
     {
+        public string SourceName { get; private set; }
         private static List<Keywords> accessibilities = new List<Keywords>()
         {
             Public,
@@ -63,7 +65,14 @@ namespace Steadsoft.Novus.Parser.Classes
 
             var tokenizer = new Tokenizer<Keywords>(Tokens, Definition, Assembly.GetExecutingAssembly());
             var source = new TokenEnumerator(tokenizer.Tokenize(sourceFile), BlockComment, LineComment);
-            return new Parser(source);
+            var p = new Parser(source);
+
+            if (SourceText == SourceOrigin.Pathname)
+                p.SourceName = Path.GetFullPath(Input);
+            else
+                p.SourceName = "Raw Text";
+
+            return p;
         }
         public bool TrySyntaxPhase(out BlockStatement Tree)
         {
@@ -1261,9 +1270,9 @@ namespace Steadsoft.Novus.Parser.Classes
                 foreach (var duplicate in duplicates)
                 {
                     if (duplicate.ShortStatementTypeName == "method")
-                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortStatementTypeName} name '{duplicate.FriendlyName}' within {containerName} '{Stmt.Name}', there is already a defintion of a {firstuse.ShortStatementTypeName} with this name and signature at line {firstuse.Line}."));
+                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortStatementTypeName} name '{duplicate.FriendlyName}' within {containerName} '{Stmt.Name}', there is already a defintion within this scope, of a {firstuse.ShortStatementTypeName} with this name and signature at line {firstuse.Line}."));
                     else
-                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortStatementTypeName} name '{duplicate.FriendlyName}' within {containerName} '{Stmt.Name}', there is already a defintion of a {firstuse.ShortStatementTypeName} with this name at line {firstuse.Line}."));
+                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortStatementTypeName} name '{duplicate.FriendlyName}' within {containerName} '{Stmt.Name}', there is already a defintion within this scope, of a {firstuse.ShortStatementTypeName} with this name at line {firstuse.Line}."));
                 }
             }
         }

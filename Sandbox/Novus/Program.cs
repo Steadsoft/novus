@@ -34,6 +34,12 @@ namespace Sandbox
 
             var saved = Console.ForegroundColor;
 
+            if (messages.Any())
+            {
+                Console.WriteLine($"Diagnostics from compilation of '{parser.SourceName}'");
+                Console.WriteLine();
+            }
+
             foreach (var msg in messages.OrderBy(m => m.Line))
             {
                 try

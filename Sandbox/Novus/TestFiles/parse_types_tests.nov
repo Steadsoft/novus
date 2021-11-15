@@ -83,9 +83,8 @@
 
                def GetScreenArea (argx string)  (string) public override public
                {
-                  return;
+                  return "so long";
                }
-
 
                def Name string public readonly public; // a field definition
                def Name double private readonly public; // a field definition
@@ -102,6 +101,10 @@
 
                    call some_other_method (<expression>,<expression>...);
 
+                   result = some_function; // no args, so no parens
+
+                   result = some_other_function (<expression>,<expression>...)
+
                    goto label;
 
                    while (<expression>)
@@ -110,6 +113,10 @@
                    until (<expression>)
                       <statement>
 
+                   select (<expression>)
+                      <statmenet>
+
+                   break [<label>]
 
                    */
                 }
