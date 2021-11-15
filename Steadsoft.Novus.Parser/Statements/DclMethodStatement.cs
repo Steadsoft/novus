@@ -23,6 +23,40 @@ namespace Steadsoft.Novus.Parser.Statements
             this.Parent = Parent;
         }
 
+        /// <summary>
+        /// The Name in the case of a method, has two forms, one is the friendly name devoid of any embellishments arising from signatures
+        /// and the other is that expanded name with signature embellishments. Because name is a contrived string used only within the
+        /// compiler it is unhelpful to expose to users.
+        /// </summary>
+        public override string Name
+        {
+            get
+            {
+                StringBuilder namebuilder = new StringBuilder();
+
+                namebuilder.Append(base.Name);
+
+                foreach (var t in Parameters)
+                {
+                    namebuilder.Append($".{t.TypeName}({t.PassBy})");
+                }
+
+                return namebuilder.ToString();
+            }
+        }
+
+        /// <summary>
+        /// This is the basic name of a method devoid of signature embellishments, this is the name we use 
+        /// in diagnostic messages and so on, it is the one exposed to users.
+        /// </summary>
+        public override string FriendlyName
+        {
+            get
+            {
+                return base.Name;
+            }
+        }
+
         public void AddParameter(Parameter Parameter)
         {
             Parameters.Add(Parameter);

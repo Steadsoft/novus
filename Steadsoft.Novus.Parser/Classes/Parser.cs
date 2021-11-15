@@ -26,10 +26,10 @@ namespace Steadsoft.Novus.Parser.Classes
     public class Parser
     {
         private static List<Keywords> accessibilities = new List<Keywords>()
-        { 
-            Public, 
-            Private, 
-            Protected, 
+        {
+            Public,
+            Private,
+            Protected,
             Internal
         };
         public delegate void DiagnosticEventHandler(object Sender, DiagnosticEventArgs Args);
@@ -243,36 +243,37 @@ namespace Steadsoft.Novus.Parser.Classes
 
                         // Now analyze each specific type according to their own specific rules.
 
-                        switch (dclTypeStatement.TypeKind)
-                        {
-                            case Enum:
-                            case Interface:
-                            case Struct:
-                            case Singlet:
-                               {
-                                    if (dclTypeStatement.Options.ContainsOnly(dclTypeStatement.TypeKind, New, Public, Protected, Internal, Private) == false)
+                        if (ReportErrors)
+                            switch (dclTypeStatement.TypeKind)
+                            {
+                                case Enum:
+                                case Interface:
+                                case Struct:
+                                case Singlet:
                                     {
-                                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Only the options 'new, public, protected, internal and private' may appear in the declaration of the {dclTypeStatement.TypeKind.ToString().ToLower()} '{Stmt.Name}'."));
+                                        if (dclTypeStatement.Options.ContainsOnly(dclTypeStatement.TypeKind, New, Public, Protected, Internal, Private) == false)
+                                        {
+                                            OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Only the options 'new, public, protected, internal and private' may appear in the declaration of the {dclTypeStatement.TypeKind.ToString().ToLower()} '{Stmt.Name}'."));
+                                        }
+                                        break;
                                     }
-                                    break;
-                                }
-                            case Class:
-                                {
-                                    if (dclTypeStatement.Options.ContainsOnly(Class, New, Public, Protected, Internal, Private, Abstract, Sealed) == false)
+                                case Class:
                                     {
-                                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Only the options 'new, public, protected, internal, private and abstract' may appear in the declaration of the {dclTypeStatement.TypeKind.ToString().ToLower()} '{Stmt.Name}'."));
+                                        if (dclTypeStatement.Options.ContainsOnly(Class, New, Public, Protected, Internal, Private, Abstract, Sealed) == false)
+                                        {
+                                            OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Only the options 'new, public, protected, internal, private and abstract' may appear in the declaration of the {dclTypeStatement.TypeKind.ToString().ToLower()} '{Stmt.Name}'."));
+                                        }
+                                        break;
                                     }
-                                    break;
-                                }
-                            case IsNotKeyword:
-                                {
-                                    break;
-                                }
-                            default:
-                                {
-                                    break;
-                                }
-                        }
+                                case IsNotKeyword:
+                                    {
+                                        break;
+                                    }
+                                default:
+                                    {
+                                        break;
+                                    }
+                            }
 
                         break;
                     }
@@ -531,7 +532,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             var token = TokenSource.GetNextToken();
 
-            while (token.TokenType !=  BraceOpen && token.TokenType != SemiColon)
+            while (token.TokenType != BraceOpen && token.TokenType != SemiColon)
             {
                 if (token.Keyword == IsNotKeyword)
                 {
@@ -548,7 +549,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             if (token.TokenType == BraceOpen)
             {
-               TokenSource.PushToken(token); // put the brace { back.
+                TokenSource.PushToken(token); // put the brace { back.
                 if (Stmt is DclMethodStatement)
                 {
                     (Stmt as DclMethodStatement).HasBody = true;
@@ -771,54 +772,54 @@ namespace Steadsoft.Novus.Parser.Classes
 
             while (token.TokenType != NoMoreTokens && token.TokenType != BraceClose)
             {
-                    switch (token.Keyword)
-                    {
-                        case Type:
-                            TokenSource.PushToken(token);
-                            if (TryParseType(token, out var typeStatement, out DiagMsg))
-                            {
-                                body.AddChild(typeStatement);
-                            }
-                            else
-                            {
-                                OnDiagnostic(this, ParsedBad(typeStatement, DiagMsg));
-                                TokenSource.SkipToNext("}");
-                            }
-                            token = TokenSource.GetNextToken();
-                            continue;
-                        case Def:
-                            TokenSource.PushToken(token);
-                            if (TryParseDef(token, out var defStatement, Stmt, out DiagMsg))
-                            {
-                                body.AddChild(defStatement);
-                            }
-                            else
-                            {
-                                OnDiagnostic(this, ParsedBad(defStatement, DiagMsg));
-                                TokenSource.SkipToNext("}");
-                            }
-                            token = TokenSource.GetNextToken();
-                            continue;
-                        case Public:
-                        case Internal:
-                        case Protected:
-                        case Private:
-                            TokenSource.PushToken(token);
-                            if (TryParseAccessorBlock(token, out var accessorStatement, Stmt, out DiagMsg))
-                            {
-                                body.AddChild(accessorStatement);
-                            }
-                            else
-                            {
-                                OnDiagnostic(this, ParsedBad(accessorStatement, DiagMsg));
-                                TokenSource.SkipToNext("}");
-                            }
-                            token = TokenSource.GetNextToken();
-                            continue;
-                        default:
-                            OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, $"Unexpected token '{token.Lexeme}' found."));
-                            break;
-                    }
+                switch (token.Keyword)
+                {
+                    case Type:
+                        TokenSource.PushToken(token);
+                        if (TryParseType(token, out var typeStatement, out DiagMsg))
+                        {
+                            body.AddChild(typeStatement);
+                        }
+                        else
+                        {
+                            OnDiagnostic(this, ParsedBad(typeStatement, DiagMsg));
+                            TokenSource.SkipToNext("}");
+                        }
+                        token = TokenSource.GetNextToken();
+                        continue;
+                    case Def:
+                        TokenSource.PushToken(token);
+                        if (TryParseDef(token, out var defStatement, Stmt, out DiagMsg))
+                        {
+                            body.AddChild(defStatement);
+                        }
+                        else
+                        {
+                            OnDiagnostic(this, ParsedBad(defStatement, DiagMsg));
+                            TokenSource.SkipToNext("}");
+                        }
+                        token = TokenSource.GetNextToken();
+                        continue;
+                    case Public:
+                    case Internal:
+                    case Protected:
+                    case Private:
+                        TokenSource.PushToken(token);
+                        if (TryParseAccessorBlock(token, out var accessorStatement, Stmt, out DiagMsg))
+                        {
+                            body.AddChild(accessorStatement);
+                        }
+                        else
+                        {
+                            OnDiagnostic(this, ParsedBad(accessorStatement, DiagMsg));
+                            TokenSource.SkipToNext("}");
+                        }
+                        token = TokenSource.GetNextToken();
+                        continue;
+                    default:
+                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, $"Unexpected token '{token.Lexeme}' found."));
+                        break;
+                }
             }
 
             return true;
@@ -837,34 +838,34 @@ namespace Steadsoft.Novus.Parser.Classes
 
             while (token.TokenType != NoMoreTokens && token.TokenType != BraceClose)
             {
-                    // The members of an enum are never other types or defintions, we must parse this differently
+                // The members of an enum are never other types or defintions, we must parse this differently
 
-                    if (token.TokenType != Identifier)
-                    {
-                        OnDiagnostic(this, ParsedBad(Stmt, DiagMsg));
-                        token = TokenSource.GetNextToken();
-                        continue;
-                    }
+                if (token.TokenType != Identifier)
+                {
+                    OnDiagnostic(this, ParsedBad(Stmt, DiagMsg));
+                    token = TokenSource.GetNextToken();
+                    continue;
+                }
 
-                    var name = token.Lexeme;
+                var name = token.Lexeme;
 
+                token = TokenSource.GetNextToken();
+
+                if (token.TokenType != Comma && token.TokenType != BraceClose)
+                {
+                    OnDiagnostic(this, ParsedBad(Stmt, DiagMsg));
+                    token = TokenSource.GetNextToken();
+                    continue;
+                }
+
+                // store the enum member as a child
+
+                Stmt.Block.AddChild(new DclEnumMemberStatement(Prior.LineNumber, Prior.ColNumber, name, Stmt));
+
+                if (token.TokenType == Comma)
                     token = TokenSource.GetNextToken();
 
-                    if (token.TokenType != Comma && token.TokenType != BraceClose)
-                    {
-                        OnDiagnostic(this, ParsedBad(Stmt, DiagMsg));
-                        token = TokenSource.GetNextToken();
-                        continue;
-                    }
-
-                    // store the enum member as a child
-
-                    Stmt.Block.AddChild(new DclEnumMemberStatement(Prior.LineNumber, Prior.ColNumber, name, Stmt));
-
-                    if (token.TokenType == Comma)
-                        token = TokenSource.GetNextToken();
-
-                    continue;
+                continue;
             }
 
             return true;
@@ -1259,7 +1260,10 @@ namespace Steadsoft.Novus.Parser.Classes
 
                 foreach (var duplicate in duplicates)
                 {
-                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortStatementTypeName} name '{duplicate.Name}' within {containerName} '{Stmt.Name}', there is already a defintion of a {firstuse.ShortStatementTypeName} with this name at line {firstuse.Line}."));
+                    if (duplicate.ShortStatementTypeName == "method")
+                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortStatementTypeName} name '{duplicate.FriendlyName}' within {containerName} '{Stmt.Name}', there is already a defintion of a {firstuse.ShortStatementTypeName} with this name and signature at line {firstuse.Line}."));
+                    else
+                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortStatementTypeName} name '{duplicate.FriendlyName}' within {containerName} '{Stmt.Name}', there is already a defintion of a {firstuse.ShortStatementTypeName} with this name at line {firstuse.Line}."));
                 }
             }
         }

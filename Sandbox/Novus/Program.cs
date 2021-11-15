@@ -62,6 +62,16 @@ namespace Sandbox
             DumpParseTree(root);
         }
 
+        private static void DoIt(int A)
+        {
+            ;
+        }
+
+        private static void DoIt(ref int A)
+        {
+            ;
+        }
+
         private static void MsgHandler(object Sender, DiagnosticEventArgs Args)
         {
             messages.Add(Args);
@@ -69,6 +79,10 @@ namespace Sandbox
 
         private static void DumpParseTree(BlockStatement Root)
         {
+            Console.WriteLine("DUMP OF PARSE TREE FOLLOWS:");
+            Console.WriteLine();
+
+
             foreach (var stmt in Root.Children)
             {
                 string text = stmt.Dump(0);

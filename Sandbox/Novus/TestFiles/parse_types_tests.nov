@@ -1,6 +1,6 @@
 ﻿namespace a.x.rere
 {
-   type ee enum public
+   type ee enum public static
    {
         A,
         B,
@@ -11,6 +11,7 @@
    type IAmAnInterface interface
    {
         def Reboot (a int) (int);
+        def Reboot (b int) (int);
    }
 
    type aa 
@@ -73,10 +74,18 @@
                   return;
                }
 
+               // this is an overload not a dupe declaration
+
                def GetScreenArea (arg1 string)  (string) public override public
                {
                   return;
                }
+
+               def GetScreenArea (argx string)  (string) public override public
+               {
+                  return;
+               }
+
 
                def Name string public readonly public; // a field definition
                def Name double private readonly public; // a field definition

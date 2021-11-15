@@ -6,7 +6,19 @@ namespace Steadsoft.Novus.Parser.Statements
 {
     public class DclStatement : Statement
     {
-        public string Name { get; private set; }
+        public virtual string Name { get; private set; }
+        /// <summary>
+        /// This is the name with any embellishments stripped away.
+        /// </summary>
+        /// <remarks>
+        /// Some declarations are for things like methods where their unique name include signature detail.
+        /// The FriendlyName is used to report diagnostic messages and so on to avoid confusing users.
+        /// For the majority of items the Name and the FriendlyName are identical.
+        /// </remarks>
+        public virtual string FriendlyName 
+        { 
+            get { return Name; }
+        }
         public string ShortStatementTypeName { get; private set; }
         /// <summary>
         /// Indicates optional keywords encountered while parsing.
