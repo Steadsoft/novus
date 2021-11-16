@@ -65,7 +65,7 @@
                 }
             }
             ";
-        public const string DelimiterTest =
+        public const string DelimiterTest_1 =
             @"
             #delimiter |||
 
@@ -74,5 +74,6 @@
             ""jhdkjhdkajshdkajshdkkhsdhd""
 
             ";
+
     }
 }

@@ -18,7 +18,7 @@ namespace Steadsoft.Novus.Scanner.Classes
     /// </remarks>
     public class Tokenizer<T> where T : struct, Enum
     {
-        private readonly SparseTable<State, char, (Step, State, TokenType)> table;
+        internal readonly SparseTable<State, char, (Step, State, TokenType)> Table;
         private SourceFile source;
         private int I; // used to index character stream.
         /// <summary>
@@ -31,7 +31,7 @@ namespace Steadsoft.Novus.Scanner.Classes
         {
             if (string.IsNullOrWhiteSpace(TokenData)) throw new ArgumentNullException(nameof(TokenData));
 
-            table = new();
+            Table = new();
 
             switch (TokenSource)
             {
@@ -92,20 +92,20 @@ namespace Steadsoft.Novus.Scanner.Classes
                     flag = char.TryParse(parts[1], out char code);
 
                     if (flag)
-                        table.Add(curstate, code, (step, newstate, token));
+                        Table.Add(curstate, code, (step, newstate, token));
                     else
                     {
                         parts[1] = Regex.Unescape(parts[1]);
                         flag = char.TryParse(parts[1], out code);
 
                         if (flag)
-                            table.Add(curstate, code, (step, newstate, token));
+                            Table.Add(curstate, code, (step, newstate, token));
                     }
                 }
                 else
                 {
                     var cls = (LexicalClass)Enum.Parse(typeof(LexicalClass), parts[1]);
-                    table.Add(curstate, cls, (step, newstate, token));
+                    Table.Add(curstate, cls, (step, newstate, token));
                 }
             }
 
@@ -147,7 +147,7 @@ namespace Steadsoft.Novus.Scanner.Classes
                 var charclass = character.Char.GetLexicalClass();
 
 
-                bool found = table.TryGet(state, character.Char, out tuple) ? true : table.TryGet(state, charclass, out tuple) ? true : table.TryGet(state, Any, out tuple);
+                bool found = Table.TryGet(state, character.Char, out tuple) ? true : Table.TryGet(state, charclass, out tuple) ? true : Table.TryGet(state, Any, out tuple);
 
                 if (found == false)
                     throw new InvalidOperationException($"No handler found in state '{state}' for char '{character.Char}' having lexical class '{charclass}' at L={character.Line} C={character.Col}.");

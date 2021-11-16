@@ -22,14 +22,9 @@ INITIAL			'"'		DiscardContinue QUOTATION		Undecided
 PREPROC         Alpha   AppendContinue  PREPROC         Undecided
 PREPROC         Any     RewindReturn    INITIAL         Preprocessor
 
-INITIAL			'|'		DiscardContinue D1A				Undecided 
-D1A   			'|'		DiscardContinue D1B				Undecided 
-D1B             '|'     DiscardContinue D1C		        QString
 
-D1C             '|'     DiscardContinue D2A             QString
-D2A             '|'     DiscardContinue D2B             QString
-D2B             '|'     DiscardReturn   INITIAL         QString
-D1C             Any     AppendContinue  D1C             QString
+
+
 
 INITIAL			White	DiscardContinue	INITIAL			Undecided 
 INITIAL			Alpha	AppendContinue  IDENTIFIER		Undecided 

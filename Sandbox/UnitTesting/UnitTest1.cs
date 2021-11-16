@@ -38,13 +38,28 @@ namespace UnitTesting
         {
             Token token;
 
-            var parser = Parser.CreateParser(SourceOrigin.Text, Source.DelimiterTest, TokenDefinition.Resource, "novus.csv");
+            var parser = Parser.CreateParser(SourceOrigin.Text, Source.DelimiterTest_1, TokenDefinition.Resource, "novus.csv");
 
             var tokens = parser.TokenSource.PeekNextTokens(2);
 
 
             Assert.IsTrue(tokens[0].TokenType == TokenType.QString && tokens[0].Lexeme == "lkfhjsdkfhsdkfghsdkgfhdfkg");
             Assert.IsTrue(tokens[1].TokenType == TokenType.QString && tokens[1].Lexeme == "jhdkjhdkajshdkajshdkkhsdhd");
+
+        }
+
+        [TestMethod]
+        public void TestTokenizer_3()
+        {
+            Token token;
+
+            var parser = Parser.CreateParser(SourceOrigin.Pathname, @"..\..\..\Sources\string_delimiter_test_1.nov", TokenDefinition.Resource, "novus.csv");
+
+            var tokens = parser.TokenSource.PeekNextTokens(2);
+
+
+            Assert.IsTrue(tokens[0].TokenType == TokenType.QString && tokens[0].Lexeme == @"lkfhj""dk""""""dkfghsdkgfhdfkg");
+            Assert.IsTrue(tokens[1].TokenType == TokenType.QString && tokens[1].Lexeme == "jhdkjhd|||kajshdkajshdkkhsdhd");
 
         }
 

@@ -141,6 +141,8 @@ namespace Steadsoft.Novus.Scanner.Classes
 
         private void ProcessDelimiterDirective(Token token)
         {
+            bool has_start_end = false;
+
             StringBuilder delimiter = new();
 
             Character c = tokenizer.GetNextRawChar();
@@ -150,19 +152,55 @@ namespace Steadsoft.Novus.Scanner.Classes
                 c = tokenizer.GetNextRawChar();
             }
 
-            delimiter.Append(c.Char);
-
-            while (Char.IsWhiteSpace(c.Char) == false)
+            while (c.Char != '\r')
             {
                 delimiter.Append(c.Char);
                 c = tokenizer.GetNextRawChar();
             }
 
+            var chars = delimiter.ToString().Trim();
+
+            if (chars.Contains(' '))
+            {
+                has_start_end = true;
+            }
+            else
+            {
+                has_start_end = false;
+            }
+
             // Now we have the raw set of characters specfied for the string literal delimiter.
             // We must now use these to update the scanner table so that the delimiter becomes the
             // new one for literal string tokenization.
+
+            int I,J;
+
+            if (has_start_end)
+            {
+
+            }
+            else
+            {
+                tokenizer.Table.Add(State.INITIAL, chars[0], (Step.DiscardContinue, State.DELIMITER0, TokenType.Undecided));
+
+                for (I = 1; I < chars.Length; I++)
+                {
+                    tokenizer.Table.Add((State)(I-1), chars[I], (Step.DiscardContinue, (State)(I), TokenType.Undecided));
+                }
+
+                tokenizer.Table.Add<LexicalClass>((State)(I - 1),LexicalClass.Any, (Step.AppendContinue, (State)(I - 1), TokenType.Undecided));
+
+                for (J = 0; J < chars.Length-1; J++)
+                {
+                    tokenizer.Table.Add((State)(I - 1), chars[J], (Step.DiscardContinue, (State)(I), TokenType.Undecided));
+                    I++;
+                }
+
+                tokenizer.Table.Add((State)(I - 1), chars[J], (Step.DiscardReturn, State.INITIAL, TokenType.QString));
+
+            }
         }
-        /// <summary>
+        /// <summary> 
         /// Returns the supplied token to the input, no check is made so be careful!
         /// </summary>
         /// <param name="Token"></param>

@@ -9,6 +9,16 @@
     /// </remarks>
     public enum State
     {
+        DELIMITER0,
+        DELIMITER1,
+        DELIMITER2,
+        DELIMITER3,
+        DELIMITER4,
+        DELIMITER5,
+        DELIMITER6,
+        DELIMITER7,
+        DELIMITER8,
+        DELIMITER9,
         INITIAL,
         IDENTIFIER,
         INTEGER,
@@ -28,11 +38,5 @@
         QUOTATION,
         APOSTROPHE,
         PREPROC,
-        D1A,
-        D1B,
-        D1C,
-        D2A,
-        D2B,
-        D2C
     }
 }
