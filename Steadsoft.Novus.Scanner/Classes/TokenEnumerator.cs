@@ -157,6 +157,10 @@ namespace Steadsoft.Novus.Scanner.Classes
                 delimiter.Append(c.Char);
                 c = tokenizer.GetNextRawChar();
             }
+
+            // Now we have the raw set of characters specfied for the string literal delimiter.
+            // We must now use these to update the scanner table so that the delimiter becomes the
+            // new one for literal string tokenization.
         }
         /// <summary>
         /// Returns the supplied token to the input, no check is made so be careful!

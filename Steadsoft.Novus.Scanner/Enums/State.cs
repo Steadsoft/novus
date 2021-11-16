@@ -28,10 +28,11 @@
         QUOTATION,
         APOSTROPHE,
         PREPROC,
-        D1,
-        D2,
-        D3,
-        D4,
-        D5
+        D1A,
+        D1B,
+        D1C,
+        D2A,
+        D2B,
+        D2C
     }
 }
