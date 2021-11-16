@@ -65,6 +65,14 @@
                 }
             }
             ";
+        public const string DelimiterTest =
+            @"
+            #delimiter |||
 
+            |||lkfhjsdkfhsdkfghsdkgfhdfkg|||
+
+            ""jhdkjhdkajshdkajshdkkhsdhd""
+
+            ";
     }
 }

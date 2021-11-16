@@ -1,11 +1,5 @@
-﻿#delimiter |||
-
-||| lkfhjsdkfhsdkfghsdkgfhdfkg |||
-
-
-namespace a.x.rere
+﻿namespace a.x.rere
 {
-
 
    type ee enum public static
    {

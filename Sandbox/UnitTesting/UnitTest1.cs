@@ -32,6 +32,22 @@ namespace UnitTesting
 
             Assert.IsTrue(token.Keyword == Keywords.Type);
         }
+
+        [TestMethod]
+        public void TestTokenizer_2()
+        {
+            Token token;
+
+            var parser = Parser.CreateParser(SourceOrigin.Text, Source.DelimiterTest, TokenDefinition.Resource, "novus.csv");
+
+            var tokens = parser.TokenSource.PeekNextTokens(2);
+
+
+            Assert.IsTrue(tokens[0].TokenType == TokenType.QString);
+            Assert.IsTrue(tokens[0].TokenType == TokenType.QString);
+
+        }
+
         [TestMethod]
         public void TestParser_1()
         {
