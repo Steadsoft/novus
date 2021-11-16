@@ -66,7 +66,7 @@ namespace Steadsoft.Novus.Parser.Classes
             }
 
             var tokenizer = new Tokenizer<Keywords>(Tokens, Definition, Assembly.GetExecutingAssembly());
-            var source = new TokenEnumerator(tokenizer.Tokenize(sourceFile), BlockComment, LineComment);
+            var source = new TokenEnumerator(tokenizer, sourceFile, BlockComment, LineComment);
             var p = new Parser(source, tokenizer);
 
             if (SourceText == SourceOrigin.Pathname)
@@ -422,6 +422,8 @@ namespace Steadsoft.Novus.Parser.Classes
             }
                 
             t = TokenSource.GetNextToken(); // closing semicolon
+
+            Stmt = new DclDelimiterStatement(t.LineNumber, t.ColNumber, delimiter.ToString());
 
             return true;
         }

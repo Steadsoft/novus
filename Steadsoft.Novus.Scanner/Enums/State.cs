@@ -27,5 +27,11 @@
         SHIFT_LEFT,
         QUOTATION,
         APOSTROPHE,
+        PREPROC,
+        D1,
+        D2,
+        D3,
+        D4,
+        D5
     }
 }

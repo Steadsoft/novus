@@ -6,11 +6,15 @@ namespace Steadsoft.Novus.Scanner.Classes
     public class TokenEnumerator 
     {
         private readonly IEnumerator<Token> enumerator;
+        private readonly IEnumerable<Token> source;
+        private readonly Tokenizer<Keywords> tokenizer;
         private readonly TokenType[] Skips;
         private readonly Stack<Token> pushed = new();
-        public TokenEnumerator(IEnumerable<Token> Source, params TokenType[] Skips)
+        public TokenEnumerator(Tokenizer<Keywords> Tokenizer, SourceFile SourceFile, params TokenType[] Skips)
         {
-            enumerator = Source.GetEnumerator();
+            tokenizer = Tokenizer;
+            source = Tokenizer.Tokenize(SourceFile);
+            enumerator = source.GetEnumerator();
             this.Skips = Skips;
         }
 
@@ -116,13 +120,36 @@ namespace Steadsoft.Novus.Scanner.Classes
 
             while (enumerator.MoveNext())
             {
-                if (Skips.Contains(enumerator.Current.TokenType) == false)
-                    return enumerator.Current;
+                var token = enumerator.Current;
+
+                if (token.TokenType == Preprocessor)
+                {
+                    if (token.Lexeme == "#delimiter")
+                    {
+                        ProcessDelimiterDirective(token);
+                    }
+                    continue; // do not return this to parser.
+                }
+
+                if (Skips.Contains(token.TokenType) == false)
+                    return token;
             }
 
             return new Token(NoMoreTokens, "", 0, 0);
         }
 
+        private void ProcessDelimiterDirective(Token token)
+        {
+            //Character c = source.GetNextRawChar();
+
+            //while (c.Char != ')')
+            //{
+            //    delimiter.Append(c.Char);
+            //    c = tokenizer.GetNextRawChar();
+            //}
+
+            //t = TokenSource.GetNextToken(); // closing semicolon
+        }
         /// <summary>
         /// Returns the supplied token to the input, no check is made so be careful!
         /// </summary>

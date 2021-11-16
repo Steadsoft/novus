@@ -1,5 +1,6 @@
 ﻿// This is the token defintions for the the Novus language is based on C#
 
+INITIAL         '#'     AppendContinue  PREPROC         Undecided
 INITIAL			'*'		AppendReturn    INITIAL			Times
 INITIAL			','		AppendReturn    INITIAL			Comma
 INITIAL			';'		AppendReturn    INITIAL			SemiColon
@@ -17,6 +18,14 @@ INITIAL			'='		AppendContinue  EQUALS			Undecided
 INITIAL			'>'		AppendContinue  GREATER			Undecided 
 INITIAL			'<'		AppendContinue  LESSER			Undecided 
 INITIAL			'"'		AppendContinue  QUOTATION		Undecided 
+
+PREPROC         Alpha   AppendContinue  PREPROC         Undecided
+PREPROC         Any     RewindReturn    INITIAL         Preprocessor
+
+INITIAL			'|'		AppendContinue  D1				Undecided 
+D1   			'|'		AppendContinue  D2				Undecided 
+D2              '|'     AppendContinue  INITIAL			QString
+
 INITIAL			White	DiscardContinue	INITIAL			Undecided 
 INITIAL			Alpha	AppendContinue  IDENTIFIER		Undecided 
 INITIAL			Digit	AppendContinue  INTEGER			Undecided 
