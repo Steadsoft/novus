@@ -29,6 +29,7 @@
         Until,
         Goto,
         Call,
-        Delimiter
+        Demark,
+        Undemark
     }
 }

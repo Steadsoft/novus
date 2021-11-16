@@ -8,6 +8,13 @@ using static Steadsoft.Novus.Scanner.Enums.TokenType;
 
 namespace Steadsoft.Novus.Scanner.Classes
 {
+    public class Entry
+    {
+        public Step Step { get; set; }
+        public State State { get; set; }
+        public TokenType TokenType { get; set; }
+
+    }
     /// <summary>
     /// Represents a mechanism which can consume source and emit language tokens.
     /// </summary>
@@ -18,7 +25,7 @@ namespace Steadsoft.Novus.Scanner.Classes
     /// </remarks>
     public class Tokenizer<T> where T : struct, Enum
     {
-        internal readonly SparseTable<State, char, (Step, State, TokenType)> Table;
+        internal readonly SparseTable<State, char, Entry> Table;
         private SourceFile source;
         private int I; // used to index character stream.
         /// <summary>
@@ -42,6 +49,8 @@ namespace Steadsoft.Novus.Scanner.Classes
                             using (StreamReader sr = new(fs, Encoding.UTF8))
                             {
                                 PopulateTable(sr);
+                                sr.DiscardBufferedData();
+                                sr.BaseStream.Seek(0, SeekOrigin.Begin);
                             }
                         }
                         break;
@@ -52,15 +61,19 @@ namespace Steadsoft.Novus.Scanner.Classes
                         using (StreamReader sr = new(stream))
                         {
                             PopulateTable(sr);
+                            sr.DiscardBufferedData();
+                            sr.BaseStream.Seek(0, SeekOrigin.Begin);
                         }
                         break;
                     }
             }
 
+
         }
 
         private void PopulateTable(StreamReader sr)
         {
+
             bool flag;
 
             while (!sr.EndOfStream)
@@ -92,23 +105,22 @@ namespace Steadsoft.Novus.Scanner.Classes
                     flag = char.TryParse(parts[1], out char code);
 
                     if (flag)
-                        Table.Add(curstate, code, (step, newstate, token));
+                        Table.Add(curstate, code, new Entry { Step = step, State = newstate, TokenType = token });
                     else
                     {
                         parts[1] = Regex.Unescape(parts[1]);
                         flag = char.TryParse(parts[1], out code);
 
                         if (flag)
-                            Table.Add(curstate, code, (step, newstate, token));
+                            Table.Add(curstate, code, new Entry { Step = step, State = newstate, TokenType = token });
                     }
                 }
                 else
                 {
                     var cls = (LexicalClass)Enum.Parse(typeof(LexicalClass), parts[1]);
-                    Table.Add(curstate, cls, (step, newstate, token));
+                    Table.Add(curstate, cls, new Entry { Step = step, State = newstate, TokenType = token });
                 }
             }
-
         }
         public Tokenizer(SourceFile File)
         {
@@ -139,7 +151,7 @@ namespace Steadsoft.Novus.Scanner.Classes
             StringBuilder lexeme = new();
             State state = State.INITIAL;
 
-            var tuple = (Step: Step.AppendReturn, State: State.INITIAL, TokenType: Undecided);
+            var tuple = new Entry { Step = Step.AppendReturn, State = State.INITIAL, TokenType = Undecided};
 
             for (I = 0; I < source.Chars.Count; I++)
             {

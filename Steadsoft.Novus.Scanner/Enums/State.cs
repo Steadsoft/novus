@@ -8,7 +8,7 @@
     /// are represented as states named after the characters read so far.
     /// </remarks>
     public enum State
-    {
+    {   
         DELIMITER0,
         DELIMITER1,
         DELIMITER2,

@@ -55,7 +55,7 @@ namespace UnitTesting
 
             var parser = Parser.CreateParser(SourceOrigin.Pathname, @"..\..\..\Sources\string_delimiter_test_1.nov", TokenDefinition.Resource, "novus.csv");
 
-            var tokens = parser.TokenSource.PeekNextTokens(2);
+            var tokens = parser.TokenSource.PeekNextTokens(4);
 
 
             Assert.IsTrue(tokens[0].TokenType == TokenType.QString && tokens[0].Lexeme == @"lkfhj""dk""""""dkfghsdkgfhdfkg");

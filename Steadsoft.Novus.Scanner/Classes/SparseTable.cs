@@ -6,7 +6,7 @@
     /// <typeparam name="T">Type of the 1st 'subscript'.</typeparam>
     /// <typeparam name="U">Type of the 2nd 'subscript'.</typeparam>
     /// <typeparam name="F">Type of objects stored in the table.</typeparam>
-    public class SparseTable<T, U, F>
+    public class SparseTable<T, U, F> where F : Entry
     {
         private readonly Dictionary<T, Dictionary<U, F>> table = new();
 
@@ -40,6 +40,28 @@
         public bool TryGet<V>(T t, V u, out F f) where V : Enum
         {
             return TryGet(t, (U)Convert.ChangeType(u, typeof(U)), out f);
+        }
+
+        public void RemoveAllEntriesFor(T initial, params T[] matches) //where T : Enum
+        {
+            foreach (var t in table[initial])
+            {
+                if (t.Value.State.Equals(Enums.State.DELIMITER0))
+                {
+                    table[initial].Remove(t.Key);
+                }
+            }
+
+            foreach (var key in table.Keys)
+            {
+                foreach (var match in matches)
+                {
+                    if (key.Equals(match))
+                    {
+                        table.Remove(key);
+                    }
+                }
+            }
         }
     }
 }

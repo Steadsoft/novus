@@ -1,6 +1,7 @@
 ﻿using Steadsoft.Novus.Scanner.Enums;
 using System.Text;
 using static Steadsoft.Novus.Scanner.Enums.TokenType;
+using static Steadsoft.Novus.Scanner.Enums.State;
 
 namespace Steadsoft.Novus.Scanner.Classes
 {
@@ -125,10 +126,16 @@ namespace Steadsoft.Novus.Scanner.Classes
 
                 if (token.TokenType == Preprocessor)
                 {
-                    if (token.Lexeme == "#delimiter")
+                    if (token.Lexeme == "#demark")
                     {
-                        ProcessDelimiterDirective(token);
+                        ProcessDemarkDirective(token);
                     }
+
+                    if (token.Lexeme == "#undemark")
+                    {
+                        ProcessUndemarkDirective();
+                    }
+
                     continue; // do not return this to parser.
                 }
 
@@ -139,7 +146,12 @@ namespace Steadsoft.Novus.Scanner.Classes
             return new Token(NoMoreTokens, "", 0, 0);
         }
 
-        private void ProcessDelimiterDirective(Token token)
+        private void ProcessUndemarkDirective()
+        {
+            tokenizer.Table.RemoveAllEntriesFor(INITIAL, DELIMITER0, DELIMITER1, DELIMITER2, DELIMITER3, DELIMITER4, DELIMITER5, DELIMITER6, DELIMITER7, DELIMITER8, DELIMITER9);
+        }
+
+        private void ProcessDemarkDirective(Token token)
         {
             bool has_start_end = false;
 
@@ -181,22 +193,22 @@ namespace Steadsoft.Novus.Scanner.Classes
             }
             else
             {
-                tokenizer.Table.Add(State.INITIAL, chars[0], (Step.DiscardContinue, State.DELIMITER0, TokenType.Undecided));
+                tokenizer.Table.Add(State.INITIAL, chars[0],  new Entry { Step = Step.DiscardContinue, State = State.DELIMITER0, TokenType = TokenType.Undecided });
 
                 for (I = 1; I < chars.Length; I++)
                 {
-                    tokenizer.Table.Add((State)(I-1), chars[I], (Step.DiscardContinue, (State)(I), TokenType.Undecided));
+                    tokenizer.Table.Add((State)(I-1), chars[I], new Entry { Step = Step.DiscardContinue, State = (State)(I), TokenType = TokenType.Undecided });
                 }
 
-                tokenizer.Table.Add<LexicalClass>((State)(I - 1),LexicalClass.Any, (Step.AppendContinue, (State)(I - 1), TokenType.Undecided));
+                tokenizer.Table.Add<LexicalClass>((State)(I - 1),LexicalClass.Any, new Entry { Step = Step.AppendContinue, State = (State)(I - 1), TokenType = TokenType.Undecided });
 
                 for (J = 0; J < chars.Length-1; J++)
                 {
-                    tokenizer.Table.Add((State)(I - 1), chars[J], (Step.DiscardContinue, (State)(I), TokenType.Undecided));
+                    tokenizer.Table.Add((State)(I - 1), chars[J], new Entry { Step = Step.DiscardContinue, State = (State)(I), TokenType = TokenType.Undecided });
                     I++;
                 }
 
-                tokenizer.Table.Add((State)(I - 1), chars[J], (Step.DiscardReturn, State.INITIAL, TokenType.QString));
+                tokenizer.Table.Add((State)(I - 1), chars[J], new Entry { Step = Step.DiscardReturn, State = State.INITIAL, TokenType = TokenType.QString });
 
             }
         }
