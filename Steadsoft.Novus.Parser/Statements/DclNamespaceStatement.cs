@@ -40,13 +40,4 @@ namespace Steadsoft.Novus.Parser.Statements
             return builder.ToString();
         }
     }
-    public class DclDelimiterStatement : DclStatement
-    {
-        public string DelimitText { get; private set; }
-        public DclDelimiterStatement(int Line, int Col, string DelimitText) : base(Line, Col, "none", "delimiter")
-        {
-            this.DelimitText = DelimitText;
-        }
-    }
 }
-

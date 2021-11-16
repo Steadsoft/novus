@@ -1,6 +1,7 @@
 ﻿namespace a.x.rere
 {
-   delimiter(|||);
+
+#delimiter |||
 
    type ee enum public static
    {
@@ -16,14 +17,13 @@
         def Reboot (b int) (int);
    }
 
-
    // |||this is some text inside which we can embed " or "" or ' or ' or whatever was want|||;
 
    type aa 
    {
       public private
       {
-   
+
       }
 
       internal

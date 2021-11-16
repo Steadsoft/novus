@@ -1,4 +1,5 @@
 ﻿using Steadsoft.Novus.Scanner.Enums;
+using System.Text;
 using static Steadsoft.Novus.Scanner.Enums.TokenType;
 
 namespace Steadsoft.Novus.Scanner.Classes
@@ -140,15 +141,22 @@ namespace Steadsoft.Novus.Scanner.Classes
 
         private void ProcessDelimiterDirective(Token token)
         {
-            //Character c = source.GetNextRawChar();
+            StringBuilder delimiter = new();
 
-            //while (c.Char != ')')
-            //{
-            //    delimiter.Append(c.Char);
-            //    c = tokenizer.GetNextRawChar();
-            //}
+            Character c = tokenizer.GetNextRawChar();
 
-            //t = TokenSource.GetNextToken(); // closing semicolon
+            while (Char.IsWhiteSpace(c.Char))
+            {
+                c = tokenizer.GetNextRawChar();
+            }
+
+            delimiter.Append(c.Char);
+
+            while (Char.IsWhiteSpace(c.Char) == false)
+            {
+                delimiter.Append(c.Char);
+                c = tokenizer.GetNextRawChar();
+            }
         }
         /// <summary>
         /// Returns the supplied token to the input, no check is made so be careful!
