@@ -183,6 +183,12 @@ namespace Steadsoft.Novus.Scanner.Classes
                         {
                             break;
                         }
+                    case Step.DiscardReturn:
+                        {
+                            yield return new Token(tuple.TokenType, lexeme.ToString(), start_line, start_col);
+                            lexeme.Clear();
+                            break;
+                        }
                     default:
                         throw new InvalidOperationException("really?");
                 }

@@ -17,18 +17,18 @@ INITIAL			'+'		AppendContinue  INITIAL			Plus
 INITIAL			'='		AppendContinue  EQUALS			Undecided 
 INITIAL			'>'		AppendContinue  GREATER			Undecided 
 INITIAL			'<'		AppendContinue  LESSER			Undecided 
-INITIAL			'"'		AppendContinue  QUOTATION		Undecided 
+INITIAL			'"'		DiscardContinue QUOTATION		Undecided 
 
 PREPROC         Alpha   AppendContinue  PREPROC         Undecided
 PREPROC         Any     RewindReturn    INITIAL         Preprocessor
 
-INITIAL			'|'		AppendContinue  D1A				Undecided 
-D1A   			'|'		AppendContinue  D1B				Undecided 
-D1B             '|'     AppendContinue  D1C		        QString
+INITIAL			'|'		DiscardContinue D1A				Undecided 
+D1A   			'|'		DiscardContinue D1B				Undecided 
+D1B             '|'     DiscardContinue D1C		        QString
 
-D1C             '|'     AppendContinue  D2A             QString
-D2A             '|'     AppendContinue  D2B             QString
-D2B             '|'     AppendReturn    INITIAL         QString
+D1C             '|'     DiscardContinue D2A             QString
+D2A             '|'     DiscardContinue D2B             QString
+D2B             '|'     DiscardReturn   INITIAL         QString
 D1C             Any     AppendContinue  D1C             QString
 
 INITIAL			White	DiscardContinue	INITIAL			Undecided 
@@ -70,7 +70,7 @@ GREATER			Any		RewindReturn	INITIAL			Greater
 LESSER			'<'		AppendReturn	INITIAL			ShiftLeft 
 LESSER			Any		RewindReturn	INITIAL			Lesser 
 
-QUOTATION		'"'		AppendReturn	INITIAL			QString 
+QUOTATION		'"'		DiscardReturn	INITIAL			QString 
 QUOTATION		Any		AppendContinue  QUOTATION		Undecided 
 
 APOSTROPHE		'\''	AppendReturn	INITIAL			AString 

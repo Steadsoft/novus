@@ -43,8 +43,8 @@ namespace UnitTesting
             var tokens = parser.TokenSource.PeekNextTokens(2);
 
 
-            Assert.IsTrue(tokens[0].TokenType == TokenType.QString);
-            Assert.IsTrue(tokens[0].TokenType == TokenType.QString);
+            Assert.IsTrue(tokens[0].TokenType == TokenType.QString && tokens[0].Lexeme == "lkfhjsdkfhsdkfghsdkgfhdfkg");
+            Assert.IsTrue(tokens[1].TokenType == TokenType.QString && tokens[1].Lexeme == "jhdkjhdkajshdkajshdkkhsdhd");
 
         }
 

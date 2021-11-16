@@ -15,6 +15,10 @@
         /// </summary>
         DiscardContinue,
         /// <summary>
+        /// Discard the just read character and return the built token.
+        /// </summary>
+        DiscardReturn,
+        /// <summary>
         /// Return the just-read char so it will be read again but return the currently built token
         /// </summary>
         RewindReturn
