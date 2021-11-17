@@ -10,6 +10,7 @@ namespace Steadsoft.Novus.Parser.Statements
     /// </summary>
     public class DclTypeStatement : DclStatement, IBlockContainer
     {
+        public new TypeName Name { get; private set; }
         public Keywords TypeKind { get; internal set; }
         public BlockStatement Block { get; private set; }
         /// <summary>
@@ -18,8 +19,9 @@ namespace Steadsoft.Novus.Parser.Statements
         /// consistency and applicability at a later step.
         /// </summary>
 
-        public DclTypeStatement(int Line, int Col, string Name) : base(Line, Col, Name, "type")
+        public DclTypeStatement(int Line, int Col, TypeName TypeName) : base(Line, Col, TypeName.Name, "type")
         {
+            this.Name = TypeName;
             Block = null;
         }
         public void AddBody(BlockStatement Stmt)

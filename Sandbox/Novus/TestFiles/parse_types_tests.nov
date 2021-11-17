@@ -1,7 +1,7 @@
 ﻿namespace a.x.rere
 {
 
-   type ee<a,b> enum public static
+   type ee enum public static
    {
         A,
         B,
@@ -58,7 +58,7 @@
          // The parser does not care about these words or dupes etc, that's handled by a second
          // pass after the parse is done.
 
-         type Category class sealed sealed abstract static public private
+         type Category<T, U<X>, V<Z> > class sealed sealed abstract static public private
          {
             type Window class public struct abstract sealed 
             {

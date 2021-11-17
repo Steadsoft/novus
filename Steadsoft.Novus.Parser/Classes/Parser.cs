@@ -585,7 +585,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             //var name = token.Lexeme;
 
-            Stmt = new DclTypeStatement(Prior.LineNumber, Prior.ColNumber, typename.Name);
+            Stmt = new DclTypeStatement(Prior.LineNumber, Prior.ColNumber, typename);
 
             if (TryParseDclOptions(token, Stmt, out DiagMsg))
                 return TryParseTypeBody(token, ref Stmt, out DiagMsg);
