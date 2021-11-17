@@ -62,7 +62,7 @@ namespace Steadsoft.Novus.Parser.Classes
             }
             else
             {
-                sourceFile = SourceFile.CreateFromString(Input);
+                sourceFile = SourceFile.CreateFromText(Input);
             }
 
             var tokenizer = new Tokenizer<Keywords>(Tokens, Definition, Assembly.GetExecutingAssembly());
@@ -508,13 +508,12 @@ namespace Steadsoft.Novus.Parser.Classes
             return true;
 
         }
-        private bool TryParseType(Token Prior, out DclTypeStatement Stmt, out string DiagMsg)
+        private bool TryParseTypeName(Token Prior, out TypeName TypeName, out string DiagMsg)
         {
-            Stmt = null;
+            DiagMsg = null;
+            TypeName = null;
 
-            TokenSource.VerifyExpectedToken(Type, out var token);
-
-            token = TokenSource.GetNextToken();
+            var token = TokenSource.GetNextToken();
 
             if (token.TokenType != Identifier)
             {
@@ -522,9 +521,71 @@ namespace Steadsoft.Novus.Parser.Classes
                 return false;
             }
 
-            var name = token.Lexeme;
+            TypeName = new TypeName(token.Lexeme);
 
-            Stmt = new DclTypeStatement(Prior.LineNumber, Prior.ColNumber, name);
+            token = TokenSource.GetNextToken();
+
+            if (token.TokenType != Lesser)
+            {
+                TokenSource.PushToken(token); // this isn't for us
+                return true;
+            }
+
+            // at thus point we've seen : somename<
+
+            TokenSource.PushToken(token);
+
+            return TryParseGenericTypeList(Prior, TypeName, out DiagMsg);
+
+        }
+
+        private bool TryParseGenericTypeList(Token Prior, TypeName TypeName, out string DiagMsg)
+        {
+            DiagMsg = null;
+
+            TokenSource.VerifyExpectedToken(TokenType.Lesser, out var token);
+
+            while (token.TokenType != Greater)
+            {
+                if (TryParseTypeName(Prior, out var typename, out DiagMsg))
+                {
+                    TypeName.GenericArgNames.Add(typename);
+
+                    token = TokenSource.GetNextToken();
+
+                    if (token.TokenType == Comma)
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+
+            return true;
+        }
+        private bool TryParseType(Token Prior, out DclTypeStatement Stmt, out string DiagMsg)
+        {
+            Stmt = null;
+
+            TokenSource.VerifyExpectedToken(Type, out var token);
+
+            //token = TokenSource.GetNextToken();
+
+            //if (token.TokenType != Identifier)
+            //{
+            //    DiagMsg = $"Unexpected token {token.Lexeme}";
+            //    return false;
+            //}
+
+            TryParseTypeName(Prior, out var typename, out DiagMsg);
+
+            //var name = token.Lexeme;
+
+            Stmt = new DclTypeStatement(Prior.LineNumber, Prior.ColNumber, typename.Name);
 
             if (TryParseDclOptions(token, Stmt, out DiagMsg))
                 return TryParseTypeBody(token, ref Stmt, out DiagMsg);

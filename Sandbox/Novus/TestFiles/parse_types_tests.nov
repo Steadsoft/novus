@@ -1,7 +1,7 @@
 ﻿namespace a.x.rere
 {
 
-   type ee enum public static
+   type ee<a,b> enum public static
    {
         A,
         B,
