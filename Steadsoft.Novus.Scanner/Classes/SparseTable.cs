@@ -9,7 +9,6 @@
     public class SparseTable<T, U, F> where F : Entry
     {
         private readonly Dictionary<T, Dictionary<U, F>> table = new();
-
         public void Add(T t, U u, F f)
         {
             if (table.ContainsKey(t) == false)
@@ -18,12 +17,10 @@
             if (table[t].ContainsKey(u) == false)
                 table[t].Add(u, f);
         }
-
         public void Add<V>(T t, V u, F f) where V : Enum
         {
             Add(t, (U)Convert.ChangeType(u, typeof(U)), f);
         }
-
         public bool TryGet(T t, U u, out F f)
         {
             f = default;
@@ -36,12 +33,10 @@
 
             return false;
         }
-
         public bool TryGet<V>(T t, V u, out F f) where V : Enum
         {
             return TryGet(t, (U)Convert.ChangeType(u, typeof(U)), out f);
         }
-
         public void RemoveAllEntriesFor(T initial, params T[] matches) //where T : Enum
         {
             foreach (var t in table[initial])

@@ -2,9 +2,9 @@
 {
     public record Character
     {
-        public char Char { get; private set; }
-        public int Line { get; private set; }
-        public int Col { get; private set; }
+        public char Char { get; private init; }
+        public int Line { get; private init; }
+        public int Col { get; private init; }
         public Character(char Char, int Line, int Col)
         {
             this.Char = Char;

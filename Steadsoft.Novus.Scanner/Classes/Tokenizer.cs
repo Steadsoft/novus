@@ -15,6 +15,7 @@ namespace Steadsoft.Novus.Scanner.Classes
         public TokenType TokenType { get; set; }
 
     }
+
     /// <summary>
     /// Represents a mechanism which can consume source and emit language tokens.
     /// </summary>
@@ -26,6 +27,7 @@ namespace Steadsoft.Novus.Scanner.Classes
     public class Tokenizer<T> where T : struct, Enum
     {
         internal readonly SparseTable<State, char, Entry> Table;
+        internal Entry[,] Map = new Entry[64, 64];
         private SourceFile source;
         private int I; // used to index character stream.
         /// <summary>
@@ -209,4 +211,4 @@ namespace Steadsoft.Novus.Scanner.Classes
             }
         }
     }
-}
+} 
