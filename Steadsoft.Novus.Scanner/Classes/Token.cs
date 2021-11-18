@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using static Steadsoft.Novus.Scanner.Enums.TokenType;
-using static Steadsoft.Novus.Scanner.Enums.Keywords;
 using Steadsoft.Novus.Scanner.Enums;
 
 namespace Steadsoft.Novus.Scanner.Classes

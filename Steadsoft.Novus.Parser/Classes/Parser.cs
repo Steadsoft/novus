@@ -2,7 +2,6 @@
 using Steadsoft.Novus.Scanner.Enums;
 using Steadsoft.Novus.Parser.Statements;
 using Steadsoft.Novus.Parser.Statics;
-using Steadsoft.Novus.Scanner;
 using System.Reflection;
 using System.Text;
 using static Steadsoft.Novus.Scanner.Enums.TokenType;
@@ -560,9 +559,9 @@ namespace Steadsoft.Novus.Parser.Classes
 
                     if (token.TokenType == ShiftRight)
                     {
-                        // OK we read a >> which is a distinct token
+                        // OK we read a >> which is a distinct token (ShiftRight)
                         // since we are parsing a generic arglist though
-                        // we want to treat this as a > followed by a >
+                        // we will treat this as two tokens, a > followed by a >
 
                         var simulated_token = new Token(TokenType.Greater, ">", token.LineNumber, token.ColNumber + 1);
 

@@ -1,5 +1,4 @@
-﻿using Steadsoft.Novus.Scanner.Enums;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using static Steadsoft.Novus.Scanner.Enums.TokenType;
 using Steadsoft.Novus.Scanner.Classes;
 
