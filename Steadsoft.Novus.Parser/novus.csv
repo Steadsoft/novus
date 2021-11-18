@@ -19,12 +19,8 @@ INITIAL			'>'		AppendContinue  GREATER			Undecided
 INITIAL			'<'		AppendContinue  LESSER			Undecided 
 INITIAL			'"'		DiscardContinue QUOTATION		Undecided 
 
-PREPROC         Alpha   AppendContinue  PREPROC         Undecided
-PREPROC         Any     RewindReturn    INITIAL         Preprocessor
-
-
-
-
+PREPROC			Alpha   AppendContinue  PREPROC         Undecided
+PREPROC			Any     RewindReturn    INITIAL         Preprocessor
 
 INITIAL			White	DiscardContinue	INITIAL			Undecided 
 INITIAL			Alpha	AppendContinue  IDENTIFIER		Undecided 
@@ -70,7 +66,6 @@ QUOTATION		Any		AppendContinue  QUOTATION		Undecided
 
 APOSTROPHE		'\''	AppendReturn	INITIAL			AString 
 APOSTROPHE		Any		AppendContinue  APOSTROPHE		Undecided 
-
 
 // Novus does not support operators that are both expressions and assignments combined.
 // This means there's no ++ or -- for example.
