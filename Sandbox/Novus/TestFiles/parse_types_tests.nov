@@ -58,7 +58,7 @@
          // The parser does not care about these words or dupes etc, that's handled by a second
          // pass after the parse is done.
 
-         type Category<T, U<X>, V<Z> > class sealed sealed abstract static public private
+         type Category<T, U<X>, V<Z>> class sealed sealed abstract static public private
          {
             type Window class public struct abstract sealed 
             {
@@ -92,7 +92,7 @@
                def Name string public readonly public; // a field definition
                def Name double private readonly public; // a field definition
 
-                type GetScreenArea class
+                type GetScreenArea<A,B<X,Y>,C,D> class
                 {
                    // We can't really begin to work on actual statements yet because we must
                    // deal with parsing expressions and we can't do that much until we have

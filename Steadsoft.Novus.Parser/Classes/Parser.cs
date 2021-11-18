@@ -557,6 +557,19 @@ namespace Steadsoft.Novus.Parser.Classes
                     {
                         continue;
                     }
+
+                    if (token.TokenType == ShiftRight)
+                    {
+                        // OK we read a >> which is a distinct token
+                        // since we are parsing a generic arglist though
+                        // we want to treat this as a > followed by a >
+
+                        var simulated_token = new Token(TokenType.Greater, ">", token.LineNumber, token.ColNumber + 1);
+
+                        TokenSource.PushToken(simulated_token);
+
+                        token = simulated_token;
+                    }
                 }
                 else
                 {

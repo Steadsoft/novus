@@ -33,7 +33,9 @@ namespace Steadsoft.Novus.Parser.Statements
                 builder.Append(",");
             }
 
-            return builder.ToString().TrimEnd(',') + ">";
+            var result = builder.ToString().TrimEnd(',') + ">";
+
+            return result;
         }
     }
 }
