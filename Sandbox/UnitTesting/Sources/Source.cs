@@ -67,12 +67,13 @@
             ";
         public const string DelimiterTest_1 =
             @"
-            #add_delimiter |||
+            #delimiter.add |||
 
             |||lkfhjsdkfhsdkfghsdkgfhdfkg|||
 
             ""jhdkjhdkajshdkajshdkkhsdhd""
 
+            #delimter.drop
             ";
 
     }

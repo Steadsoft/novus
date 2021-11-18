@@ -8,6 +8,8 @@
     /// <typeparam name="F">Type of objects stored in the table.</typeparam>
     public class SparseTable<T, U, F> where F : Entry
     {
+        // TODO This class has degenarted a bit and needs retidying...its a bit hacky...
+
         private readonly Dictionary<T, Dictionary<U, F>> table = new();
         public void Add(T t, U u, F f)
         {

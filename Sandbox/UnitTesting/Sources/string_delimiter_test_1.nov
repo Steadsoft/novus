@@ -1,15 +1,15 @@
-﻿    #add_delimiter ^^^ 
+﻿    #delimiter.add ^^^ 
 
     ^^^lkfhj"dk"""dkfghsdkgfhdfkg^^^
 
     "jhdkjhd|||kajshdkajshdkkhsdhd"
 
-    #remove_delimiter
+    #delimiter.drop
 
-    #add_delimiter ```
+    #delimiter.add ```
 
     ```lkfhj"dk^^^dkfghsdkgfhdfkg```
 
     "jhdkjhd|||kajshdkajshdkkhsdhd"
 
-    #remove_delimiter
+    #delimiter.drop

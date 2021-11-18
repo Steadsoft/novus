@@ -29,7 +29,5 @@
         Until,
         Goto,
         Call,
-        Add_Delimiter,
-        Remove_Delimiter
     }
 }

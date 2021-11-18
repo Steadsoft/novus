@@ -19,9 +19,13 @@ INITIAL         '>'     AppendContinue  GREATER         Undecided
 INITIAL         '<'     AppendContinue  LESSER          Undecided 
 INITIAL         '"'     DiscardContinue QUOTATION       Undecided 
 
-PREPROC         Alpha   AppendContinue  PREPROC         Undecided
-PREPROC         '_'     AppendContinue  PREPROC         Undecided
+PREPROC         Alpha   AppendContinue  PREPROC2        Undecided
 PREPROC         Any     RewindReturn    INITIAL         Preprocessor
+
+PREPROC2        Alpha   AppendContinue  PREPROC2        Undecided
+PREPROC2        '.'     AppendContinue  PREPROC2        Undecided
+PREPROC2        '_'     AppendContinue  PREPROC2        Undecided
+PREPROC2        Any     RewindReturn    INITIAL         Preprocessor
 
 INITIAL         White   DiscardContinue INITIAL         Undecided 
 INITIAL         Alpha   AppendContinue  IDENTIFIER      Undecided 

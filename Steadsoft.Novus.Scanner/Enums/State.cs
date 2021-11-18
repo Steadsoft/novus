@@ -38,5 +38,6 @@
         QUOTATION,
         APOSTROPHE,
         PREPROC,
+        PREPROC2
     }
 }

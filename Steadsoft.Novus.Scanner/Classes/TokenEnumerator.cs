@@ -124,19 +124,20 @@ namespace Steadsoft.Novus.Scanner.Classes
             {
                 var token = enumerator.Current;
 
-                if (token.TokenType == Preprocessor)
+                if (token.TokenType == TokenType.Preprocessor)
                 {
-                    if (token.Lexeme == "#add_delimiter")
+                    if (token.Lexeme == Preprocessor.Delimiter.Add)
                     {
-                        ProcessDemarkDirective(token);
+                        ProcessDelimiterAdd(token);
                     }
 
-                    if (token.Lexeme == "#remove_delimiter")
+                    if (token.Lexeme == Preprocessor.Delimiter.Drop)
                     {
-                        ProcessUndemarkDirective();
+                        ProcessDelimiterDrop();
                     }
 
-                    continue; // do not return this to parser.
+                    // TODO we should report unrecognized preprocessor stuff here.
+                    continue; // discard, do not return this to parser, 
                 }
 
                 if (Skips.Contains(token.TokenType) == false)
@@ -146,12 +147,12 @@ namespace Steadsoft.Novus.Scanner.Classes
             return new Token(NoMoreTokens, "", 0, 0);
         }
 
-        private void ProcessUndemarkDirective()
+        private void ProcessDelimiterDrop()
         {
             tokenizer.Table.RemoveAllEntriesFor(INITIAL, DELIMITER0, DELIMITER1, DELIMITER2, DELIMITER3, DELIMITER4, DELIMITER5, DELIMITER6, DELIMITER7, DELIMITER8, DELIMITER9);
         }
 
-        private void ProcessDemarkDirective(Token token)
+        private void ProcessDelimiterAdd(Token token)
         {
             bool has_start_end = false;
 
