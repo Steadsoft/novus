@@ -20,6 +20,7 @@ INITIAL         '<'     AppendContinue  LESSER          Undecided
 INITIAL         '"'     DiscardContinue QUOTATION       Undecided 
 
 PREPROC         Alpha   AppendContinue  PREPROC         Undecided
+PREPROC         '_'     AppendContinue  PREPROC         Undecided
 PREPROC         Any     RewindReturn    INITIAL         Preprocessor
 
 INITIAL         White   DiscardContinue INITIAL         Undecided 

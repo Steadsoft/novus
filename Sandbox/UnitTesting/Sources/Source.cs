@@ -67,7 +67,7 @@
             ";
         public const string DelimiterTest_1 =
             @"
-            #demark |||
+            #add_delimiter |||
 
             |||lkfhjsdkfhsdkfghsdkgfhdfkg|||
 

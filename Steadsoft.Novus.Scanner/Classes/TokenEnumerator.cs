@@ -126,12 +126,12 @@ namespace Steadsoft.Novus.Scanner.Classes
 
                 if (token.TokenType == Preprocessor)
                 {
-                    if (token.Lexeme == "#demark")
+                    if (token.Lexeme == "#add_delimiter")
                     {
                         ProcessDemarkDirective(token);
                     }
 
-                    if (token.Lexeme == "#undemark")
+                    if (token.Lexeme == "#remove_delimiter")
                     {
                         ProcessUndemarkDirective();
                     }

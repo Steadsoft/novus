@@ -29,7 +29,7 @@
         Until,
         Goto,
         Call,
-        Demark,
-        Undemark
+        Add_Delimiter,
+        Remove_Delimiter
     }
 }

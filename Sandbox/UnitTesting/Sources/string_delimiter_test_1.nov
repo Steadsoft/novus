@@ -1,15 +1,15 @@
-﻿    #demark ^^^ 
+﻿    #add_delimiter ^^^ 
 
     ^^^lkfhj"dk"""dkfghsdkgfhdfkg^^^
 
     "jhdkjhd|||kajshdkajshdkkhsdhd"
 
-    #undemark
+    #remove_delimiter
 
-    #demark ```
+    #add_delimiter ```
 
     ```lkfhj"dk^^^dkfghsdkgfhdfkg```
 
     "jhdkjhd|||kajshdkajshdkkhsdhd"
 
-    #undemark
+    #remove_delimiter
