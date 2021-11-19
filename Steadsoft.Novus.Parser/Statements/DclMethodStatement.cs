@@ -95,5 +95,7 @@ namespace Steadsoft.Novus.Parser.Statements
         }
 
         public override string Qualifier => throw new NotImplementedException();
+
+        public override string LiteralDecoratedName => throw new NotImplementedException();
     }
 }

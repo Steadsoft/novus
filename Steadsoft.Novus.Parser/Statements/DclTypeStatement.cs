@@ -17,11 +17,19 @@ namespace Steadsoft.Novus.Parser.Statements
         {
             get
             {
-                return DeclaredName + GenericArgs.ToString();
+                return DeclaredName + GenericArgs.DecoratedName;
             }
         }
         public Keywords TypeKind { get; internal set; }
         public BlockStatement Block { get; private set; }
+
+        public override string LiteralDecoratedName
+        {
+            get
+            {
+                return DeclaredName + GenericArgs.LiteralDecoratedName;
+            }
+        }
 
         /// <summary>
         /// Indicates optional keywords encountered while parsing.

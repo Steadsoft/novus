@@ -15,6 +15,8 @@ namespace Steadsoft.Novus.Parser.Statements
 
         public override string Qualifier => throw new System.NotImplementedException();
 
+        public override string LiteralDecoratedName => throw new System.NotImplementedException();
+
         public DclFieldStatement(int Line, int Col, string Name, string TypeName, DclTypeStatement Parent) : base(Line, Col, Name, "field")
         {
             this.TypeName = TypeName;

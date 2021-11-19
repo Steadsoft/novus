@@ -26,6 +26,33 @@ namespace Steadsoft.Novus.Parser.Statements
             return GenericArgs.Any();
         }
 
+        public string DecoratedName
+        {
+            get
+            {
+                return ToString();
+            }
+        }
+
+        public string LiteralDecoratedName
+        {
+            get
+            {
+                StringBuilder text = new StringBuilder();
+
+                text.Append("<");
+
+                for (int I = 0; I < GenericArgs.Count; I++)
+                {
+                    text.Append(GenericArgs[I].LiteralDecoratedName);
+                    text.Append(',');
+                }
+
+                return text.ToString().Trim(',') + ">";
+            }
+        }
+
+
         public override string ToString()
         {
             StringBuilder text = new StringBuilder();
@@ -52,6 +79,21 @@ namespace Steadsoft.Novus.Parser.Statements
         {
             this.ArgName = Name;
             this.GenericArgs = new GenericArgList();
+        }
+
+        public string LiteralDecoratedName
+        {
+            get
+            {
+                if (GenericArgs.Any())
+                {
+                    return ArgName + GenericArgs.LiteralDecoratedName;
+                }
+                else
+                {
+                    return ArgName;
+                }
+            }
         }
 
         public override string ToString()

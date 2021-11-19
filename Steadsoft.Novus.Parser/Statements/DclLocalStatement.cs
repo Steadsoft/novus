@@ -11,6 +11,8 @@ namespace Steadsoft.Novus.Parser.Statements
 
         public override string Qualifier => null;
 
+        public override string LiteralDecoratedName => throw new System.NotImplementedException();
+
         public DclLocalStatement(int Line, int Col, string Name, string TypeName) : base(Line, Col, Name, "local")
         {
             this.TypeName = TypeName;

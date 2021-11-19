@@ -13,6 +13,8 @@ namespace Steadsoft.Novus.Parser.Statements
         public override string DecoratedName { get => DeclaredName; }
         public override string Qualifier { get => null; }
 
+        public override string LiteralDecoratedName => throw new System.NotImplementedException();
+
         public DclEnumMemberStatement(int Line, int Col, string Name, DclTypeStatement Parent) : base(Line, Col, Name, "member")
         {
             this.Parent = Parent;
