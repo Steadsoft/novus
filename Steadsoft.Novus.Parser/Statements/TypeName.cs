@@ -6,11 +6,11 @@ namespace Steadsoft.Novus.Parser.Statements
     public class TypeName
     {
         public string Name { get; init; }
-        public List<TypeName> GenericArgNames { get; set; }
+        public List<(TypeName,int)> GenericArgNames { get; set; }
         public TypeName(string Name)
         {
             this.Name = Name;
-            this.GenericArgNames = new List<TypeName>();
+            this.GenericArgNames = new List<(TypeName,int)>();
         }
 
         public override string ToString()
@@ -24,9 +24,9 @@ namespace Steadsoft.Novus.Parser.Statements
 
             builder.Append("<");
 
-            foreach (TypeName type in GenericArgNames)
+            foreach (var type in GenericArgNames)
             {
-                builder.Append(type.ToString());
+                builder.Append(type.Item2 + type.ToString());
                 builder.Append(",");
             }
 

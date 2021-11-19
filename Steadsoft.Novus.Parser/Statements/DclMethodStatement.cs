@@ -28,13 +28,13 @@ namespace Steadsoft.Novus.Parser.Statements
         /// and the other is that expanded name with signature embellishments. Because name is a contrived string used only within the
         /// compiler it is unhelpful to expose to users.
         /// </summary>
-        public override string Name
+        public override string DecalredName
         {
             get
             {
                 StringBuilder namebuilder = new StringBuilder();
 
-                namebuilder.Append(base.Name);
+                namebuilder.Append(base.DecalredName);
 
                 foreach (var t in Parameters)
                 {
@@ -53,7 +53,7 @@ namespace Steadsoft.Novus.Parser.Statements
         {
             get
             {
-                return base.Name;
+                return base.DecalredName;
             }
         }
 
@@ -72,7 +72,7 @@ namespace Steadsoft.Novus.Parser.Statements
         {
             StringBuilder builder = new();
 
-            builder.AppendLine($"{Prepad(nesting)}Method: [{Name}] {ParametersText} {ReturnsText} {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
+            builder.AppendLine($"{Prepad(nesting)}Method: [{DecalredName}] {ParametersText} {ReturnsText} {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
 
             if (HasBody)
                 builder.Append(Block.Dump(nesting));

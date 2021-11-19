@@ -6,8 +6,8 @@
         A,
         B,
         C,
-        A
    }
+
 
    type IAmAnInterface interface
    {
@@ -57,6 +57,11 @@
       {
          // The parser does not care about these words or dupes etc, that's handled by a second
          // pass after the parse is done.
+
+         type Category<Z, U<X>, V<Z>> class sealed sealed abstract static public private
+         {
+         
+         }
 
          type Category<T, U<X>, V<Z>> class sealed sealed abstract static public private
          {

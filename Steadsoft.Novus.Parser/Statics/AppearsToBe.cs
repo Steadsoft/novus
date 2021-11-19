@@ -12,21 +12,26 @@ namespace Steadsoft.Novus.Parser.Statics
         public static bool MethodDeclaration(TokenEnumerator TokenSource)
         {
             return
-                TokenSource.NextTokensAre(SemiColon) ||
-                TokenSource.NextTokensAre(ParenOpen, Identifier, Identifier) ||
-                FunctionReturnType(TokenSource);
+                TokenSource.NextTokensAre(Identifier, SemiColon) ||
+                TokenSource.NextTokensAre(Identifier, ParenOpen, Identifier, Identifier) || 
+                TokenSource.NextTokensAre(Identifier, ParenOpen, Identifier, ParenClose);
         }
 
-        public static bool FunctionReturnType(TokenEnumerator TokenSource)
-        {
-            return TokenSource.NextTokensAre(ParenOpen, Identifier, ParenClose);
-        }
+        //public static bool FunctionReturnType(TokenEnumerator TokenSource)
+        //{
+        //    return TokenSource.NextTokensAre(ParenOpen, Identifier, ParenClose);
+        //}
 
         public static bool FieldDeclaration(TokenEnumerator TokenSource)
         {
             var tokens = new List<Token>();
 
             var token = TokenSource.GetNextToken();
+
+            if (token.TokenType != Identifier)
+                return false;
+
+            token = TokenSource.GetNextToken();
 
             while (token.TokenType != BraceOpen && token.TokenType != SemiColon)
             {
@@ -41,7 +46,7 @@ namespace Steadsoft.Novus.Parser.Statics
                 return true;
             }
 
-            return false;
+            return false;  
         }
     }
 }

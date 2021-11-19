@@ -20,7 +20,7 @@ namespace Steadsoft.Novus.Parser.Statements
         {
             StringBuilder builder = new();
 
-            builder.AppendLine($"{Prepad(nesting)}Field: [{Name}] {TypeName} {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
+            builder.AppendLine($"{Prepad(nesting)}Field: [{DecalredName}] {TypeName} {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
 
             return builder.ToString();
         }

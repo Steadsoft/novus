@@ -25,14 +25,14 @@ namespace Steadsoft.Novus.Parser.Statements
 
         public override string ToString()
         {
-            return Name;
+            return DecalredName;
         }
 
         public override string Dump(int nesting)
         {
             StringBuilder builder = new();
 
-            builder.AppendLine($"{Prepad(nesting)}Namespace: [{Name}]");
+            builder.AppendLine($"{Prepad(nesting)}Namespace: [{DecalredName}]");
 
             if (Block != null)
                 builder.Append(Block.Dump(nesting));

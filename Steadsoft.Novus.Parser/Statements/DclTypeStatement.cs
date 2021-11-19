@@ -10,7 +10,15 @@ namespace Steadsoft.Novus.Parser.Statements
     /// </summary>
     public class DclTypeStatement : DclStatement, IBlockContainer
     {
-        public new TypeName Name { get; private set; }
+        public TypeName TypeName { get; private set; }
+
+        public override string DecalredName
+        {
+            get
+            {
+                return TypeName.ToString(); 
+            }
+        }
         public Keywords TypeKind { get; internal set; }
         public BlockStatement Block { get; private set; }
         /// <summary>
@@ -21,7 +29,7 @@ namespace Steadsoft.Novus.Parser.Statements
 
         public DclTypeStatement(int Line, int Col, TypeName TypeName) : base(Line, Col, TypeName.Name, "type")
         {
-            this.Name = TypeName;
+            this.TypeName = TypeName;
             Block = null;
         }
         public void AddBody(BlockStatement Stmt)
@@ -32,14 +40,14 @@ namespace Steadsoft.Novus.Parser.Statements
 
         public override string ToString()
         {
-            return $"{Name}";
+            return $"{DecalredName}";
         }
 
         public override string Dump(int nesting)
         {
             StringBuilder builder = new();
 
-            builder.AppendLine($"{Prepad(nesting)}Type: [{Name}] {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
+            builder.AppendLine($"{Prepad(nesting)}Type: [{DecalredName}] {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
 
             builder.Append(Block.Dump(nesting));
 

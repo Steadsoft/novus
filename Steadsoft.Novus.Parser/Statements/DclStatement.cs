@@ -4,9 +4,11 @@ using System.Collections.Generic;
 
 namespace Steadsoft.Novus.Parser.Statements
 {
-    public class DclStatement : Statement
+    public abstract class DclStatement : Statement
     {
-        public virtual string Name { get; private set; }
+        public virtual string DecalredName { get; private set; }
+        public virtual string FullName { get; private set; }
+        public virtual string QualifiedName { get; private set; }
         /// <summary>
         /// This is the name with any embellishments stripped away.
         /// </summary>
@@ -17,7 +19,7 @@ namespace Steadsoft.Novus.Parser.Statements
         /// </remarks>
         public virtual string FriendlyName 
         { 
-            get { return Name; }
+            get { return DecalredName; }
         }
         public string ShortStatementTypeName { get; private set; }
         /// <summary>
@@ -32,7 +34,7 @@ namespace Steadsoft.Novus.Parser.Statements
         }
         public DclStatement(int Line, int Col, string Name, string ShortStatementTypeName) : base(Line, Col)
         {
-            this.Name = Name;
+            this.DecalredName = Name;
             this.ShortStatementTypeName = ShortStatementTypeName;
             Options = new List<Keywords>();
         }

@@ -232,7 +232,7 @@ namespace Steadsoft.Novus.Parser.Classes
                             else
                             {
                                 if (ReportErrors)
-                                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Warning, Stmt.Line, Stmt.Col, $"No type-kind specified for type '{Stmt.Name}', assuming 'class'."));
+                                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Warning, Stmt.Line, Stmt.Col, $"No type-kind specified for type '{Stmt.DecalredName}', assuming 'class'."));
                                 dclTypeStatement.TypeKind = Class;
                             }
                         }
@@ -245,7 +245,7 @@ namespace Steadsoft.Novus.Parser.Classes
                             {
                                 if (ReportErrors)
                                 {
-                                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Duplicate options '{group.Key.ToString().ToLower()}' in {dclTypeStatement.TypeKind.ToString().ToLower()} '{Stmt.Name}'."));
+                                    OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Duplicate options '{group.Key.ToString().ToLower()}' in {dclTypeStatement.TypeKind.ToString().ToLower()} '{Stmt.DecalredName}'."));
                                 }
                             }
                         }
@@ -262,7 +262,7 @@ namespace Steadsoft.Novus.Parser.Classes
                                     {
                                         if (dclTypeStatement.Options.ContainsOnly(dclTypeStatement.TypeKind, New, Public, Protected, Internal, Private) == false)
                                         {
-                                            OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Only the options 'new, public, protected, internal and private' may appear in the declaration of the {dclTypeStatement.TypeKind.ToString().ToLower()} '{Stmt.Name}'."));
+                                            OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Only the options 'new, public, protected, internal and private' may appear in the declaration of the {dclTypeStatement.TypeKind.ToString().ToLower()} '{Stmt.DecalredName}'."));
                                         }
                                         break;
                                     }
@@ -270,7 +270,7 @@ namespace Steadsoft.Novus.Parser.Classes
                                     {
                                         if (dclTypeStatement.Options.ContainsOnly(Class, New, Public, Protected, Internal, Private, Abstract, Sealed) == false)
                                         {
-                                            OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Only the options 'new, public, protected, internal, private and abstract' may appear in the declaration of the {dclTypeStatement.TypeKind.ToString().ToLower()} '{Stmt.Name}'."));
+                                            OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, Stmt.Line, Stmt.Col, $"Only the options 'new, public, protected, internal, private and abstract' may appear in the declaration of the {dclTypeStatement.TypeKind.ToString().ToLower()} '{Stmt.DecalredName}'."));
                                         }
                                         break;
                                     }
@@ -331,7 +331,7 @@ namespace Steadsoft.Novus.Parser.Classes
                         {
                             foreach (var group in groups)
                             {
-                                OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, declaration.Line, declaration.Col, $"The option '{group.Key.ToString().ToLower()}' appears more than once in the declaration of field '{declaration.Name}'."));
+                                OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, declaration.Line, declaration.Col, $"The option '{group.Key.ToString().ToLower()}' appears more than once in the declaration of field '{declaration.DecalredName}'."));
                             }
                         }
 
@@ -343,7 +343,7 @@ namespace Steadsoft.Novus.Parser.Classes
                         {
                             foreach (var group in groups)
                             {
-                                OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, declaration.Line, declaration.Col, $"The option '{group.Key.ToString().ToLower()}' appears more than once in the declaration of method '{declaration.Name}'."));
+                                OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, declaration.Line, declaration.Col, $"The option '{group.Key.ToString().ToLower()}' appears more than once in the declaration of method '{declaration.DecalredName}'."));
                             }
                         }
 
@@ -544,11 +544,13 @@ namespace Steadsoft.Novus.Parser.Classes
 
             TokenSource.VerifyExpectedToken(TokenType.Lesser, out var token);
 
+            int ordinal = 0;
+
             while (token.TokenType != Greater)
             {
                 if (TryParseTypeName(Prior, out var typename, out DiagMsg))
                 {
-                    TypeName.GenericArgNames.Add(typename);
+                    TypeName.GenericArgNames.Add((typename, ordinal++));
 
                     token = TokenSource.GetNextToken();
 
@@ -1088,32 +1090,93 @@ namespace Steadsoft.Novus.Parser.Classes
                 DiagMsg = $"Unexpected token {token.Lexeme}";
                 return false;
             }
-
-            var name = token.Lexeme;
-
-            Stmt = new DclStatement(Prior.LineNumber, Prior.ColNumber, name);
+                
+            TokenSource.PushToken(token);
 
             if (AppearsToBeA.MethodDeclaration(TokenSource))
             {
-                if (TryParseMethodDeclaration(token, ref Stmt, Parent, out DiagMsg))
-                    return TryParseMethodBody(token, ref Stmt, out DiagMsg);
+                if (TryParseMethodDeclaration(token, out var stmt, Parent, out DiagMsg))
+                    return TryParseMethodBody(token, ref stmt, out DiagMsg);
             }
             else
             {
                 if (AppearsToBeA.FieldDeclaration(TokenSource))
-                    return TryParseFieldDeclaration(token, ref Stmt, Parent, out DiagMsg);
+                    return TryParseFieldDeclaration(token, out var stmt, Parent, out DiagMsg);
             }
 
             return false;
 
         }
-        private bool TryParseFieldDeclaration(Token Prior, ref DclStatement Stmt, DclTypeStatement Parent, out string DiagMsg)
+        private bool TryParseMethodDeclaration(Token Prior, out DclMethodStatement Stmt, DclTypeStatement Parent, out string DiagMsg)
         {
+            Token token;
+
+            DclMethodStatement methodDef = null;
+
+            Stmt = null;
+            DiagMsg = string.Empty;
+
+            // A method declaration is any of:
+            // def <identifier> ;
+            // def <identifier> (<typename>) ;
+            // def <identifier> (<identifier> <typename> ...);
+            // def <identifier> { ... }
+            // def <identifier> (<typename>) { ... }
+            // def <identifier> (<identifier> <typename> ...) { ... }
+
+            // At the 'def' <identifier> has already been consumed.
+
+            if (!AppearsToBeA.MethodDeclaration(TokenSource))
+            {
+                DiagMsg = "Invalid parser method called.";
+                return false;
+            }
+
+            token = TokenSource.GetNextToken();
+
+            methodDef = new DclMethodStatement(Prior.LineNumber, Prior.ColNumber, token.Lexeme, Parent);
+
+            token = TokenSource.PeekNextTokens(1).First();
+
+            if (token.TokenType == SemiColon || token.TokenType == BraceOpen)
+            {
+                if (token.TokenType == SemiColon)
+                    methodDef.HasBody = false;
+                else
+                    methodDef.HasBody = true;
+
+                return true;
+            }
+
+            if (TokenSource.NextTokensAre(ParenOpen, Identifier, Identifier))
+            {
+                TryParseParameterList(Prior, ref methodDef, out DiagMsg);
+            }
+
+            if (TokenSource.NextTokensAre(ParenOpen, Identifier, ParenClose))
+            {
+                TokenSource.GetNextToken();
+                var retToken = TokenSource.GetNextToken();
+                methodDef.Returns = retToken.Lexeme;
+                TokenSource.GetNextToken(); // Consume the closing rpar
+            }
+
+            TryParseDclOptions(Prior, methodDef, out DiagMsg);
+
+            Stmt = methodDef;
+
+            return true;
+
+        }
+
+        private bool TryParseFieldDeclaration(Token Prior, out DclFieldStatement Stmt, DclTypeStatement Parent, out string DiagMsg)
+        {
+            Stmt = null;
             DiagMsg = string.Empty;
 
             var token = TokenSource.GetNextToken();
 
-            DclFieldStatement field = new DclFieldStatement(Stmt.Line, Stmt.Col, Stmt.Name, token.Lexeme, Parent);
+            var field = new DclFieldStatement(Prior.LineNumber, Prior.ColNumber, token.Lexeme, Parent.DecalredName, Parent);
 
             token = TokenSource.GetNextToken();
 
@@ -1207,81 +1270,7 @@ namespace Steadsoft.Novus.Parser.Classes
             return true;
 
         }
-        private bool TryParseMethodDeclaration(Token Prior, ref DclStatement Stmt, DclTypeStatement Parent, out string DiagMsg)
-        {
-            Token token;
-
-            DclMethodStatement methodDef;
-
-            DiagMsg = string.Empty;
-
-            // A method declaration is any of:
-            // def <identifier> ;
-            // def <identifier> (<typename>) ;
-            // def <identifier> (<identifier> <typename> ...);
-            // def <identifier> { ... }
-            // def <identifier> (<typename>) { ... }
-            // def <identifier> (<identifier> <typename> ...) { ... }
-
-            // At the 'def' <identifier> has already been consumed.
-
-            if (!AppearsToBeA.MethodDeclaration(TokenSource))
-            {
-                DiagMsg = "Invalid parser method called.";
-                return false;
-            }
-
-            methodDef = new DclMethodStatement(Stmt.Line, Stmt.Col, Stmt.Name, Parent);
-
-            token = TokenSource.PeekNextTokens(1).First();
-
-            if (token.TokenType == SemiColon || token.TokenType == BraceOpen)
-            {
-                if (token.TokenType == SemiColon)
-                    methodDef.HasBody = false;
-                else
-                    methodDef.HasBody = true;
-
-                return true;
-            }
-
-            if (TokenSource.NextTokensAre(ParenOpen, Identifier, Identifier))
-            {
-                TryParseParameterList(Prior, ref methodDef, out DiagMsg);
-            }
-
-            if (TokenSource.NextTokensAre(ParenOpen, Identifier, ParenClose))
-            {
-                TokenSource.GetNextToken();
-                var retToken = TokenSource.GetNextToken();
-                methodDef.Returns = retToken.Lexeme;
-                TokenSource.GetNextToken(); // Consume the closing rpar
-            }
-
-            TryParseDclOptions(Prior, methodDef, out DiagMsg);
-
-            //token = TokenSource.GetNextToken();
-
-            //while (token.TokenType != SemiColon && token.TokenType != BraceOpen)
-            //{
-            //    if (token.Keyword != IsNotKeyword)
-            //        methodDef.Options.Add(token.Keyword);
-
-            //    token = TokenSource.GetNextToken();
-            //}
-
-            //if (token.TokenType == BraceOpen)
-            //{
-            //    TokenSource.PushToken(token);
-            //    methodDef.HasBody = true;
-            //}
-
-            Stmt = methodDef;
-
-            return true;
-
-        }
-        private bool TryParseMethodBody(Token Prior, ref DclStatement Stmt, out string DiagMsg)
+        private bool TryParseMethodBody(Token Prior, ref DclMethodStatement Stmt, out string DiagMsg)
         {
             var method = (DclMethodStatement)(Stmt);
 
@@ -1333,7 +1322,7 @@ namespace Steadsoft.Novus.Parser.Classes
             var dupeDeclarations = Stmt.Block.Children.
                 Where(c => c is DclStatement).
                 Cast<DclStatement>().
-                GroupBy(dcl => dcl.Name).
+                GroupBy(dcl => dcl.DecalredName).
                 Where(dcl => dcl.Count() > 1);
 
             foreach (var declaration in dupeDeclarations)
@@ -1344,9 +1333,9 @@ namespace Steadsoft.Novus.Parser.Classes
                 foreach (var duplicate in duplicates)
                 {
                     if (duplicate.ShortStatementTypeName == "method")
-                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortStatementTypeName} name '{duplicate.FriendlyName}' within {containerName} '{Stmt.Name}', there is already a defintion within this scope, of a {firstuse.ShortStatementTypeName} with this name and signature at line {firstuse.Line}."));
+                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortStatementTypeName} name '{duplicate.FriendlyName}' within {containerName} '{Stmt.DecalredName}', there is already a defintion within this scope, of a {firstuse.ShortStatementTypeName} with this name and signature at line {firstuse.Line}."));
                     else
-                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortStatementTypeName} name '{duplicate.FriendlyName}' within {containerName} '{Stmt.Name}', there is already a defintion within this scope, of a {firstuse.ShortStatementTypeName} with this name at line {firstuse.Line}."));
+                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortStatementTypeName} name '{duplicate.FriendlyName}' within {containerName} '{Stmt.DecalredName}', there is already a defintion within this scope, of a {firstuse.ShortStatementTypeName} with this name at line {firstuse.Line}."));
                 }
             }
         }
