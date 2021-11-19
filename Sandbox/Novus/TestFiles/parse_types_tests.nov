@@ -9,7 +9,7 @@
    }
 
 
-   type IAmAnInterface interface
+   type IAmAnInterface<T,B> interface
    {
         def Reboot (a int) (int);
         def Reboot (b int) (int);
@@ -63,7 +63,7 @@
          
          }
 
-         type Category<T, U<X>, V<Z>> class sealed sealed abstract static public private
+         type Category<T, U<X>, V<Z,X>> class sealed sealed abstract static public private
          {
             type Window class public struct abstract sealed 
             {

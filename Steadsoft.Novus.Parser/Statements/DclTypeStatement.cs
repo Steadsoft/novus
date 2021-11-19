@@ -1,5 +1,6 @@
 ﻿using Steadsoft.Novus.Scanner.Enums;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -10,13 +11,13 @@ namespace Steadsoft.Novus.Parser.Statements
     /// </summary>
     public class DclTypeStatement : DclStatement, IBlockContainer
     {
-        public TypeName TypeName { get; private set; }
+        public GenericArgList GenericArgs { get; set; }
         public override string Qualifier { get => DeclaredName; }
         public override string DecoratedName 
         {
             get
             {
-                return TypeName.ToString();
+                return DeclaredName + GenericArgs.ToString();
             }
         }
         public Keywords TypeKind { get; internal set; }
@@ -28,10 +29,10 @@ namespace Steadsoft.Novus.Parser.Statements
         /// consistency and applicability at a later step.
         /// </summary>
 
-        public DclTypeStatement(int Line, int Col, TypeName TypeName) : base(Line, Col, TypeName.Name, "type")
+        public DclTypeStatement(int Line, int Col, string Name) : base(Line, Col, Name, "type")
         {
-            this.TypeName = TypeName;
-            Block = null;
+            GenericArgs = new GenericArgList();
+            Block = new BlockStatement(Line, Col);
         }
         public void AddBody(BlockStatement Stmt)
         {

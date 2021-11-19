@@ -507,10 +507,10 @@ namespace Steadsoft.Novus.Parser.Classes
             return true;
 
         }
-        private bool TryParseTypeName(Token Prior, out TypeName TypeName, out string DiagMsg)
+        private bool TryParseTypeName(Token Prior, out DclTypeStatement Stmt, out string DiagMsg)
         {
+            Stmt = null;
             DiagMsg = null;
-            TypeName = null;
 
             var token = TokenSource.GetNextToken();
 
@@ -520,13 +520,13 @@ namespace Steadsoft.Novus.Parser.Classes
                 return false;
             }
 
-            TypeName = new TypeName(token.Lexeme);
+            Stmt = new DclTypeStatement(Prior.LineNumber, Prior.ColNumber, token.Lexeme);
 
             token = TokenSource.GetNextToken();
 
             if (token.TokenType != Lesser)
             {
-                TokenSource.PushToken(token); // this isn't for us
+                TokenSource.PushToken(token); // nothing more to do
                 return true;
             }
 
@@ -534,11 +534,11 @@ namespace Steadsoft.Novus.Parser.Classes
 
             TokenSource.PushToken(token);
 
-            return TryParseGenericTypeList(Prior, TypeName, out DiagMsg);
+            return TryParseGenericArgList(Prior, Stmt.GenericArgs, out DiagMsg);
 
         }
 
-        private bool TryParseGenericTypeList(Token Prior, TypeName TypeName, out string DiagMsg)
+        private bool TryParseGenericArgList(Token Prior, GenericArgList Args, out string DiagMsg)
         {
             DiagMsg = null;
 
@@ -546,33 +546,48 @@ namespace Steadsoft.Novus.Parser.Classes
 
             while (token.TokenType != Greater)
             {
-                if (TryParseTypeName(Prior, out var typename, out DiagMsg))
-                {
-                    TypeName.GenericArgNames.Add(typename);
+                token = TokenSource.GetNextToken();
 
-                    token = TokenSource.GetNextToken();
-
-                    if (token.TokenType == Comma)
-                    {
-                        continue;
-                    }
-
-                    if (token.TokenType == ShiftRight)
-                    {
-                        // OK we read a >> which is a distinct token (ShiftRight)
-                        // since we are parsing a generic arglist though
-                        // we will treat this as two tokens, a > followed by a >
-
-                        var simulated_token = new Token(TokenType.Greater, ">", token.LineNumber, token.ColNumber + 1);
-
-                        TokenSource.PushToken(simulated_token);
-
-                        token = simulated_token;
-                    }
-                }
-                else
-                {
+                if (token.TokenType != Identifier)
                     return false;
+
+                var genericArg = new GenericArg(token.Lexeme);
+
+                Args.Add(genericArg);
+
+                token = TokenSource.GetNextToken();
+
+                switch (token.TokenType)
+                {
+                    case TokenType.Comma:
+                        {
+                            continue;
+                        }
+
+                    case TokenType.Lesser:
+                        {
+                            TokenSource.PushToken(token);
+                            if (TryParseGenericArgList(Prior, genericArg.GenericArgs, out DiagMsg) == false)
+                                return false;
+                            token = TokenSource.GetNextToken();
+                            continue;
+                        }
+                    case TokenType.Greater:
+                        {
+                            return true; 
+                        }
+
+                    case TokenType.ShiftRight:
+                        {
+                            // OK we read a >> which is a distinct token (ShiftRight)
+                            // since we are parsing a generic arglist though
+                            // we will treat this as two tokens, a > followed by a >
+
+                            var simulated_token = new Token(TokenType.Greater, ">", token.LineNumber, token.ColNumber + 1);
+
+                            TokenSource.PushToken(simulated_token);
+                            return true;
+                        }
                 }
 
             }
@@ -593,11 +608,10 @@ namespace Steadsoft.Novus.Parser.Classes
             //    return false;
             //}
 
-            TryParseTypeName(Prior, out var typename, out DiagMsg);
+            TryParseTypeName(Prior, out Stmt, out DiagMsg);
 
             //var name = token.Lexeme;
 
-            Stmt = new DclTypeStatement(Prior.LineNumber, Prior.ColNumber, typename);
 
             if (TryParseDclOptions(token, Stmt, out DiagMsg))
                 return TryParseTypeBody(token, ref Stmt, out DiagMsg);
