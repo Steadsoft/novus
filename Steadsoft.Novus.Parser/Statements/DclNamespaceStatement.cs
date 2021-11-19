@@ -10,6 +10,10 @@ namespace Steadsoft.Novus.Parser.Statements
     {
         public BlockStatement Block { get; private set; }
 
+        public override string DecoratedName => DeclaredName;
+
+        public override string Qualifier => null;
+
         public DclNamespaceStatement(int Line, int Col, string Name) : base(Line, Col, Name, "namespace")
         {
             Block = new BlockStatement(Line, Col);
@@ -25,14 +29,14 @@ namespace Steadsoft.Novus.Parser.Statements
 
         public override string ToString()
         {
-            return DecalredName;
+            return DeclaredName;
         }
 
         public override string Dump(int nesting)
         {
             StringBuilder builder = new();
 
-            builder.AppendLine($"{Prepad(nesting)}Namespace: [{DecalredName}]");
+            builder.AppendLine($"{Prepad(nesting)}Namespace: [{DeclaredName}]");
 
             if (Block != null)
                 builder.Append(Block.Dump(nesting));

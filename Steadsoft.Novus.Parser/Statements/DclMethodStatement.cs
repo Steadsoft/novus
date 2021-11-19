@@ -28,13 +28,13 @@ namespace Steadsoft.Novus.Parser.Statements
         /// and the other is that expanded name with signature embellishments. Because name is a contrived string used only within the
         /// compiler it is unhelpful to expose to users.
         /// </summary>
-        public override string DecalredName
+        public override string DecoratedName 
         {
             get
             {
                 StringBuilder namebuilder = new StringBuilder();
 
-                namebuilder.Append(base.DecalredName);
+                namebuilder.Append(base.DeclaredName);
 
                 foreach (var t in Parameters)
                 {
@@ -42,18 +42,6 @@ namespace Steadsoft.Novus.Parser.Statements
                 }
 
                 return namebuilder.ToString();
-            }
-        }
-
-        /// <summary>
-        /// This is the basic name of a method devoid of signature embellishments, this is the name we use 
-        /// in diagnostic messages and so on, it is the one exposed to users.
-        /// </summary>
-        public override string FriendlyName
-        {
-            get
-            {
-                return base.DecalredName;
             }
         }
 
@@ -72,7 +60,7 @@ namespace Steadsoft.Novus.Parser.Statements
         {
             StringBuilder builder = new();
 
-            builder.AppendLine($"{Prepad(nesting)}Method: [{DecalredName}] {ParametersText} {ReturnsText} {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
+            builder.AppendLine($"{Prepad(nesting)}Method: [{DeclaredName}] {ParametersText} {ReturnsText} {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
 
             if (HasBody)
                 builder.Append(Block.Dump(nesting));
@@ -106,5 +94,6 @@ namespace Steadsoft.Novus.Parser.Statements
             }
         }
 
+        public override string Qualifier => throw new NotImplementedException();
     }
 }

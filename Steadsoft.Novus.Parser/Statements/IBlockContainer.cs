@@ -8,7 +8,7 @@
     {
         public string ShortStatementTypeName { get; }
         BlockStatement Block { get; }
-        string DecalredName { get; }
+        string DeclaredName { get; }
         int Line { get; }
         int Col { get; }
     }

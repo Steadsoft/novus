@@ -7,6 +7,10 @@ namespace Steadsoft.Novus.Parser.Statements
     {
         public string TypeName { get; private set; }
 
+        public override string DecoratedName => DeclaredName;
+
+        public override string Qualifier => null;
+
         public DclLocalStatement(int Line, int Col, string Name, string TypeName) : base(Line, Col, Name, "local")
         {
             this.TypeName = TypeName;
@@ -16,7 +20,7 @@ namespace Steadsoft.Novus.Parser.Statements
         {
             StringBuilder builder = new();
 
-            builder.AppendLine($"{Prepad(nesting)}Local: [{DecalredName}] {TypeName} {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
+            builder.AppendLine($"{Prepad(nesting)}Local: [{DeclaredName}] {TypeName} {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
 
             return builder.ToString();
         }

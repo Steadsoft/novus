@@ -10,6 +10,11 @@ namespace Steadsoft.Novus.Parser.Statements
     {
         public DclTypeStatement Parent { get; private set; }
         public string TypeName { get; private set; }
+
+        public override string DecoratedName => DeclaredName;
+
+        public override string Qualifier => throw new System.NotImplementedException();
+
         public DclFieldStatement(int Line, int Col, string Name, string TypeName, DclTypeStatement Parent) : base(Line, Col, Name, "field")
         {
             this.TypeName = TypeName;
@@ -20,7 +25,7 @@ namespace Steadsoft.Novus.Parser.Statements
         {
             StringBuilder builder = new();
 
-            builder.AppendLine($"{Prepad(nesting)}Field: [{DecalredName}] {TypeName} {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
+            builder.AppendLine($"{Prepad(nesting)}Field: [{DeclaredName}] {TypeName} {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
 
             return builder.ToString();
         }

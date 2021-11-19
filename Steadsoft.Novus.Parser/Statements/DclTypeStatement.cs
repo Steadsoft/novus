@@ -11,16 +11,17 @@ namespace Steadsoft.Novus.Parser.Statements
     public class DclTypeStatement : DclStatement, IBlockContainer
     {
         public TypeName TypeName { get; private set; }
-
-        public override string DecalredName
+        public override string Qualifier { get => DeclaredName; }
+        public override string DecoratedName 
         {
             get
             {
-                return TypeName.ToString(); 
+                return TypeName.ToString();
             }
         }
         public Keywords TypeKind { get; internal set; }
         public BlockStatement Block { get; private set; }
+
         /// <summary>
         /// Indicates optional keywords encountered while parsing.
         /// These are blindly added during parsing and checked for
@@ -40,14 +41,14 @@ namespace Steadsoft.Novus.Parser.Statements
 
         public override string ToString()
         {
-            return $"{DecalredName}";
+            return $"{DeclaredName}";
         }
 
         public override string Dump(int nesting)
         {
             StringBuilder builder = new();
 
-            builder.AppendLine($"{Prepad(nesting)}Type: [{DecalredName}] {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
+            builder.AppendLine($"{Prepad(nesting)}Type: [{DeclaredName}] {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
 
             builder.Append(Block.Dump(nesting));
 
