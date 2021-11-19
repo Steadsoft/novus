@@ -544,13 +544,11 @@ namespace Steadsoft.Novus.Parser.Classes
 
             TokenSource.VerifyExpectedToken(TokenType.Lesser, out var token);
 
-            int ordinal = 0;
-
             while (token.TokenType != Greater)
             {
                 if (TryParseTypeName(Prior, out var typename, out DiagMsg))
                 {
-                    TypeName.GenericArgNames.Add((typename, ordinal++));
+                    TypeName.GenericArgNames.Add(typename);
 
                     token = TokenSource.GetNextToken();
 
@@ -1080,6 +1078,7 @@ namespace Steadsoft.Novus.Parser.Classes
         {
             Stmt = null;
             DiagMsg = string.Empty;
+            bool flag;
 
             TokenSource.VerifyExpectedToken(Def, out var token);
 
@@ -1096,12 +1095,25 @@ namespace Steadsoft.Novus.Parser.Classes
             if (AppearsToBeA.MethodDeclaration(TokenSource))
             {
                 if (TryParseMethodDeclaration(token, out var stmt, Parent, out DiagMsg))
-                    return TryParseMethodBody(token, stmt, out DiagMsg);
+                {
+                    Stmt = stmt;
+                    flag = TryParseMethodBody(token, stmt, out DiagMsg);
+                    return flag;
+                }
             }
             else
             {
                 if (AppearsToBeA.FieldDeclaration(TokenSource))
-                    return TryParseFieldDeclaration(token, out var stmt, Parent, out DiagMsg);
+                {
+                    flag = TryParseFieldDeclaration(token, out var stmt, Parent, out DiagMsg);
+
+                    if (flag)
+                    {
+                        Stmt = stmt;
+                    }
+
+                    return flag;
+                }
             }
 
             return false;
@@ -1322,7 +1334,7 @@ namespace Steadsoft.Novus.Parser.Classes
             var dupeDeclarations = Stmt.Block.Children.
                 Where(c => c is DclStatement).
                 Cast<DclStatement>().
-                GroupBy(dcl => dcl.DeclaredName).
+                GroupBy(dcl => dcl.DecoratedName).
                 Where(dcl => dcl.Count() > 1);
 
             foreach (var declaration in dupeDeclarations)
