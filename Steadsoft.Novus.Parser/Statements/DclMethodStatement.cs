@@ -11,7 +11,7 @@ namespace Steadsoft.Novus.Parser.Statements
     /// </summary>
     public class DclMethodStatement : DclStatement, IBlockContainer
     {
-        public GenericArgList GenericArgs { get; set; }
+        public GenericName GenericName { get; set; }
         public DclTypeStatement Parent { get; private set; }
         public BlockStatement Block { get; private set; }
         public override string Qualifier => throw new NotImplementedException();
@@ -21,7 +21,7 @@ namespace Steadsoft.Novus.Parser.Statements
             {
                 StringBuilder namebuilder = new StringBuilder();
 
-                namebuilder.Append(base.DeclaredName).Append(GenericArgs.DecoratedName);
+                namebuilder.Append(base.DeclaredName).Append(GenericName.GenericArgList.DecoratedName);
 
                 foreach (var t in Parameters)
                 {
@@ -37,7 +37,7 @@ namespace Steadsoft.Novus.Parser.Statements
             {
                 StringBuilder namebuilder = new StringBuilder();
 
-                namebuilder.Append(base.DeclaredName).Append(GenericArgs.LiteralDecoratedName);
+                namebuilder.Append(base.DeclaredName).Append(GenericName.GenericArgList.LiteralDecoratedName);
 
                 foreach (var t in Parameters)
                 {
@@ -50,12 +50,12 @@ namespace Steadsoft.Novus.Parser.Statements
         public List<Parameter> Parameters { get; private set; }
         public string Returns { get; internal set; }
         public bool HasBody { get; internal set; }
-        public DclMethodStatement(int Line, int Col, string Name, DclTypeStatement Parent) : base(Line, Col, Name, "method")
+        public DclMethodStatement(int Line, int Col, GenericName Name, DclTypeStatement Parent) : base(Line, Col, Name.Name, "method")
         {
             this.Parameters = new List<Parameter>();
             this.Returns = null;
             this.Parent = Parent;
-            this.GenericArgs = new GenericArgList();
+            this.GenericName = Name; ;
         }
         /// <summary>
         /// The Name in the case of a method, has two forms, one is the friendly name devoid of any embellishments arising from signatures

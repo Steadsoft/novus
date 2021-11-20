@@ -1126,9 +1126,10 @@ namespace Steadsoft.Novus.Parser.Classes
 
             TokenSource.VerifyExpectedToken(Type, out var token);
 
-            TryParsePossiblyGenericName(Prior, out var genericName, out DiagMsg);
+            if (TryParsePossiblyGenericName(Prior, out var genericName, out DiagMsg) == false)
+                return false;
 
-            Stmt = new DclTypeStatement(Prior.LineNumber, Prior.ColNumber, genericName.Name);
+            Stmt = new DclTypeStatement(Prior.LineNumber, Prior.ColNumber, genericName);
 
             if (TryParseDclOptions(token, Stmt, out DiagMsg))
                 return TryParseTypeBody(token, ref Stmt, out DiagMsg);
@@ -1152,15 +1153,12 @@ namespace Steadsoft.Novus.Parser.Classes
                 return false;
             }
 
-            var t = TryParsePossiblyGenericName(Prior, out var genericName, out DiagMsg);
+            if (TryParsePossiblyGenericName(Prior, out var genericName, out DiagMsg) == false)
+                return false;
+
+            methodDef = new DclMethodStatement(Prior.LineNumber, Prior.ColNumber, genericName, Parent);
 
             token = TokenSource.PeekNextToken();
-
-            methodDef = new DclMethodStatement(Prior.LineNumber, Prior.ColNumber, genericName.Name, Parent);
-
-            methodDef.GenericArgs = genericName.GenericArgList;
-
-            token = TokenSource.PeekNextTokens(1).First();
 
             if (token.TokenType == SemiColon || token.TokenType == BraceOpen)
             {
