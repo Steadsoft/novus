@@ -8,6 +8,9 @@ namespace Steadsoft.Novus.Scanner.Enums
 {
     public enum ParsingHint
     {
+        /// <summary>
+        /// Instruct the scanner to return two > tokens whenever it sees a >> token.
+        /// </summary>
         SplitRightShift
     }
 }

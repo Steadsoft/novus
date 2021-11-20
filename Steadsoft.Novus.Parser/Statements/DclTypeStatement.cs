@@ -57,7 +57,7 @@ namespace Steadsoft.Novus.Parser.Statements
         {
             StringBuilder builder = new();
 
-            builder.AppendLine($"{Prepad(nesting)}Type: [{DeclaredName}] {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
+            builder.AppendLine($"{Prepad(nesting)}Type: [{LiteralDecoratedName}] {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
 
             builder.Append(Block.Dump(nesting));
 

@@ -11,9 +11,12 @@ namespace Steadsoft.Novus.Parser.Statements
         /// </summary>
         public string DeclaredName { get; }
         /// <summary>
-        /// This is the name of a declared entity that includes generic argument and/or signature information.
+        /// This is the name of a declared entity that includes generic argument and/or signature information but in numeric form.
         /// </summary>
         public abstract string DecoratedName { get; }
+        /// <summary>
+        /// This is the decorated name but with the original identifers used in the source rather than numeric codes.
+        /// </summary>
         public abstract string LiteralDecoratedName { get; }
         /// <summary>
         /// This the fully qualified container name that includes namespaces, container types etc.

@@ -122,6 +122,9 @@ namespace Steadsoft.Novus.Scanner.Classes
         {
             var token = ReadNextToken();
 
+            /* TODO We may need to review this because there may be cases where we return from here having pushed a simulated token and then the caller pops the hint, raising the question is that simulated token still meaningful, valid?
+            */
+
             if (hints.Any())
             {
                 if (hints.Peek() == ParsingHint.SplitRightShift)

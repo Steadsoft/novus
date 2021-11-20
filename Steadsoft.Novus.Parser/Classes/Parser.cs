@@ -540,6 +540,8 @@ namespace Steadsoft.Novus.Parser.Classes
 
         private bool TryParseGenericArgList(Token Prior, GenericArgList Args, out string DiagMsg)
         {
+            // TODO Parsing comma lists can be generified by having a generic loop that handles and consumes the comma and calls a supplied Func to do the parsing specific to the kind of list.
+
             DiagMsg = null;
 
             TokenSource.VerifyExpectedToken(TokenType.Lesser, out var token);
