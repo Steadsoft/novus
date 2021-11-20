@@ -17,5 +17,10 @@
             this.Name = Name;
             this.GenericArgList = new GenericArgList();
         }
+
+        public override string ToString()
+        {
+            return Name + GenericArgList.LiteralDecoratedName;
+        }
     }
 }

@@ -11,7 +11,7 @@
 
    type IAmAnInterface<T,B> interface
    {
-        def Reboot<V> (a int) (int);
+        def Reboot<V> (a List<V>) (int);
         def Reboot<K> (b int) (int);
    }
 
@@ -70,7 +70,7 @@
                
                // This is a method defintion, it has no return type, so its not a 'function'
 
-               def ClearScreen (arg1 int, arg2 string, arg3 float) private protected internal public
+               def ClearScreen (arg1 int, arg2 Dictionary<string,List<string>>, arg3 float) private protected internal public
                {
                   return;
                }

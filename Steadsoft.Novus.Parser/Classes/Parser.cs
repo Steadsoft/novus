@@ -1246,15 +1246,18 @@ namespace Steadsoft.Novus.Parser.Classes
 
                 var pname = token.Lexeme;
 
-                token = TokenSource.GetNextToken();
+                var ok = TryParsePossiblyGenericName(Prior, out var gname, out DiagMsg);
 
-                if (token.TokenType != Identifier)
+
+                //token = TokenSource.GetNextToken();
+
+                if (ok == false)
                 {
                     DiagMsg = $"Unexpected token in parameter declaration '{token.Lexeme}'";
                     continue;
                 }
 
-                var typename = token.Lexeme;
+                //var typename = token.Lexeme;
 
                 token = TokenSource.GetNextToken();
 
@@ -1262,19 +1265,19 @@ namespace Steadsoft.Novus.Parser.Classes
                 {
                     case Ref:
                         {
-                            Stmt.AddParameter(new Parameter(pname, typename, PassBy.Ref));
+                            Stmt.AddParameter(new Parameter(pname, gname, PassBy.Ref));
                             break;
                         }
                     case Out:
                         {
-                            Stmt.AddParameter(new Parameter(pname, typename, PassBy.Out));
+                            Stmt.AddParameter(new Parameter(pname, gname, PassBy.Out));
                             break;
                         }
 
                     default:
                         {
                             TokenSource.PushToken(token);
-                            Stmt.AddParameter(new Parameter(pname, typename, PassBy.Value));
+                            Stmt.AddParameter(new Parameter(pname, gname, PassBy.Value));
                             break;
                         }
                 }
