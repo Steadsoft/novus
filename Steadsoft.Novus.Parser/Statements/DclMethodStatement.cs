@@ -35,7 +35,16 @@ namespace Steadsoft.Novus.Parser.Statements
         {
             get
             {
-                return DeclaredName + GenericArgs.LiteralDecoratedName;
+                StringBuilder namebuilder = new StringBuilder();
+
+                namebuilder.Append(base.DeclaredName).Append(GenericArgs.LiteralDecoratedName);
+
+                foreach (var t in Parameters)
+                {
+                    namebuilder.Append($".{t.TypeName}({t.PassBy})");
+                }
+
+                return namebuilder.ToString();
             }
         }
         public List<Parameter> Parameters { get; private set; }
@@ -92,7 +101,7 @@ namespace Steadsoft.Novus.Parser.Statements
         {
             StringBuilder builder = new();
 
-            builder.AppendLine($"{Prepad(nesting)}Method: [{LiteralDecoratedName}] {ParametersText} {ReturnsText} {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
+            builder.AppendLine($"{Prepad(nesting)}Method: [{LiteralDecoratedName}] {ReturnsText} {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
 
             if (HasBody)
                 builder.Append(Block.Dump(nesting));

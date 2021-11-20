@@ -11,8 +11,8 @@
 
    type IAmAnInterface<T,B> interface
    {
-        def Reboot (a int) (int);
-        def Reboot (b int) (int);
+        def Reboot<V> (a int) (int);
+        def Reboot<K> (b int) (int);
    }
 
    // |||this is some text inside which we can embed " or "" or ' or ' or whatever was want|||;
