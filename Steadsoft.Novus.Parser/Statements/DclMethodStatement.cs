@@ -97,11 +97,15 @@ namespace Steadsoft.Novus.Parser.Statements
                 return builder.ToString().Trim(' ').Trim(',') + ")";
             }
         }
+        private string KindName
+        {
+            get { return Returns == null ? "Method:  " : "Function:"; }
+        }
         public override string Dump(int nesting)
         {
             StringBuilder builder = new();
 
-            builder.AppendLine($"{Prepad(nesting)}Method: [{LiteralDecoratedName}] {ReturnsText} {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
+            builder.AppendLine($"{Prepad(nesting)}{KindName} [{LiteralDecoratedName}] {ReturnsText} {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
 
             if (HasBody)
                 builder.Append(Block.Dump(nesting));

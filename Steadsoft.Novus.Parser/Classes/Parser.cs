@@ -544,9 +544,9 @@ namespace Steadsoft.Novus.Parser.Classes
             return TryParseGenericArgList(Prior, GenericName.GenericArgList, out DiagMsg);
 
         }
-        private bool TryParseGenericArgList(Token Prior, GenericArgList Args, out string DiagMsg)
+        private bool TryParseGenericArgList(Token Prior, GenericArgList Args, out string DiagMsg) 
         {
-            // TODO Parsing comma lists can be generified by having a generic loop that handles and consumes the comma and calls a supplied Func to do the parsing specific to the kind of list.
+            // TODO Parsing comma lists can be generified by having a generic loop that handles and consumes the comma and calls a supplied Func to do the parsing specific to the kind of items in the commalist.
 
             DiagMsg = null;
 
@@ -1160,6 +1160,8 @@ namespace Steadsoft.Novus.Parser.Classes
 
             token = TokenSource.PeekNextToken();
 
+            // TODO This code must expect parameter typenames to be generic names sometimes.
+
             if (token.TokenType == SemiColon || token.TokenType == BraceOpen)
             {
                 if (token.TokenType == SemiColon)
@@ -1170,12 +1172,12 @@ namespace Steadsoft.Novus.Parser.Classes
                 return true;
             }
 
-            if (TokenSource.NextTokensAre(ParenOpen, Identifier, Identifier))
+            if (TokenSource.NextTokensAre(ParenOpen, Identifier, Identifier)) // TODO this will fail if the arg typename identifier is generic
             {
                 TryParseParameterList(Prior, ref methodDef, out DiagMsg);
             }
 
-            if (TokenSource.NextTokensAre(ParenOpen, Identifier, ParenClose))
+            if (TokenSource.NextTokensAre(ParenOpen, Identifier, ParenClose)) // TODO this will fail if the return typename identifier is generic
             {
                 TokenSource.GetNextToken();
                 var retToken = TokenSource.GetNextToken();
@@ -1190,7 +1192,6 @@ namespace Steadsoft.Novus.Parser.Classes
             return true;
 
         }
-
         private bool TryParseFieldDeclaration(Token Prior, out DclFieldStatement Stmt, DclTypeStatement Parent, out string DiagMsg)
         {
             Stmt = null;
