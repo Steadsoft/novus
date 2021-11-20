@@ -12,6 +12,7 @@ namespace Steadsoft.Novus.Scanner.Classes
         private readonly Tokenizer<Keywords> tokenizer;
         private readonly TokenType[] Skips;
         private readonly Stack<Token> pushed = new();
+        private readonly Stack<ParsingHint> hints = new();
         public TokenEnumerator(Tokenizer<Keywords> Tokenizer, SourceFile SourceFile, params TokenType[] Skips)
         {
             tokenizer = Tokenizer;
@@ -104,11 +105,46 @@ namespace Steadsoft.Novus.Scanner.Classes
             return list;
         }
 
+        public void PushHint(ParsingHint Hint)
+        {
+            hints.Push(Hint);
+        }
+
+        public void PopHint()
+        {
+            hints.Pop();
+        }
         /// <summary>
         /// Consume and returns the next token.
         /// </summary>
         /// <returns></returns>
         public Token GetNextToken()
+        {
+            var token = ReadNextToken();
+
+            if (hints.Any())
+            {
+                if (hints.Peek() == ParsingHint.SplitRightShift)
+                {
+                    if (token.TokenType == ShiftRight)
+                    {
+                        // OK we read a >> which is a distinct token (ShiftRight)
+                        // since we are parsing a generic arglist though
+                        // we will treat this as two tokens, a > followed by a >
+
+                        var simulated_token = new Token(TokenType.Greater, ">", token.LineNumber, token.ColNumber + 1);
+
+                        PushToken(simulated_token);
+
+                        return simulated_token;
+                    }
+                }
+            }
+
+            return token;
+        }
+
+        private Token ReadNextToken()
         {
             // Once a token has been consumed it is in the past, can't be re-read.
             // But we can 'push' a token at any point and the next time we get a
@@ -145,6 +181,7 @@ namespace Steadsoft.Novus.Scanner.Classes
             }
 
             return new Token(NoMoreTokens, "", 0, 0);
+
         }
 
         private void ProcessDelimiterDrop()

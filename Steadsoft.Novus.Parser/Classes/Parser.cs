@@ -544,52 +544,58 @@ namespace Steadsoft.Novus.Parser.Classes
 
             TokenSource.VerifyExpectedToken(TokenType.Lesser, out var token);
 
-            while (token.TokenType != Greater)
+            try
             {
-                token = TokenSource.GetNextToken();
+                // The pair of chars >> represent a right shift but also appear at the end
+                // of a generic argument list sometimes, in the latter case we want these
+                // to be seen as distinct > chars. The tokenizer allows this by letting us
+                // temporarily set a hint during parsing, this is present only briefly as
+                // we part certain constructs. This is signficant benefit because it removes the
+                // need for the parser to understand token structure and removes the fiddly 
+                // logic from the parsing code.
 
-                if (token.TokenType != Identifier)
-                    return false;
+                TokenSource.PushHint(ParsingHint.SplitRightShift);
 
-                var genericArg = new GenericArg(token.Lexeme);
-
-                Args.Add(genericArg);
-
-                token = TokenSource.GetNextToken();
-
-                switch (token.TokenType)
+                while (token.TokenType != Greater)
                 {
-                    case TokenType.Comma:
-                        {
-                            continue;
-                        }
+                    token = TokenSource.GetNextToken();
 
-                    case TokenType.Lesser:
-                        {
-                            TokenSource.PushToken(token);
-                            if (TryParseGenericArgList(Prior, genericArg.GenericArgs, out DiagMsg) == false)
-                                return false;
-                            token = TokenSource.GetNextToken();
-                            continue;
-                        }
-                    case TokenType.Greater:
-                        {
-                            return true; 
-                        }
+                    if (token.TokenType != Identifier)
+                        return false;
 
-                    case TokenType.ShiftRight:
-                        {
-                            // OK we read a >> which is a distinct token (ShiftRight)
-                            // since we are parsing a generic arglist though
-                            // we will treat this as two tokens, a > followed by a >
+                    var genericArg = new GenericArg(token.Lexeme);
 
-                            var simulated_token = new Token(TokenType.Greater, ">", token.LineNumber, token.ColNumber + 1);
+                    Args.Add(genericArg);
 
-                            TokenSource.PushToken(simulated_token);
-                            return true;
-                        }
+                    token = TokenSource.GetNextToken();
+
+                    switch (token.TokenType)
+                    {
+                        case TokenType.Comma:
+                            {
+                                continue;
+                            }
+
+                        case TokenType.Lesser:
+                            {
+                                TokenSource.PushToken(token);
+                                if (TryParseGenericArgList(Prior, genericArg.GenericArgs, out DiagMsg) == false)
+                                    return false;
+                                token = TokenSource.GetNextToken();
+                                continue;
+                            }
+                        case TokenType.Greater:
+                            {
+                                return true;
+                            }
+                    }
+
                 }
+            }
 
+            finally
+            {
+                TokenSource.PopHint();
             }
 
             return true;
