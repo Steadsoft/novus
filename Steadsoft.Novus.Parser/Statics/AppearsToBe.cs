@@ -13,6 +13,7 @@ namespace Steadsoft.Novus.Parser.Statics
         {
             return
                 TokenSource.NextTokensAre(Identifier, SemiColon) ||
+                TokenSource.NextTokensAre(Identifier, Lesser) ||
                 TokenSource.NextTokensAre(Identifier, ParenOpen, Identifier, Identifier) || 
                 TokenSource.NextTokensAre(Identifier, ParenOpen, Identifier, ParenClose);
         }

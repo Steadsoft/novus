@@ -132,7 +132,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
                     case Type:
                         TokenSource.PushToken(token);
-                        if (TryParseType(token, out var typeStatement, out message))
+                        if (TryParseTypeDeclaration(token, out var typeStatement, out message))
                         {
                             Tree.AddChild(typeStatement);
                         }
@@ -486,7 +486,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
                     case Type:
                         TokenSource.PushToken(token);
-                        if (TryParseType(token, out var typeStatement, out DiagMsg))
+                        if (TryParseTypeDeclaration(token, out var typeStatement, out DiagMsg))
                         {
                             Block.AddChild(typeStatement);
                         }
@@ -602,33 +602,6 @@ namespace Steadsoft.Novus.Parser.Classes
 
             return true;
         }
-        private bool TryParseType(Token Prior, out DclTypeStatement Stmt, out string DiagMsg)
-        {
-            Stmt = null;
-
-            TokenSource.VerifyExpectedToken(Type, out var token);
-
-            //token = TokenSource.GetNextToken();
-
-            //if (token.TokenType != Identifier)
-            //{
-            //    DiagMsg = $"Unexpected token {token.Lexeme}";
-            //    return false;
-            //}
-
-            TryParseTypeName(Prior, out Stmt, out DiagMsg);
-
-            //var name = token.Lexeme;
-
-
-            if (TryParseDclOptions(token, Stmt, out DiagMsg))
-                return TryParseTypeBody(token, ref Stmt, out DiagMsg);
-            else
-                TokenSource.SkipToNext("}");
-
-            return false;
-
-        }
         private bool TryParseDclOptions(Token Prior, DclStatement Stmt, out string DiagMsg)
         {
             bool parsed = true;
@@ -683,7 +656,7 @@ namespace Steadsoft.Novus.Parser.Classes
                 {
                     case Type:
                         TokenSource.PushToken(token);
-                        if (TryParseType(token, out var typeStatement, out DiagMsg))
+                        if (TryParseTypeDeclaration(token, out var typeStatement, out DiagMsg))
                         {
                             body.AddChild(typeStatement);
                         }
@@ -749,7 +722,7 @@ namespace Steadsoft.Novus.Parser.Classes
                 {
                     case Type:
                         TokenSource.PushToken(token);
-                        if (TryParseType(token, out var typeStatement, out DiagMsg))
+                        if (TryParseTypeDeclaration(token, out var typeStatement, out DiagMsg))
                         {
                             body.AddChild(typeStatement);
                         }
@@ -815,7 +788,7 @@ namespace Steadsoft.Novus.Parser.Classes
                 {
                     case Type:
                         TokenSource.PushToken(token);
-                        if (TryParseType(token, out var typeStatement, out DiagMsg))
+                        if (TryParseTypeDeclaration(token, out var typeStatement, out DiagMsg))
                         {
                             body.AddChild(typeStatement);
                         }
@@ -881,7 +854,7 @@ namespace Steadsoft.Novus.Parser.Classes
                 {
                     case Type:
                         TokenSource.PushToken(token);
-                        if (TryParseType(token, out var typeStatement, out DiagMsg))
+                        if (TryParseTypeDeclaration(token, out var typeStatement, out DiagMsg))
                         {
                             body.AddChild(typeStatement);
                         }
@@ -1141,6 +1114,21 @@ namespace Steadsoft.Novus.Parser.Classes
             return false;
 
         }
+        private bool TryParseTypeDeclaration(Token Prior, out DclTypeStatement Stmt, out string DiagMsg)
+        {
+            Stmt = null;
+
+            TokenSource.VerifyExpectedToken(Type, out var token);
+
+            TryParseTypeName(Prior, out Stmt, out DiagMsg);
+
+            if (TryParseDclOptions(token, Stmt, out DiagMsg))
+                return TryParseTypeBody(token, ref Stmt, out DiagMsg);
+            else
+                TokenSource.SkipToNext("}");
+
+            return false;
+        }
         private bool TryParseMethodDeclaration(Token Prior, out DclMethodStatement Stmt, DclTypeStatement Parent, out string DiagMsg)
         {
             Token token;
@@ -1158,6 +1146,8 @@ namespace Steadsoft.Novus.Parser.Classes
             // def <identifier> (<typename>) { ... }
             // def <identifier> (<identifier> <typename> ...) { ... }
 
+            // also all of the above with <...> after the identifier.
+
             // At the 'def' <identifier> has already been consumed.
 
             if (!AppearsToBeA.MethodDeclaration(TokenSource))
@@ -1166,9 +1156,17 @@ namespace Steadsoft.Novus.Parser.Classes
                 return false;
             }
 
-            token = TokenSource.GetNextToken();
+            #region Temp Hack
 
-            methodDef = new DclMethodStatement(Prior.LineNumber, Prior.ColNumber, token.Lexeme, Parent);
+            var t = TryParseTypeName(Prior, out var s, out DiagMsg);
+
+            token = TokenSource.PeekNextToken();
+
+            methodDef = new DclMethodStatement(Prior.LineNumber, Prior.ColNumber, s.DeclaredName, Parent);
+
+            methodDef.GenericArgs = s.GenericArgs;
+
+            #endregion
 
             token = TokenSource.PeekNextTokens(1).First();
 

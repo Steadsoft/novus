@@ -12,6 +12,7 @@ namespace Steadsoft.Novus.Parser.Statements
     public class DclTypeStatement : DclStatement, IBlockContainer
     {
         public GenericArgList GenericArgs { get; set; }
+        public BlockStatement Block { get; private set; }
         public override string Qualifier { get => DeclaredName; }
         public override string DecoratedName 
         {
@@ -20,9 +21,6 @@ namespace Steadsoft.Novus.Parser.Statements
                 return DeclaredName + GenericArgs.DecoratedName;
             }
         }
-        public Keywords TypeKind { get; internal set; }
-        public BlockStatement Block { get; private set; }
-
         public override string LiteralDecoratedName
         {
             get
@@ -30,13 +28,12 @@ namespace Steadsoft.Novus.Parser.Statements
                 return DeclaredName + GenericArgs.LiteralDecoratedName;
             }
         }
-
+        public Keywords TypeKind { get; internal set; }
         /// <summary>
         /// Indicates optional keywords encountered while parsing.
         /// These are blindly added during parsing and checked for
         /// consistency and applicability at a later step.
         /// </summary>
-
         public DclTypeStatement(int Line, int Col, string Name) : base(Line, Col, Name, "type")
         {
             GenericArgs = new GenericArgList();
@@ -47,12 +44,10 @@ namespace Steadsoft.Novus.Parser.Statements
             Block = Stmt ?? throw new ArgumentNullException(nameof(Stmt));
             Block.Parent = this;
         }
-
         public override string ToString()
         {
             return $"{DeclaredName}";
         }
-
         public override string Dump(int nesting)
         {
             StringBuilder builder = new();

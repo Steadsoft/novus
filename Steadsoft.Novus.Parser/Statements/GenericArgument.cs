@@ -38,6 +38,9 @@ namespace Steadsoft.Novus.Parser.Statements
         {
             get
             {
+                if (GenericArgs.Count == 0)
+                    return "";
+
                 StringBuilder text = new StringBuilder();
 
                 text.Append("<");

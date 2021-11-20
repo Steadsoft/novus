@@ -14,6 +14,30 @@ namespace Steadsoft.Novus.Parser.Statements
         public GenericArgList GenericArgs { get; set; }
         public DclTypeStatement Parent { get; private set; }
         public BlockStatement Block { get; private set; }
+        public override string Qualifier => throw new NotImplementedException();
+        public override string DecoratedName 
+        {
+            get
+            {
+                StringBuilder namebuilder = new StringBuilder();
+
+                namebuilder.Append(base.DeclaredName).Append(GenericArgs.DecoratedName);
+
+                foreach (var t in Parameters)
+                {
+                    namebuilder.Append($".{t.TypeName}({t.PassBy})");
+                }
+
+                return namebuilder.ToString();
+            }
+        }
+        public override string LiteralDecoratedName
+        {
+            get
+            {
+                return DeclaredName + GenericArgs.LiteralDecoratedName;
+            }
+        }
         public List<Parameter> Parameters { get; private set; }
         public string Returns { get; internal set; }
         public bool HasBody { get; internal set; }
@@ -24,50 +48,19 @@ namespace Steadsoft.Novus.Parser.Statements
             this.Parent = Parent;
             this.GenericArgs = new GenericArgList();
         }
-
         /// <summary>
         /// The Name in the case of a method, has two forms, one is the friendly name devoid of any embellishments arising from signatures
         /// and the other is that expanded name with signature embellishments. Because name is a contrived string used only within the
         /// compiler it is unhelpful to expose to users.
         /// </summary>
-        public override string DecoratedName 
-        {
-            get
-            {
-                StringBuilder namebuilder = new StringBuilder();
-
-                namebuilder.Append(base.DeclaredName);
-
-                foreach (var t in Parameters)
-                {
-                    namebuilder.Append($".{t.TypeName}({t.PassBy})");
-                }
-
-                return namebuilder.ToString();
-            }
-        }
-
         public void AddParameter(Parameter Parameter)
         {
             Parameters.Add(Parameter);
         }
-
         public void AddBody(BlockStatement Stmt)
         {
             Block = Stmt ?? throw new ArgumentNullException(nameof(Stmt));
             Block.Parent = this;
-        }
-
-        public override string Dump(int nesting)
-        {
-            StringBuilder builder = new();
-
-            builder.AppendLine($"{Prepad(nesting)}Method: [{DeclaredName}] {ParametersText} {ReturnsText} {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
-
-            if (HasBody)
-                builder.Append(Block.Dump(nesting));
-
-            return builder.ToString();
         }
         private string ReturnsText
         {
@@ -95,9 +88,16 @@ namespace Steadsoft.Novus.Parser.Statements
                 return builder.ToString().Trim(' ').Trim(',') + ")";
             }
         }
+        public override string Dump(int nesting)
+        {
+            StringBuilder builder = new();
 
-        public override string Qualifier => throw new NotImplementedException();
+            builder.AppendLine($"{Prepad(nesting)}Method: [{LiteralDecoratedName}] {ParametersText} {ReturnsText} {string.Join(", ", Options.OrderBy(op => op.ToString()))}");
 
-        public override string LiteralDecoratedName => DecoratedName;
+            if (HasBody)
+                builder.Append(Block.Dump(nesting));
+
+            return builder.ToString();
+        }
     }
 }

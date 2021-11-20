@@ -86,6 +86,11 @@ namespace Steadsoft.Novus.Scanner.Classes
             return true;
         }
 
+        public Token PeekNextToken()
+        {
+            return PeekNextTokens(1).First();
+        }
+
         /// <summary>
         /// Returns the next 'n' tokens in order, without consuming them from the input.
         /// </summary>
