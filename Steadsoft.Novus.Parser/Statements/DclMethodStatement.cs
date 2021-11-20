@@ -11,6 +11,7 @@ namespace Steadsoft.Novus.Parser.Statements
     /// </summary>
     public class DclMethodStatement : DclStatement, IBlockContainer
     {
+        public GenericArgList GenericArgs { get; set; }
         public DclTypeStatement Parent { get; private set; }
         public BlockStatement Block { get; private set; }
         public List<Parameter> Parameters { get; private set; }
@@ -21,6 +22,7 @@ namespace Steadsoft.Novus.Parser.Statements
             this.Parameters = new List<Parameter>();
             this.Returns = null;
             this.Parent = Parent;
+            this.GenericArgs = new GenericArgList();
         }
 
         /// <summary>
