@@ -63,7 +63,7 @@
          
          }
 
-         type Category<T, U<X>, V<Z,X>> class sealed sealed abstract static public private
+         type Category<T, U<X>, V<X>> class sealed sealed abstract static public private
          {
             type Window class public struct abstract sealed 
             {

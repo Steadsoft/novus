@@ -14,7 +14,7 @@ namespace Steadsoft.Novus.Parser.Statements
 
         public override string Qualifier => null;
 
-        public override string LiteralDecoratedName => throw new NotImplementedException();
+        public override string LiteralDecoratedName => DecoratedName;
 
         public DclNamespaceStatement(int Line, int Col, string Name) : base(Line, Col, Name, "namespace")
         {

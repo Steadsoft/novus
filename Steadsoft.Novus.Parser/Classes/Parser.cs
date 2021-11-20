@@ -1367,9 +1367,9 @@ namespace Steadsoft.Novus.Parser.Classes
                 foreach (var duplicate in duplicates)
                 {
                     if (duplicate.ShortStatementTypeName == "method")
-                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortStatementTypeName} name '{duplicate.DeclaredName}' within {containerName} '{Stmt.DeclaredName}', there is already a defintion within this scope, of a {firstuse.ShortStatementTypeName} with this name and signature at line {firstuse.Line}."));
+                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortStatementTypeName} name '{duplicate.LiteralDecoratedName}' within {containerName} '{Stmt.DeclaredName}', there is already a defintion within this scope, of a {firstuse.ShortStatementTypeName} with this name and signature at line {firstuse.Line}."));
                     else
-                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortStatementTypeName} name '{duplicate.DeclaredName}' within {containerName} '{Stmt.DeclaredName}', there is already a defintion within this scope, of a {firstuse.ShortStatementTypeName} with this name at line {firstuse.Line}."));
+                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortStatementTypeName} name '{duplicate.LiteralDecoratedName}' within {containerName} '{Stmt.DeclaredName}', there is already a defintion within this scope, of a {firstuse.ShortStatementTypeName} with this name at line {firstuse.Line}."));
                 }
             }
         }
