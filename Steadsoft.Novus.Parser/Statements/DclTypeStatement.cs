@@ -59,4 +59,16 @@ namespace Steadsoft.Novus.Parser.Statements
             return builder.ToString();
         }
     }
+
+    public class GenericName
+    {
+        public string Name { get; set; }
+        public GenericArgList GenericArgList { get; set; }
+
+        public GenericName(string Name)
+        {
+            this.Name = Name;
+            this.GenericArgList = new GenericArgList();
+        }
+    }
 }

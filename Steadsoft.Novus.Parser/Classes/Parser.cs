@@ -507,9 +507,16 @@ namespace Steadsoft.Novus.Parser.Classes
             return true;
 
         }
-        private bool TryParseTypeName(Token Prior, out DclTypeStatement Stmt, out string DiagMsg)
+        /// <summary>
+        /// Tries tp arse a name that is an identifier possibly followed by a generic argument list.
+        /// </summary>
+        /// <param name="Prior"></param>
+        /// <param name="GenericName"></param>
+        /// <param name="DiagMsg"></param>
+        /// <returns></returns>
+        private bool TryParsePossiblyGenericName(Token Prior, out GenericName GenericName, out string DiagMsg)
         {
-            Stmt = null;
+            GenericName = null;
             DiagMsg = null;
 
             var token = TokenSource.GetNextToken();
@@ -520,7 +527,7 @@ namespace Steadsoft.Novus.Parser.Classes
                 return false;
             }
 
-            Stmt = new DclTypeStatement(Prior.LineNumber, Prior.ColNumber, token.Lexeme);
+            GenericName = new GenericName(token.Lexeme);
 
             token = TokenSource.GetNextToken();
 
@@ -534,10 +541,9 @@ namespace Steadsoft.Novus.Parser.Classes
 
             TokenSource.PushToken(token);
 
-            return TryParseGenericArgList(Prior, Stmt.GenericArgs, out DiagMsg);
+            return TryParseGenericArgList(Prior, GenericName.GenericArgList, out DiagMsg);
 
         }
-
         private bool TryParseGenericArgList(Token Prior, GenericArgList Args, out string DiagMsg)
         {
             // TODO Parsing comma lists can be generified by having a generic loop that handles and consumes the comma and calls a supplied Func to do the parsing specific to the kind of list.
@@ -1120,7 +1126,9 @@ namespace Steadsoft.Novus.Parser.Classes
 
             TokenSource.VerifyExpectedToken(Type, out var token);
 
-            TryParseTypeName(Prior, out Stmt, out DiagMsg);
+            TryParsePossiblyGenericName(Prior, out var genericName, out DiagMsg);
+
+            Stmt = new DclTypeStatement(Prior.LineNumber, Prior.ColNumber, genericName.Name);
 
             if (TryParseDclOptions(token, Stmt, out DiagMsg))
                 return TryParseTypeBody(token, ref Stmt, out DiagMsg);
@@ -1138,35 +1146,19 @@ namespace Steadsoft.Novus.Parser.Classes
             Stmt = null;
             DiagMsg = string.Empty;
 
-            // A method declaration is any of:
-            // def <identifier> ;
-            // def <identifier> (<typename>) ;
-            // def <identifier> (<identifier> <typename> ...);
-            // def <identifier> { ... }
-            // def <identifier> (<typename>) { ... }
-            // def <identifier> (<identifier> <typename> ...) { ... }
-
-            // also all of the above with <...> after the identifier.
-
-            // At the 'def' <identifier> has already been consumed.
-
             if (!AppearsToBeA.MethodDeclaration(TokenSource))
             {
                 DiagMsg = "Invalid parser method called.";
                 return false;
             }
 
-            #region Temp Hack
-
-            var t = TryParseTypeName(Prior, out var s, out DiagMsg);
+            var t = TryParsePossiblyGenericName(Prior, out var genericName, out DiagMsg);
 
             token = TokenSource.PeekNextToken();
 
-            methodDef = new DclMethodStatement(Prior.LineNumber, Prior.ColNumber, s.DeclaredName, Parent);
+            methodDef = new DclMethodStatement(Prior.LineNumber, Prior.ColNumber, genericName.Name, Parent);
 
-            methodDef.GenericArgs = s.GenericArgs;
-
-            #endregion
+            methodDef.GenericArgs = genericName.GenericArgList;
 
             token = TokenSource.PeekNextTokens(1).First();
 
