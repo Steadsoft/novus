@@ -48,7 +48,7 @@ namespace Steadsoft.Novus.Parser.Statements
             }
         }
         public List<Parameter> Parameters { get; private set; }
-        public string Returns { get; internal set; }
+        public GenericName Returns { get; internal set; }
         public bool HasBody { get; internal set; }
         public DclMethodStatement(int Line, int Col, GenericName Name, DclTypeStatement Parent) : base(Line, Col, Name.Name, "method")
         {

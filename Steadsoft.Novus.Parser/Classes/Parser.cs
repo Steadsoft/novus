@@ -367,6 +367,8 @@ namespace Steadsoft.Novus.Parser.Classes
             Stmt = null;
             DiagMsg = string.Empty;
 
+            // TODO we will need to eventually load external .Net assemblies if 'using' is to be helpful. Until then we have no way to resolve decalred name to actual entities outside of the source.
+
             StringBuilder builder = new();
 
             TokenSource.VerifyExpectedToken(Using, out var token);
@@ -1172,17 +1174,20 @@ namespace Steadsoft.Novus.Parser.Classes
                 return true;
             }
 
-            if (TokenSource.NextTokensAre(ParenOpen, Identifier, Identifier)) // TODO this will fail if the arg typename identifier is generic
+            if (TokenSource.NextTokensAre(ParenOpen, Identifier, Identifier)) 
             {
                 TryParseParameterList(Prior, ref methodDef, out DiagMsg);
             }
 
-            if (TokenSource.NextTokensAre(ParenOpen, Identifier, ParenClose)) // TODO this will fail if the return typename identifier is generic
+            if (TokenSource.NextTokensAre(ParenOpen, Identifier, ParenClose) || TokenSource.NextTokensAre(ParenOpen, Identifier, Lesser))
             {
                 TokenSource.GetNextToken();
-                var retToken = TokenSource.GetNextToken();
-                methodDef.Returns = retToken.Lexeme;
-                TokenSource.GetNextToken(); // Consume the closing rpar
+
+                if (TryParsePossiblyGenericName(Prior, out var returnType, out DiagMsg))
+                {
+                    methodDef.Returns = returnType;
+                    TokenSource.GetNextToken(); // Consume the closing rpar
+                }
             }
 
             TryParseDclOptions(Prior, methodDef, out DiagMsg);
@@ -1246,10 +1251,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
                 var pname = token.Lexeme;
 
-                var ok = TryParsePossiblyGenericName(Prior, out var gname, out DiagMsg);
-
-
-                //token = TokenSource.GetNextToken();
+                var ok = TryParsePossiblyGenericName(Prior, out var parameterType, out DiagMsg);
 
                 if (ok == false)
                 {
@@ -1257,27 +1259,25 @@ namespace Steadsoft.Novus.Parser.Classes
                     continue;
                 }
 
-                //var typename = token.Lexeme;
-
                 token = TokenSource.GetNextToken();
 
                 switch (token.Keyword)
                 {
                     case Ref:
                         {
-                            Stmt.AddParameter(new Parameter(pname, gname, PassBy.Ref));
+                            Stmt.AddParameter(new Parameter(pname, parameterType, PassBy.Ref));
                             break;
                         }
                     case Out:
                         {
-                            Stmt.AddParameter(new Parameter(pname, gname, PassBy.Out));
+                            Stmt.AddParameter(new Parameter(pname, parameterType, PassBy.Out));
                             break;
                         }
 
                     default:
                         {
                             TokenSource.PushToken(token);
-                            Stmt.AddParameter(new Parameter(pname, gname, PassBy.Value));
+                            Stmt.AddParameter(new Parameter(pname, parameterType, PassBy.Value));
                             break;
                         }
                 }

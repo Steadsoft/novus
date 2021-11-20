@@ -11,7 +11,7 @@
 
    type IAmAnInterface<T,B> interface
    {
-        def Reboot<V> (a List<V>) (int);
+        def Reboot<V> (a List<V>) (List<int>);
         def Reboot<K> (b int) (int);
    }
 
@@ -84,7 +84,7 @@
 
                // this is an overload not a dupe declaration
 
-               def GetScreenArea (arg1 string)  (string) public override public
+               def GetScreenArea (arg1 string)  (Func<string,float,List<T>,bool>) public override public
                {
                   return;
                }
