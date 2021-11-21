@@ -2,7 +2,7 @@
 {
     public enum Keywords
     {
-        IsNotKeyword = 0,
+        IsNotAKeyword = 0,
         Using,
         Namespace,
         Def,
@@ -29,5 +29,10 @@
         Until,
         Goto,
         Call,
+        Return,
+        /// <summary>
+        /// TODO Conditional return statement, syntx not yet defined.
+        /// </summary>
+        Returnon
     }
 }
