@@ -274,7 +274,7 @@ namespace Steadsoft.Novus.Parser.Classes
                                         }
                                         break;
                                     }
-                                case IsNotKeyword:
+                                case IsNotAKeyword:
                                     {
                                         break;
                                     }
@@ -620,7 +620,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             while (token.TokenType != BraceOpen && token.TokenType != SemiColon)
             {
-                if (token.Keyword == IsNotKeyword)
+                if (token.Keyword == IsNotAKeyword)
                 {
                     DiagMsg = $"Unexpected token in type declaration '{token.Lexeme}'";
                     parsed = false;
@@ -996,7 +996,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             var token = TokenSource.GetNextToken();
 
-            if (token.Keyword == IsNotKeyword)
+            if (token.Keyword == IsNotAKeyword)
             {
                 DiagMsg = $"Unexpected token {token.Lexeme}";
                 TokenSource.SkipToNext("}");
@@ -1016,7 +1016,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             if (token.TokenType != BraceOpen)
             {
-                if (token.Keyword == IsNotKeyword)
+                if (token.Keyword == IsNotAKeyword)
                 {
                     DiagMsg = $"Unexpected token {token.Lexeme}";
                     TokenSource.SkipToNext("}");
@@ -1210,7 +1210,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             while (token.TokenType != SemiColon)
             {
-                if (token.Keyword != IsNotKeyword)
+                if (token.Keyword != IsNotAKeyword)
                 {
                     field.AddOption(token.Keyword);
                     token = TokenSource.GetNextToken();
@@ -1335,7 +1335,7 @@ namespace Steadsoft.Novus.Parser.Classes
             {
                 var stmt = (DclTypeStatement)(Stmt);
 
-                if (stmt.TypeKind != IsNotKeyword)
+                if (stmt.TypeKind != IsNotAKeyword)
                     containerName = stmt.TypeKind.ToString();
                 else
                     containerName = Stmt.ShortStatementTypeName;
