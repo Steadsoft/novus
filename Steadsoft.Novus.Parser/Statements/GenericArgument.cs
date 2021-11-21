@@ -9,7 +9,7 @@ namespace Steadsoft.Novus.Parser.Statements
 
     public class GenericArgList
     {
-        private List<GenericArg> GenericArgs { get; set; }
+        public List<GenericArg> GenericArgs { get; set; }
 
         public GenericArgList()
         {

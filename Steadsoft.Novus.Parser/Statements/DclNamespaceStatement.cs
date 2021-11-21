@@ -8,6 +8,7 @@ namespace Steadsoft.Novus.Parser.Statements
     /// </summary>
     public class DclNamespaceStatement : DclStatement, IBlockContainer
     {
+        public DclNamespaceStatement Parent { get; set; }
         public BlockStatement Block { get; private set; }
 
         public override string DecoratedName => DeclaredName;
@@ -16,9 +17,10 @@ namespace Steadsoft.Novus.Parser.Statements
 
         public override string LiteralDecoratedName => DecoratedName;
 
-        public DclNamespaceStatement(int Line, int Col, string Name) : base(Line, Col, Name, "namespace")
+        public DclNamespaceStatement(DclNamespaceStatement Parent, int Line, int Col, string Name) : base(Line, Col, Name, "namespace")
         {
-            Block = new BlockStatement(Line, Col);
+            this.Parent = Parent;
+            this.Block = new BlockStatement(Line, Col);
         }
 
         public void AddBlock(BlockStatement Stmt)

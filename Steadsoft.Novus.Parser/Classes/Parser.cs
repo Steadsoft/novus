@@ -83,7 +83,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             string message;
 
-            var token = TokenSource.GetNextToken();
+            var token = TokenSource.PeekNextToken();
 
             // We expect any of the following
 
@@ -101,7 +101,6 @@ namespace Steadsoft.Novus.Parser.Classes
                 switch (token.Keyword)
                 {
                     case Using:
-                        TokenSource.PushToken(token);
                         if (TryParseUsing(token, out var usingStatement, out message))
                         {
                             Tree.AddChild(usingStatement);
@@ -112,12 +111,10 @@ namespace Steadsoft.Novus.Parser.Classes
                             OnDiagnostic(this, ParsedBad(usingStatement, message));
                             TokenSource.SkipToNext(";");
                         }
-                        token = TokenSource.GetNextToken();
-                        continue;
+                        break;
 
                     case Namespace:
-                        TokenSource.PushToken(token);
-                        if (TryParseNamespace(token, out var namespaceStatement, out message))
+                        if (TryParseNamespace(token, null, out var namespaceStatement, out message)) // no parent for the outermost namespace
                         {
                             Tree.AddChild(namespaceStatement);
                         }
@@ -127,11 +124,9 @@ namespace Steadsoft.Novus.Parser.Classes
                             OnDiagnostic(this, ParsedBad(namespaceStatement, message));
                             TokenSource.SkipToNext(";");
                         }
-                        token = TokenSource.GetNextToken();
-                        continue;
+                        break;
 
                     case Type:
-                        TokenSource.PushToken(token);
                         if (TryParseTypeDeclaration(token, out var typeStatement, out message))
                         {
                             Tree.AddChild(typeStatement);
@@ -142,15 +137,16 @@ namespace Steadsoft.Novus.Parser.Classes
                             OnDiagnostic(this, ParsedBad(typeStatement, message));
                             TokenSource.SkipToNext("}");
                         }
-                        token = TokenSource.GetNextToken();
-                        continue;
+                        break;
                     default:
                         {
                             errors++;
-                            OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, "Expected one of 'using', 'namespace' or 'type"));
+                            OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, $"Unexpected token '{token.Lexeme}', expected one of 'using', 'namespace' or 'type'."));
                             break;
                         }
                 }
+
+                token = TokenSource.PeekNextToken();
             }
 
             return errors == 0;
@@ -403,7 +399,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             }
         }
-        private bool TryParseNamespace(Token Prior, out DclNamespaceStatement Stmt, out string DiagMsg)
+        private bool TryParseNamespace(Token Prior, DclNamespaceStatement Parent, out DclNamespaceStatement Stmt, out string DiagMsg)
         {
             Stmt = null;
             DiagMsg = string.Empty;
@@ -429,16 +425,16 @@ namespace Steadsoft.Novus.Parser.Classes
 
                 if (token.TokenType == SemiColon)
                 {
-                    Stmt = new DclNamespaceStatement(Prior.LineNumber, Prior.ColNumber, builder.ToString());
+                    Stmt = new DclNamespaceStatement(Parent,Prior.LineNumber, Prior.ColNumber, builder.ToString());
                     return true;
                 }
 
                 if (token.TokenType == BraceOpen)
                 {
                     TokenSource.PushToken(token);
-                    if (TryParseNamespaceBody(out var block, out DiagMsg))
+                    Stmt = new DclNamespaceStatement(Parent,Prior.LineNumber, Prior.ColNumber, builder.ToString());
+                    if (TryParseNamespaceBody(Stmt, out var block, out DiagMsg))
                     {
-                        Stmt = new DclNamespaceStatement(Prior.LineNumber, Prior.ColNumber, builder.ToString());
                         Stmt.AddBlock(block);
                     }
 
@@ -457,7 +453,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             return false;
         }
-        private bool TryParseNamespaceBody(out BlockStatement Block, out string DiagMsg)
+        private bool TryParseNamespaceBody(DclNamespaceStatement Parent, out BlockStatement Block, out string DiagMsg)
         {
             Block = null;
             DiagMsg = string.Empty;
@@ -474,7 +470,7 @@ namespace Steadsoft.Novus.Parser.Classes
                 {
                     case Namespace:
                         TokenSource.PushToken(token);
-                        if (TryParseNamespace(token, out var namespaceStatement, out DiagMsg))
+                        if (TryParseNamespace(token, Parent, out var namespaceStatement, out DiagMsg))
                         {
                             Block.AddChild(namespaceStatement);
                         }

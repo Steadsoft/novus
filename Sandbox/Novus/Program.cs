@@ -10,7 +10,7 @@ namespace Sandbox
     // Just a sandbox for a lexer
     internal partial class Program
     {
-        private static readonly string parse_types_tests = @"..\..\..\TestFiles\parse_types_tests.nov";
+        private static readonly string parse_types_tests = @"..\..\..\TestFiles\nestedstuff.nov";
         private static List<DiagnosticEventArgs> messages = new List<DiagnosticEventArgs>();
 
         static void Main(string[] args)

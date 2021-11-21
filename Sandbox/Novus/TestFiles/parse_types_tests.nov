@@ -1,7 +1,7 @@
 ﻿namespace a.x.rere
 {
 
-   type ee enum public static
+   type ee<H<K<G>>> enum public static
    {
         A,
         B,
@@ -75,9 +75,9 @@
                   return;
                }
 
-               // This is a function delaration, returns a string
+               // This is a function delaration, returns a string, we use 'singlet' rather than 'static' to denote non-instance methods.
 
-               def GetScreenArea (arg1 float ref, arg2 int out)  (string) public override
+               def GetScreenArea (arg1 float ref, arg2 int out)  (string) public override singlet
                {
                   return;
                }

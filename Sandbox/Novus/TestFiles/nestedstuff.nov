@@ -1,0 +1,25 @@
+﻿namespace outermost
+{
+
+	namespace inner1
+	{
+		namespace inner1.A
+		{
+
+
+		}
+
+	}
+
+	namespace inner2
+	{
+		namespace inner1A
+		{
+
+
+		}
+
+	}
+
+
+}
