@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Steadsoft.Novus.Parser.Statements
+﻿namespace Steadsoft.Novus.Parser.Statements
 {
 
     /// <summary>
@@ -13,12 +11,5 @@ namespace Steadsoft.Novus.Parser.Statements
         string DeclaredName { get; }
         int Line { get; }
         int Col { get; }
-    }
-
-    public interface IContainer
-    {
-        IContainer Parent { get; }
-        List<IContainer> Children { get; }
-        void AddChild(IContainer child);
     }
 }
