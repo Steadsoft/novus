@@ -9,10 +9,10 @@ namespace Steadsoft.Novus.Parser.Statements
     /// <summary>
     /// Represents the declaration of a method or function within a type.
     /// </summary>
-    public class DclMethodStatement : DclStatement, IBlockContainer
+    public class MethodDeclaration : DclStatement, IBlockContainer
     {
         public GenericName GenericName { get; set; }
-        public DclTypeStatement Parent { get; private set; }
+        public TypeDeclaration Parent { get; private set; }
         public BlockStatement Block { get; private set; }
         public override string Qualifier => throw new NotImplementedException();
         public override string DecoratedName 
@@ -50,7 +50,7 @@ namespace Steadsoft.Novus.Parser.Statements
         public List<Parameter> Parameters { get; private set; }
         public GenericName Returns { get; internal set; }
         public bool HasBody { get; internal set; }
-        public DclMethodStatement(int Line, int Col, GenericName Name, DclTypeStatement Parent) : base(Line, Col, Name.Name, "method")
+        public MethodDeclaration(int Line, int Col, GenericName Name, TypeDeclaration Parent) : base(Line, Col, Name.Name, "method")
         {
             this.Parameters = new List<Parameter>();
             this.Returns = null;

@@ -7,7 +7,7 @@ namespace Steadsoft.Novus.Parser.Statements
     /// <summary>
     /// Represents the declaration of a namespace.
     /// </summary>
-    public class DclNamespaceStatement : DclStatement, IBlockContainer, IContainer
+    public class NamespaceDeclaration : DclStatement, IBlockContainer, IContainer
     {
         //public DclNamespaceStatement Parent { get; set; }
         public BlockStatement Block { get; private set; }
@@ -22,7 +22,7 @@ namespace Steadsoft.Novus.Parser.Statements
 
         public List<IContainer> Children { get; private set; }
 
-        public DclNamespaceStatement(IContainer Parent, int Line, int Col, string Name) : base(Line, Col, Name, "namespace")
+        public NamespaceDeclaration(IContainer Parent, int Line, int Col, string Name) : base(Line, Col, Name, "namespace")
         {
             this.Parent = Parent;
             this.Block = new BlockStatement(Line, Col);

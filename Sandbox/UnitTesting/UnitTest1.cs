@@ -73,19 +73,19 @@ namespace UnitTesting
 
             Assert.IsTrue(root.Children.Count == 7);
 
-            Assert.IsTrue(root.Children[0] is DclNamespaceStatement);
-                Assert.IsTrue(((DclNamespaceStatement)(root.Children[0])).Block.Children.Count == 1);
+            Assert.IsTrue(root.Children[0] is NamespaceDeclaration);
+                Assert.IsTrue(((NamespaceDeclaration)(root.Children[0])).Block.Children.Count == 1);
 
-            Assert.IsTrue(root.Children[1] is DclNamespaceStatement);
-                Assert.IsTrue(((DclNamespaceStatement)(root.Children[1])).Block.Children.Count == 1);
+            Assert.IsTrue(root.Children[1] is NamespaceDeclaration);
+                Assert.IsTrue(((NamespaceDeclaration)(root.Children[1])).Block.Children.Count == 1);
 
-            Assert.IsTrue(root.Children[2] is DclNamespaceStatement);
-            Assert.IsTrue(root.Children[3] is DclNamespaceStatement);
-            Assert.IsTrue(root.Children[4] is DclTypeStatement);
-            Assert.IsTrue(root.Children[5] is DclTypeStatement);
+            Assert.IsTrue(root.Children[2] is NamespaceDeclaration);
+            Assert.IsTrue(root.Children[3] is NamespaceDeclaration);
+            Assert.IsTrue(root.Children[4] is TypeDeclaration);
+            Assert.IsTrue(root.Children[5] is TypeDeclaration);
 
-            Assert.IsTrue(root.Children[6] is DclTypeStatement);
-                Assert.IsTrue(((DclTypeStatement)(root.Children[6])).Block.Children.Count == 1);
+            Assert.IsTrue(root.Children[6] is TypeDeclaration);
+                Assert.IsTrue(((TypeDeclaration)(root.Children[6])).Block.Children.Count == 1);
         }
     }
 }

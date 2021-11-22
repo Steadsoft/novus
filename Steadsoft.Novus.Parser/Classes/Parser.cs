@@ -75,7 +75,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             return p;
         }
-        public bool TrySyntaxPhase(out DclNamespaceStatement Tree)
+        public bool TrySyntaxPhase(out NamespaceDeclaration Tree)
         {
             int errors = 0;
 
@@ -85,7 +85,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             // Create an imaginary global namespace:
 
-            DclNamespaceStatement global = new DclNamespaceStatement(null, 0, 0, "@global");
+            NamespaceDeclaration global = new NamespaceDeclaration(null, 0, 0, "@global");
 
             var token = TokenSource.PeekNextToken();
 
@@ -156,7 +156,7 @@ namespace Steadsoft.Novus.Parser.Classes
             return errors == 0;
 
         }
-        public bool TrySemanticPhase(DclNamespaceStatement Tree)
+        public bool TrySemanticPhase(NamespaceDeclaration Tree)
         {
             if (Tree == null) throw new System.ArgumentNullException(nameof(Tree));
 
@@ -168,7 +168,7 @@ namespace Steadsoft.Novus.Parser.Classes
                         {
                             break;
                         }
-                    case DclNamespaceStatement stmt:
+                    case NamespaceDeclaration stmt:
                         {
                             AnalyzeNamespace(stmt);
                             break;
@@ -178,7 +178,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             return true;
         }
-        private void AnalyzeNamespace(DclNamespaceStatement Stmt)
+        private void AnalyzeNamespace(NamespaceDeclaration Stmt)
         {
             ReportDuplicateDeclarations(Stmt);
 
@@ -187,12 +187,12 @@ namespace Steadsoft.Novus.Parser.Classes
                 {
                     switch (node)
                     {
-                        case DclNamespaceStatement stmt:
+                        case NamespaceDeclaration stmt:
                             {
                                 AnalyzeNamespace(stmt);
                                 break;
                             }
-                        case DclTypeStatement stmt:
+                        case TypeDeclaration stmt:
                             {
                                 AnalyzeType(stmt);
                                 break;
@@ -214,7 +214,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             switch (Stmt)
             {
-                case DclTypeStatement dclTypeStatement:
+                case TypeDeclaration dclTypeStatement:
                     {
                         if (Stmt.Options.ContainsMoreThanOneOf(Class, Struct, Singlet, Enum, Interface))
                         {
@@ -288,7 +288,7 @@ namespace Steadsoft.Novus.Parser.Classes
                     }
             }
         }
-        private void AnalyzeType(DclTypeStatement Stmt)
+        private void AnalyzeType(TypeDeclaration Stmt)
         {
             ReportDuplicateDeclarations(Stmt);
 
@@ -299,7 +299,7 @@ namespace Steadsoft.Novus.Parser.Classes
                 {
                     switch (node)
                     {
-                        case DclTypeStatement stmt:
+                        case TypeDeclaration stmt:
                             {
                                 AnalyzeType(stmt);
                                 break;
@@ -337,7 +337,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
                         break;
                     }
-                case DclMethodStatement declaration:
+                case MethodDeclaration declaration:
                     {
                         if (groups.Any())
                         {
@@ -350,7 +350,7 @@ namespace Steadsoft.Novus.Parser.Classes
                         AnalyzeParameterList(declaration.Parameters);
                         break;
                     }
-                case DclEnumMemberStatement declaration:
+                case DclEnumMember declaration:
                     {
                         break;
                     }
@@ -403,7 +403,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             }
         }
-        private bool TryParseNamespace(Token Prior, IContainer Parent, out DclNamespaceStatement Stmt, out string DiagMsg)
+        private bool TryParseNamespace(Token Prior, IContainer Parent, out NamespaceDeclaration Stmt, out string DiagMsg)
         {
             Stmt = null;
             DiagMsg = string.Empty;
@@ -429,14 +429,14 @@ namespace Steadsoft.Novus.Parser.Classes
 
                 if (token.TokenType == SemiColon)
                 {
-                    Stmt = new DclNamespaceStatement(Parent, Prior.LineNumber, Prior.ColNumber, builder.ToString());
+                    Stmt = new NamespaceDeclaration(Parent, Prior.LineNumber, Prior.ColNumber, builder.ToString());
                     return true;
                 }
 
                 if (token.TokenType == BraceOpen)
                 {
                     TokenSource.PushToken(token);
-                    Stmt = new DclNamespaceStatement(Parent, Prior.LineNumber, Prior.ColNumber, builder.ToString());
+                    Stmt = new NamespaceDeclaration(Parent, Prior.LineNumber, Prior.ColNumber, builder.ToString());
                     if (TryParseNamespaceBody(Stmt, out var block, out DiagMsg))
                     {
                         Stmt.AddBlock(block);
@@ -457,7 +457,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             return false;
         }
-        private bool TryParseNamespaceBody(DclNamespaceStatement Parent, out BlockStatement Block, out string DiagMsg)
+        private bool TryParseNamespaceBody(NamespaceDeclaration Parent, out BlockStatement Block, out string DiagMsg)
         {
             Block = null;
             DiagMsg = string.Empty;
@@ -476,7 +476,8 @@ namespace Steadsoft.Novus.Parser.Classes
                         TokenSource.PushToken(token);
                         if (TryParseNamespace(token, Parent, out var namespaceStatement, out DiagMsg))
                         {
-                            Block.AddChild(namespaceStatement);
+                            Parent.AddChild(namespaceStatement);
+                            //Block.AddChild(namespaceStatement);
                         }
                         else
                         {
@@ -490,7 +491,8 @@ namespace Steadsoft.Novus.Parser.Classes
                         TokenSource.PushToken(token);
                         if (TryParseTypeDeclaration(token, Parent, out var typeStatement, out DiagMsg))
                         {
-                            Block.AddChild(typeStatement);
+                            Parent.AddChild(typeStatement);
+                            //Block.AddChild(typeStatement);
                         }
                         else
                         {
@@ -636,9 +638,9 @@ namespace Steadsoft.Novus.Parser.Classes
             if (token.TokenType == BraceOpen)
             {
                 TokenSource.PushToken(token); // put the brace { back.
-                if (Stmt is DclMethodStatement)
+                if (Stmt is MethodDeclaration)
                 {
-                    (Stmt as DclMethodStatement).HasBody = true;
+                    (Stmt as MethodDeclaration).HasBody = true;
                 }
             }
 
@@ -646,7 +648,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             return parsed;
         }
-        private bool TryParseStructBody(Token Prior, IContainer Parent, ref DclTypeStatement Stmt, out string DiagMsg)
+        private bool TryParseStructBody(Token Prior, IContainer Parent, ref TypeDeclaration Stmt, out string DiagMsg)
         {
             DiagMsg = string.Empty;
 
@@ -712,7 +714,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             return true;
         }
-        private bool TryParseSingletBody(Token Prior, IContainer Parent, ref DclTypeStatement Stmt, out string DiagMsg)
+        private bool TryParseSingletBody(Token Prior, IContainer Parent, ref TypeDeclaration Stmt, out string DiagMsg)
         {
             DiagMsg = string.Empty;
 
@@ -778,7 +780,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             return true;
         }
-        private bool TryParseInterfaceBody(Token Prior, IContainer Parent, ref DclTypeStatement Stmt, out string DiagMsg)
+        private bool TryParseInterfaceBody(Token Prior, IContainer Parent, ref TypeDeclaration Stmt, out string DiagMsg)
         {
             DiagMsg = string.Empty;
 
@@ -844,7 +846,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             return true;
         }
-        private bool TryParseClassBody(Token Prior, IContainer Parent, ref DclTypeStatement Stmt, out string DiagMsg)
+        private bool TryParseClassBody(Token Prior, IContainer Parent, ref TypeDeclaration Stmt, out string DiagMsg)
         {
             DiagMsg = string.Empty;
 
@@ -910,7 +912,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             return true;
         }
-        private bool TryParseEnumBody(Token Prior, ref DclTypeStatement Stmt, out string DiagMsg)
+        private bool TryParseEnumBody(Token Prior, ref TypeDeclaration Stmt, out string DiagMsg)
         {
             DiagMsg = string.Empty;
 
@@ -946,7 +948,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
                 // store the enum member as a child
 
-                Stmt.Block.AddChild(new DclEnumMemberStatement(Prior.LineNumber, Prior.ColNumber, name, Stmt));
+                Stmt.Block.AddChild(new DclEnumMember(Prior.LineNumber, Prior.ColNumber, name, Stmt));
 
                 if (token.TokenType == Comma)
                     token = TokenSource.GetNextToken();
@@ -957,7 +959,7 @@ namespace Steadsoft.Novus.Parser.Classes
             return true;
 
         }
-        private bool TryParseTypeBody(Token Prior, IContainer Parent, ref DclTypeStatement Stmt, out string DiagMsg)
+        private bool TryParseTypeBody(Token Prior, IContainer Parent, ref TypeDeclaration Stmt, out string DiagMsg)
         {
             switch (Stmt.TypeKind)
             {
@@ -987,7 +989,7 @@ namespace Steadsoft.Novus.Parser.Classes
                     }
             }
         }
-        private bool TryParseAccessorBlock(Token Prior, out BlockStatement Stmt, DclTypeStatement Parent, out string DiagMsg)
+        private bool TryParseAccessorBlock(Token Prior, out BlockStatement Stmt, TypeDeclaration Parent, out string DiagMsg)
         {
             Stmt = new AccessibilityBlock(Prior.LineNumber, Prior.ColNumber, Accessibility.Unknown);
 
@@ -1077,7 +1079,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             return true;
         }
-        private bool TryParseDef(Token Prior, out DclStatement Stmt, DclTypeStatement Parent, out string DiagMsg)
+        private bool TryParseDef(Token Prior, out DclStatement Stmt, TypeDeclaration Parent, out string DiagMsg)
         {
             Stmt = null;
             DiagMsg = string.Empty;
@@ -1122,7 +1124,7 @@ namespace Steadsoft.Novus.Parser.Classes
             return false;
 
         }
-        private bool TryParseTypeDeclaration(Token Prior, IContainer Parent, out DclTypeStatement Stmt, out string DiagMsg)
+        private bool TryParseTypeDeclaration(Token Prior, IContainer Parent, out TypeDeclaration Stmt, out string DiagMsg)
         {
             Stmt = null;
 
@@ -1131,7 +1133,7 @@ namespace Steadsoft.Novus.Parser.Classes
             if (TryParsePossiblyGenericName(Prior, out var genericName, out DiagMsg) == false)
                 return false;
 
-            Stmt = new DclTypeStatement(Parent, Prior.LineNumber, Prior.ColNumber, genericName);
+            Stmt = new TypeDeclaration(Parent, Prior.LineNumber, Prior.ColNumber, genericName);
 
             if (TryParseDclOptions(token, Stmt, out DiagMsg))
                 return TryParseTypeBody(token, Parent, ref Stmt, out DiagMsg);
@@ -1140,11 +1142,11 @@ namespace Steadsoft.Novus.Parser.Classes
 
             return false;
         }
-        private bool TryParseMethodDeclaration(Token Prior, out DclMethodStatement Stmt, DclTypeStatement Parent, out string DiagMsg)
+        private bool TryParseMethodDeclaration(Token Prior, out MethodDeclaration Stmt, TypeDeclaration Parent, out string DiagMsg)
         {
             Token token;
 
-            DclMethodStatement methodDef = null;
+            MethodDeclaration methodDef = null;
 
             Stmt = null;
             DiagMsg = string.Empty;
@@ -1158,7 +1160,7 @@ namespace Steadsoft.Novus.Parser.Classes
             if (TryParsePossiblyGenericName(Prior, out var genericName, out DiagMsg) == false)
                 return false;
 
-            methodDef = new DclMethodStatement(Prior.LineNumber, Prior.ColNumber, genericName, Parent);
+            methodDef = new MethodDeclaration(Prior.LineNumber, Prior.ColNumber, genericName, Parent);
 
             token = TokenSource.PeekNextToken();
 
@@ -1197,7 +1199,7 @@ namespace Steadsoft.Novus.Parser.Classes
             return true;
 
         }
-        private bool TryParseFieldDeclaration(Token Prior, out DclFieldStatement Stmt, DclTypeStatement Parent, out string DiagMsg)
+        private bool TryParseFieldDeclaration(Token Prior, out DclFieldStatement Stmt, TypeDeclaration Parent, out string DiagMsg)
         {
             Stmt = null;
             DiagMsg = string.Empty;
@@ -1225,7 +1227,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             return true;
         }
-        private bool TryParseParameterList(Token Prior, ref DclMethodStatement Stmt, out string DiagMsg)
+        private bool TryParseParameterList(Token Prior, ref MethodDeclaration Stmt, out string DiagMsg)
         {
             DiagMsg = string.Empty;
 
@@ -1296,9 +1298,9 @@ namespace Steadsoft.Novus.Parser.Classes
             return true;
 
         }
-        private bool TryParseMethodBody(Token Prior, DclMethodStatement Stmt, out string DiagMsg)
+        private bool TryParseMethodBody(Token Prior, MethodDeclaration Stmt, out string DiagMsg)
         {
-            var method = (DclMethodStatement)(Stmt);
+            var method = (MethodDeclaration)(Stmt);
 
             DiagMsg = string.Empty;
 
@@ -1312,7 +1314,7 @@ namespace Steadsoft.Novus.Parser.Classes
 
             TokenSource.SkipToNext("}");
 
-            ((DclMethodStatement)Stmt).AddBody(new BlockStatement(Prior.LineNumber, Prior.ColNumber));
+            ((MethodDeclaration)Stmt).AddBody(new BlockStatement(Prior.LineNumber, Prior.ColNumber));
 
             return true;
         }
@@ -1331,9 +1333,9 @@ namespace Steadsoft.Novus.Parser.Classes
         {
             string containerName = "";
 
-            if (Stmt is DclTypeStatement)
+            if (Stmt is TypeDeclaration)
             {
-                var stmt = (DclTypeStatement)(Stmt);
+                var stmt = (TypeDeclaration)(Stmt);
 
                 if (stmt.TypeKind != IsNotAKeyword)
                     containerName = stmt.TypeKind.ToString();

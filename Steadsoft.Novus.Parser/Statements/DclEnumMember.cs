@@ -7,15 +7,15 @@ namespace Steadsoft.Novus.Parser.Statements
     /// Represents the declaration of an enum member within an enum.
     /// </summary>
 
-    public class DclEnumMemberStatement : DclStatement
+    public class DclEnumMember : DclStatement
     {
-        public DclTypeStatement Parent { get; private set; }
+        public TypeDeclaration Parent { get; private set; }
         public override string DecoratedName { get => DeclaredName; }
         public override string Qualifier { get => null; }
 
         public override string LiteralDecoratedName => throw new System.NotImplementedException();
 
-        public DclEnumMemberStatement(int Line, int Col, string Name, DclTypeStatement Parent) : base(Line, Col, Name, "member")
+        public DclEnumMember(int Line, int Col, string Name, TypeDeclaration Parent) : base(Line, Col, Name, "member")
         {
             this.Parent = Parent;
         }

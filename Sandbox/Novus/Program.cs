@@ -88,7 +88,7 @@ namespace Sandbox
             messages.Add(Args);
         }
 
-        private static void DumpParseTree(DclNamespaceStatement Root)
+        private static void DumpParseTree(NamespaceDeclaration Root)
         {
             Console.WriteLine("DUMP OF PARSE TREE FOLLOWS:");
             Console.WriteLine();
