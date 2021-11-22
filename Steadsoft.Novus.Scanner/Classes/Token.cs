@@ -7,6 +7,7 @@ namespace Steadsoft.Novus.Scanner.Classes
     [DebuggerDisplay("{TokenType} {Lexeme} {Keyword}")]
     public class Token
     {
+        public int TokenId { get; private set; }
         private static List<string> keywords;
         public TokenType TokenType { get; private set; }
         public string Lexeme { get; private set; }
@@ -18,12 +19,13 @@ namespace Steadsoft.Novus.Scanner.Classes
         {
             keywords = System.Enum.GetNames(typeof(Keywords)).ToList().Select(k => k.ToLower()).ToList();
         }
-        public Token(TokenType TokenType, string Lexeme, int LineNumber, int ColNumber)
+        internal Token(TokenType TokenType, string Lexeme, int LineNumber, int ColNumber, int TokenId)
         {
             this.TokenType = TokenType;
             this.Lexeme = Lexeme;
             this.LineNumber = LineNumber;
             this.ColNumber = ColNumber;
+            this.TokenId = TokenId;
 
             Keywords keyword;
             Operators operater;

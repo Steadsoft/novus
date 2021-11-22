@@ -140,7 +140,7 @@ namespace Steadsoft.Novus.Scanner.Classes
                         // since we are parsing a generic arglist though
                         // we will treat this as two tokens, a > followed by a >
 
-                        var simulated_token = new Token(TokenType.Greater, ">", token.LineNumber, token.ColNumber + 1);
+                        var simulated_token = tokenizer.CreateToken(TokenType.Greater, ">", token.LineNumber, token.ColNumber + 1);
 
                         PushToken(simulated_token);
 
@@ -188,7 +188,7 @@ namespace Steadsoft.Novus.Scanner.Classes
                     return token;
             }
 
-            return new Token(NoMoreTokens, "", 0, 0);
+            return tokenizer.CreateToken(NoMoreTokens, "", 0, 0);
 
         }
 

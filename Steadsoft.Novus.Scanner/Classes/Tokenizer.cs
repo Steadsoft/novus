@@ -30,6 +30,7 @@ namespace Steadsoft.Novus.Scanner.Classes
         internal Entry[,] Map = new Entry[64, 64];
         private SourceFile source;
         private int I; // used to index character stream.
+        private int TokenCount = 0;
         /// <summary>
         /// Creates a new instance of a tokenizer and initialises its state machine
         /// from the CSV file that you supply.
@@ -182,14 +183,14 @@ namespace Steadsoft.Novus.Scanner.Classes
                     case Step.AppendReturn:
                         {
                             lexeme.Append(character.Char);
-                            yield return new Token(tuple.TokenType, lexeme.ToString(), start_line, start_col);
+                            yield return CreateToken(tuple.TokenType, lexeme.ToString(), start_line, start_col);
                             lexeme.Clear();
                             break;
                         }
                     case Step.RewindReturn:
                         {
                             I--;
-                            yield return new Token(tuple.TokenType, lexeme.ToString(), start_line, start_col);
+                            yield return CreateToken(tuple.TokenType, lexeme.ToString(), start_line, start_col);
                             lexeme.Clear();
                             break;
                         }
@@ -199,7 +200,7 @@ namespace Steadsoft.Novus.Scanner.Classes
                         }
                     case Step.DiscardReturn:
                         {
-                            yield return new Token(tuple.TokenType, lexeme.ToString(), start_line, start_col);
+                            yield return CreateToken(tuple.TokenType, lexeme.ToString(), start_line, start_col);
                             lexeme.Clear();
                             break;
                         }
@@ -209,6 +210,10 @@ namespace Steadsoft.Novus.Scanner.Classes
 
                 state = tuple.State; // set our state to whatever the handlder told us.
             }
+        }
+        public Token CreateToken(TokenType TokenType, string Lexeme, int Line, int Col)
+        {
+            return new Token(TokenType, Lexeme, Line, Col, TokenCount++);
         }
     }
 } 
