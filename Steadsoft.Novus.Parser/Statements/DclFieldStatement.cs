@@ -8,7 +8,7 @@ namespace Steadsoft.Novus.Parser.Statements
     /// </summary>
     public class DclFieldStatement : DclStatement
     {
-        public TypeDeclaration Parent { get; private set; }
+        public TypeNode Parent { get; private set; }
         public string TypeName { get; private set; }
 
         public override string DecoratedName => DeclaredName;
@@ -17,7 +17,7 @@ namespace Steadsoft.Novus.Parser.Statements
 
         public override string LiteralDecoratedName => throw new System.NotImplementedException();
 
-        public DclFieldStatement(int Line, int Col, string Name, string TypeName, TypeDeclaration Parent) : base(Line, Col, Name, "field")
+        public DclFieldStatement(int Line, int Col, string Name, string TypeName, TypeNode Parent) : base(Line, Col, Name, "field")
         {
             this.TypeName = TypeName;
             this.Parent = Parent;

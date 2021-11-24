@@ -9,13 +9,13 @@ namespace Steadsoft.Novus.Parser.Statements
 
     public class DclEnumMember : DclStatement
     {
-        public TypeDeclaration Parent { get; private set; }
+        public TypeNode Parent { get; private set; }
         public override string DecoratedName { get => DeclaredName; }
         public override string Qualifier { get => null; }
 
         public override string LiteralDecoratedName => throw new System.NotImplementedException();
 
-        public DclEnumMember(int Line, int Col, string Name, TypeDeclaration Parent) : base(Line, Col, Name, "member")
+        public DclEnumMember(int Line, int Col, string Name, TypeNode Parent) : base(Line, Col, Name, "member")
         {
             this.Parent = Parent;
         }

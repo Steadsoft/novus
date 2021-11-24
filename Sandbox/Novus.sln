@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Steadsoft.Novus.Parser", ".
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Steadsoft.Novus.Scanner", "..\Steadsoft.Novus.Scanner\Steadsoft.Novus.Scanner.csproj", "{39E0C2EC-1CE5-4D50-BA9A-D58DC257F011}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTesting", "UnitTesting\UnitTesting.csproj", "{582554C5-ADBD-4A41-AEF2-120E652BF1B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTesting", "UnitTesting\UnitTesting.csproj", "{582554C5-ADBD-4A41-AEF2-120E652BF1B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Steadsoft.Novus.EnhancedParser", "Steadsoft.Novus.EnhancedParser\Steadsoft.Novus.EnhancedParser.csproj", "{AA600649-B03A-4166-A67A-C2884A6532A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{582554C5-ADBD-4A41-AEF2-120E652BF1B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{582554C5-ADBD-4A41-AEF2-120E652BF1B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{582554C5-ADBD-4A41-AEF2-120E652BF1B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA600649-B03A-4166-A67A-C2884A6532A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA600649-B03A-4166-A67A-C2884A6532A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA600649-B03A-4166-A67A-C2884A6532A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA600649-B03A-4166-A67A-C2884A6532A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

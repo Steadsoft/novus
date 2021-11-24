@@ -73,19 +73,19 @@ namespace UnitTesting
 
             Assert.IsTrue(root.Children.Count == 7);
 
-            Assert.IsTrue(root.Children[0] is NamespaceDeclaration);
-                Assert.IsTrue(((NamespaceDeclaration)(root.Children[0])).Children.Count == 1);
+            Assert.IsTrue(root.Children[0] is NamespaceNode);
+                Assert.IsTrue(((NamespaceNode)(root.Children[0])).Children.Count == 1);
 
-            Assert.IsTrue(root.Children[1] is NamespaceDeclaration);
-                Assert.IsTrue(((NamespaceDeclaration)(root.Children[1])).Children.Count == 1);
+            Assert.IsTrue(root.Children[1] is NamespaceNode);
+                Assert.IsTrue(((NamespaceNode)(root.Children[1])).Children.Count == 1);
 
-            Assert.IsTrue(root.Children[2] is NamespaceDeclaration);
-            Assert.IsTrue(root.Children[3] is NamespaceDeclaration);
-            Assert.IsTrue(root.Children[4] is TypeDeclaration);
-            Assert.IsTrue(root.Children[5] is TypeDeclaration);
+            Assert.IsTrue(root.Children[2] is NamespaceNode);
+            Assert.IsTrue(root.Children[3] is NamespaceNode);
+            Assert.IsTrue(root.Children[4] is TypeNode);
+            Assert.IsTrue(root.Children[5] is TypeNode);
 
-            Assert.IsTrue(root.Children[6] is TypeDeclaration);
-                Assert.IsTrue(((TypeDeclaration)(root.Children[6])).Block.Children.Count == 1);
+            Assert.IsTrue(root.Children[6] is TypeNode);
+                Assert.IsTrue(((TypeNode)(root.Children[6])).Children.Count == 1);
         }
     }
 }

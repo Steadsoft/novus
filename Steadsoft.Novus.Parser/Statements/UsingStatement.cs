@@ -3,7 +3,7 @@
 namespace Steadsoft.Novus.Parser.Statements
 {
 
-    public class UsingStatement : Statement, IContainer
+    public class UsingStatement : Statement //, IContainer
     {
         public string Name { get; private set; }
 
