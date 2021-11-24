@@ -30,9 +30,7 @@
         Goto,
         Call,
         Return,
-        /// <summary>
-        /// TODO Conditional return statement, syntx not yet defined.
-        /// </summary>
-        Returnon
+        // This can be used as part of 'return' and in other areas.
+        When
     }
 }

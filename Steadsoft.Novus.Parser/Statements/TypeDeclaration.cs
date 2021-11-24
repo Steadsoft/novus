@@ -9,7 +9,7 @@ namespace Steadsoft.Novus.Parser.Statements
     /// <summary>
     /// Represents the declaration of a type like a class, struct, record or singlet
     /// </summary>
-    public class TypeDeclaration : DclStatement, IBlockContainer, IContainer
+    public class TypeDeclaration : DclStatement, IContainer
     {
         public GenericName GenericName { get; set; }
         public BlockStatement Block { get; private set; }

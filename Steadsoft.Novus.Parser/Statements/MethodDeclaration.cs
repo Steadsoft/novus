@@ -9,7 +9,7 @@ namespace Steadsoft.Novus.Parser.Statements
     /// <summary>
     /// Represents the declaration of a method or function within a type.
     /// </summary>
-    public class MethodDeclaration : DclStatement, IBlockContainer
+    public class MethodDeclaration : DclStatement, IContainer
     {
         public GenericName GenericName { get; set; }
         public TypeDeclaration Parent { get; private set; }
@@ -101,6 +101,11 @@ namespace Steadsoft.Novus.Parser.Statements
         {
             get { return Returns == null ? "Method:  " : "Function:"; }
         }
+
+        IContainer IContainer.Parent => throw new NotImplementedException();
+
+        public List<IContainer> Children => throw new NotImplementedException();
+
         public override string Dump(int nesting)
         {
             StringBuilder builder = new();
@@ -111,6 +116,11 @@ namespace Steadsoft.Novus.Parser.Statements
                 builder.Append(Block.Dump(nesting));
 
             return builder.ToString();
+        }
+
+        public void AddChild(IContainer child)
+        {
+            throw new NotImplementedException();
         }
     }
 }

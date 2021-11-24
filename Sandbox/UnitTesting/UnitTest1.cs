@@ -74,10 +74,10 @@ namespace UnitTesting
             Assert.IsTrue(root.Children.Count == 7);
 
             Assert.IsTrue(root.Children[0] is NamespaceDeclaration);
-                Assert.IsTrue(((NamespaceDeclaration)(root.Children[0])).Block.Children.Count == 1);
+                Assert.IsTrue(((NamespaceDeclaration)(root.Children[0])).Children.Count == 1);
 
             Assert.IsTrue(root.Children[1] is NamespaceDeclaration);
-                Assert.IsTrue(((NamespaceDeclaration)(root.Children[1])).Block.Children.Count == 1);
+                Assert.IsTrue(((NamespaceDeclaration)(root.Children[1])).Children.Count == 1);
 
             Assert.IsTrue(root.Children[2] is NamespaceDeclaration);
             Assert.IsTrue(root.Children[3] is NamespaceDeclaration);

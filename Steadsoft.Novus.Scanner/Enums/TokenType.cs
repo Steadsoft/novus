@@ -9,6 +9,7 @@
         BlockComment,
         Integer,
         Punctuator,
+        Period,
         Symbol,
         PointsTo,
         Equals,

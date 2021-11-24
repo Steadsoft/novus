@@ -182,23 +182,22 @@ namespace Steadsoft.Novus.Parser.Classes
         {
             ReportDuplicateDeclarations(Stmt);
 
-            if (Stmt.Block != null)
-                foreach (var node in Stmt.Block.Children)
+            foreach (var node in Stmt.Children)
+            {
+                switch (node)
                 {
-                    switch (node)
-                    {
-                        case NamespaceDeclaration stmt:
-                            {
-                                AnalyzeNamespace(stmt);
-                                break;
-                            }
-                        case TypeDeclaration stmt:
-                            {
-                                AnalyzeType(stmt);
-                                break;
-                            }
-                    }
+                    case NamespaceDeclaration stmt:
+                        {
+                            AnalyzeNamespace(stmt);
+                            break;
+                        }
+                    case TypeDeclaration stmt:
+                        {
+                            AnalyzeType(stmt);
+                            break;
+                        }
                 }
+            }
         }
         /// <summary>
         /// Analyzes and reports errors that are discovered within the optional keywords that can appear in various types of declarations.
@@ -403,68 +402,108 @@ namespace Steadsoft.Novus.Parser.Classes
 
             }
         }
+
+        private bool TryParseSimpleQualifiedName(out string QualifiedName)
+        {
+            QualifiedName = null;
+
+            StringBuilder qualifiedName = new StringBuilder();
+
+            var token = TokenSource.GetNextToken();
+
+            while (token.TokenType == Identifier)
+            {
+                qualifiedName.Append(token.Lexeme);
+
+                token = TokenSource.GetNextToken();
+
+                if (token.TokenType == Period)
+                {
+                    TokenSource.DiscardNextToken();
+                    qualifiedName.Append('.');
+                    token = TokenSource.PeekNextToken();
+
+                    if (token.TokenType != Identifier)
+                        return false;
+
+                    token = TokenSource.PeekNextToken();
+                }
+            }
+
+            QualifiedName = qualifiedName.ToString();
+
+            return true;
+
+        }
         private bool TryParseNamespace(Token Prior, IContainer Parent, out NamespaceDeclaration Stmt, out string DiagMsg)
         {
             Stmt = null;
             DiagMsg = string.Empty;
 
-            StringBuilder builder = new();
-
             TokenSource.VerifyExpectedToken(Namespace, out var token);
 
-            token = TokenSource.GetNextToken();
+            TryParseSimpleQualifiedName(out var namespacename);
 
-            while (token.TokenType != NoMoreTokens)
+            if (token.TokenType == SemiColon)
             {
-                if (token.TokenType != Identifier)
-                {
-                    DiagMsg = $"Unexpected token {token.Lexeme}";
-                    TokenSource.PushToken(token);
-                    return false;
-                }
+                Stmt = new NamespaceDeclaration(Parent, Prior.LineNumber, Prior.ColNumber, namespacename.ToString());
+                return true;
+            }
 
-                builder.Append(token.Lexeme);
+            if (token.TokenType == BraceOpen)
+            {
+                Stmt = new NamespaceDeclaration(Parent, Prior.LineNumber, Prior.ColNumber, namespacename.ToString());
 
                 token = TokenSource.GetNextToken();
 
-                if (token.TokenType == SemiColon)
+                while (token.TokenType != NoMoreTokens && token.TokenType != BraceClose)
                 {
-                    Stmt = new NamespaceDeclaration(Parent, Prior.LineNumber, Prior.ColNumber, builder.ToString());
-                    return true;
-                }
-
-                if (token.TokenType == BraceOpen)
-                {
-                    TokenSource.PushToken(token);
-                    Stmt = new NamespaceDeclaration(Parent, Prior.LineNumber, Prior.ColNumber, builder.ToString());
-                    if (TryParseNamespaceBody(Stmt, out var block, out DiagMsg))
+                    switch (token.Keyword)
                     {
-                        Stmt.AddBlock(block);
+                        case Namespace:
+                            TokenSource.PushToken(token);
+                            if (TryParseNamespace(token, Parent, out var namespaceStatement, out DiagMsg))
+                            {
+                                Parent.AddChild(namespaceStatement);
+                            }
+                            else
+                            {
+                                OnDiagnostic(this, ParsedBad(namespaceStatement, DiagMsg));
+                                TokenSource.SkipToNext(";");
+                            }
+                            token = TokenSource.GetNextToken();
+                            continue;
+
+                        case Type:
+                            TokenSource.PushToken(token);
+                            if (TryParseTypeDeclaration(token, Parent, out var typeStatement, out DiagMsg))
+                            {
+                                Parent.AddChild(typeStatement);
+                            }
+                            else
+                            {
+                                OnDiagnostic(this, ParsedBad(typeStatement, DiagMsg));
+                                TokenSource.SkipToNext("}");
+                            }
+                            token = TokenSource.GetNextToken();
+                            continue;
+
+                        default:
+                            OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, token.LineNumber, token.ColNumber, $"Unexpected token '{token.Lexeme}' found."));
+                            break;
                     }
-
-                    return true;
                 }
 
-
-                if (token.Lexeme == ".")
-                {
-                    builder.Append('.');
-                }
-
-                token = TokenSource.GetNextToken();
-
+                return true;
             }
 
             return false;
         }
-        private bool TryParseNamespaceBody(NamespaceDeclaration Parent, out BlockStatement Block, out string DiagMsg)
+        private void ParseNamespaceBody(NamespaceDeclaration Parent, out string DiagMsg)
         {
-            Block = null;
             DiagMsg = string.Empty;
 
             TokenSource.VerifyExpectedToken(BraceOpen, out var token);
-
-            Block = new BlockStatement(token.LineNumber, token.ColNumber);
 
             token = TokenSource.GetNextToken();
 
@@ -477,7 +516,6 @@ namespace Steadsoft.Novus.Parser.Classes
                         if (TryParseNamespace(token, Parent, out var namespaceStatement, out DiagMsg))
                         {
                             Parent.AddChild(namespaceStatement);
-                            //Block.AddChild(namespaceStatement);
                         }
                         else
                         {
@@ -492,7 +530,6 @@ namespace Steadsoft.Novus.Parser.Classes
                         if (TryParseTypeDeclaration(token, Parent, out var typeStatement, out DiagMsg))
                         {
                             Parent.AddChild(typeStatement);
-                            //Block.AddChild(typeStatement);
                         }
                         else
                         {
@@ -507,9 +544,6 @@ namespace Steadsoft.Novus.Parser.Classes
                         break;
                 }
             }
-
-            return true;
-
         }
         /// <summary>
         /// Tries tp arse a name that is an identifier possibly followed by a generic argument list.
@@ -1329,43 +1363,49 @@ namespace Steadsoft.Novus.Parser.Classes
         /// Statements that can contain declarations are namespaces and types.
         /// </remarks>
         /// <param name="Stmt">A statement that can contain declarations.</param>
-        private void ReportDuplicateDeclarations(IBlockContainer Stmt)
+        private void ReportDuplicateDeclarations(IContainer Stmt)
         {
             string containerName = "";
 
-            if (Stmt is TypeDeclaration)
-            {
-                var stmt = (TypeDeclaration)(Stmt);
+            //if (Stmt is TypeDeclaration)
+            //{
+            //    var stmt = (TypeDeclaration)(Stmt);
 
-                if (stmt.TypeKind != IsNotAKeyword)
-                    containerName = stmt.TypeKind.ToString();
-                else
-                    containerName = Stmt.ShortStatementTypeName;
-            }
-            else
-            {
-                containerName = Stmt.ShortStatementTypeName;
-            }
+            //    if (stmt.TypeKind != IsNotAKeyword)
+            //        containerName = stmt.TypeKind.ToString();
+            //    else
+            //        containerName = Stmt.ShortStatementTypeName;
+            //}
+            //else
+            //{
+            //    containerName = Stmt.ShortStatementTypeName;
+            //}
 
-            var dupeDeclarations = Stmt.Block.Children.
-                Where(c => c is DclStatement).
-                Cast<DclStatement>().
-                GroupBy(dcl => dcl.DecoratedName).
-                Where(dcl => dcl.Count() > 1);
 
-            foreach (var declaration in dupeDeclarations)
-            {
-                var firstuse = declaration.OrderBy(ns => ns.Line).Take(1).First();  // the original, legally declared instance of the name.
-                var duplicates = declaration.OrderBy(ns => ns.Line).Skip(1); // all the subsequent illegal declarations of the same name.
 
-                foreach (var duplicate in duplicates)
-                {
-                    if (duplicate.ShortStatementTypeName == "method")
-                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortStatementTypeName} name '{duplicate.LiteralDecoratedName}' within {containerName} '{Stmt.DeclaredName}', there is already a defintion within this scope, of a {firstuse.ShortStatementTypeName} with this name and signature at line {firstuse.Line}."));
-                    else
-                        OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid {duplicate.ShortStatementTypeName} name '{duplicate.LiteralDecoratedName}' within {containerName} '{Stmt.DeclaredName}', there is already a defintion within this scope, of a {firstuse.ShortStatementTypeName} with this name at line {firstuse.Line}."));
-                }
-            }
+
+
+
+
+            //var dupeDeclarations = Stmt.Children.
+            //    Where(c => c is DclStatement).
+            //    Cast<DclStatement>().
+            //    GroupBy(dcl => dcl.DecoratedName).
+            //    Where(dcl => dcl.Count() > 1);
+
+            //foreach (var declaration in dupeDeclarations)
+            //{
+            //    var firstuse = declaration.OrderBy(ns => ns.Line).Take(1).First();  // the original, legally declared instance of the name.
+            //    var duplicates = declaration.OrderBy(ns => ns.Line).Skip(1); // all the subsequent illegal declarations of the same name.
+
+            //    foreach (var duplicate in duplicates)
+            //    {
+            //        if (duplicate.ShortStatementTypeName == "method")
+            //            OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid duplicate declaration of '{duplicate.LiteralDecoratedName}' within {containerName} '{Stmt.DeclaredName}', there is already a defintion within this scope, of a {firstuse.ShortStatementTypeName} with this name and signature at line {firstuse.Line}."));
+            //        else
+            //            OnDiagnostic(this, new DiagnosticEventArgs(Severity.Error, duplicate.Line, duplicate.Col, $"Invalid duplicate declaration of '{duplicate.LiteralDecoratedName}' within {containerName} '{Stmt.DeclaredName}', there is already a defintion within this scope, of a {firstuse.ShortStatementTypeName} with this name at line {firstuse.Line}."));
+            //    }
+            //}
         }
     }
 }

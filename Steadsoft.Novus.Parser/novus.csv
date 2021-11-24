@@ -18,7 +18,7 @@ INITIAL         '='     AppendContinue  EQUALS          Undecided
 INITIAL         '>'     AppendContinue  GREATER         Undecided 
 INITIAL         '<'     AppendContinue  LESSER          Undecided 
 INITIAL         '"'     DiscardContinue QUOTATION       Undecided 
-
+INITIAL         '.'     AppendReturn    INITIAL         Period
 PREPROC         Alpha   AppendContinue  PREPROC2        Undecided
 PREPROC         Any     RewindReturn    INITIAL         Preprocessor
 
