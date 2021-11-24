@@ -75,17 +75,20 @@ namespace Steadsoft.Novus.Parser.Classes
 
             return p;
         }
-        public bool TrySyntaxPhase(out NamespaceDeclaration Tree)
+        /// <summary>
+        /// Creates an empty global namespace and then populates it with parsed constructs as it consumes the source code.
+        /// </summary>
+        /// <param name="Global"></param>
+        /// <returns>A possibly empty namespace node.</returns>
+        public bool TrySyntaxPhase(out NamespaceDeclaration Global)
         {
             int errors = 0;
-
-            Tree = null;
 
             string message;
 
             // Create an imaginary global namespace:
 
-            NamespaceDeclaration global = new NamespaceDeclaration(null, 0, 0, "@global");
+            Global = new NamespaceDeclaration(null, 0, 0, "@global");
 
             var token = TokenSource.PeekNextToken();
 
@@ -97,17 +100,12 @@ namespace Steadsoft.Novus.Parser.Classes
 
             while (token.TokenType != NoMoreTokens)
             {
-                if (Tree == null)
-                {
-                    Tree = global; // new BlockStatement(token.LineNumber, token.ColNumber);
-                }
-
                 switch (token.Keyword)
                 {
                     case Using:
-                        if (TryParseUsing(token, global, out var usingStatement, out message))
+                        if (TryParseUsing(token, Global, out var usingStatement, out message))
                         {
-                            Tree.AddChild(usingStatement);
+                            Global.AddChild(usingStatement);
                         }
                         else
                         {
@@ -118,9 +116,9 @@ namespace Steadsoft.Novus.Parser.Classes
                         break;
 
                     case Namespace:
-                        if (TryParseNamespace(token, global, out var namespaceStatement, out message)) // no parent for the outermost namespace
+                        if (TryParseNamespace(token, Global, out var namespaceStatement, out message)) // no parent for the outermost namespace
                         {
-                            Tree.AddChild(namespaceStatement);
+                            Global.AddChild(namespaceStatement);
                         }
                         else
                         {
@@ -131,9 +129,9 @@ namespace Steadsoft.Novus.Parser.Classes
                         break;
 
                     case Type:
-                        if (TryParseTypeDeclaration(token, global, out var typeStatement, out message))
+                        if (TryParseTypeDeclaration(token, Global, out var typeStatement, out message))
                         {
-                            Tree.AddChild(typeStatement);
+                            Global.AddChild(typeStatement);
                         }
                         else
                         {
@@ -411,29 +409,33 @@ namespace Steadsoft.Novus.Parser.Classes
 
             var token = TokenSource.GetNextToken();
 
-            while (token.TokenType == Identifier)
+            while (true)
             {
-                qualifiedName.Append(token.Lexeme);
+                if (token.TokenType == Identifier)
+                {
+                    qualifiedName.Append(token.Lexeme);
+                }
+                else
+                {
+                    return false;
+                }
 
-                token = TokenSource.GetNextToken();
+                token = TokenSource.PeekNextToken();
+
+                if (token.TokenType == SemiColon || token.TokenType == BraceOpen)
+                {
+                    QualifiedName = qualifiedName.ToString();
+                    return true;
+                }
 
                 if (token.TokenType == Period)
                 {
                     TokenSource.DiscardNextToken();
                     qualifiedName.Append('.');
-                    token = TokenSource.PeekNextToken();
-
-                    if (token.TokenType != Identifier)
-                        return false;
-
-                    token = TokenSource.PeekNextToken();
                 }
+
+                token = TokenSource.GetNextToken();
             }
-
-            QualifiedName = qualifiedName.ToString();
-
-            return true;
-
         }
         private bool TryParseNamespace(Token Prior, IContainer Parent, out NamespaceDeclaration Stmt, out string DiagMsg)
         {
@@ -443,6 +445,8 @@ namespace Steadsoft.Novus.Parser.Classes
             TokenSource.VerifyExpectedToken(Namespace, out var token);
 
             TryParseSimpleQualifiedName(out var namespacename);
+
+            token = TokenSource.GetNextToken();
 
             if (token.TokenType == SemiColon)
             {
@@ -462,9 +466,9 @@ namespace Steadsoft.Novus.Parser.Classes
                     {
                         case Namespace:
                             TokenSource.PushToken(token);
-                            if (TryParseNamespace(token, Parent, out var namespaceStatement, out DiagMsg))
+                            if (TryParseNamespace(token, Stmt, out var namespaceStatement, out DiagMsg))
                             {
-                                Parent.AddChild(namespaceStatement);
+                                Stmt.AddChild(namespaceStatement);
                             }
                             else
                             {
@@ -476,9 +480,9 @@ namespace Steadsoft.Novus.Parser.Classes
 
                         case Type:
                             TokenSource.PushToken(token);
-                            if (TryParseTypeDeclaration(token, Parent, out var typeStatement, out DiagMsg))
+                            if (TryParseTypeDeclaration(token, Stmt, out var typeStatement, out DiagMsg))
                             {
-                                Parent.AddChild(typeStatement);
+                                Stmt.AddChild(typeStatement);
                             }
                             else
                             {
