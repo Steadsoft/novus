@@ -1,11 +1,7 @@
 ﻿using Steadsoft.Novus.Scanner.Classes;
 using Steadsoft.Novus.Scanner.Enums;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using static Steadsoft.Novus.Scanner.Enums.TokenType;
 using static Steadsoft.Novus.Scanner.Enums.Keywords;
 
