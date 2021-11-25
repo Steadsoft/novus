@@ -11,7 +11,7 @@ using static Steadsoft.Novus.Scanner.Enums.Keywords;
 
 namespace Steadsoft.Novus.EnhancedParser.Classes
 {
-    public sealed class Parser
+    public sealed partial class Parser
     {
         public static object Empty = new object();
 
@@ -68,7 +68,7 @@ namespace Steadsoft.Novus.EnhancedParser.Classes
 
             while (t.Keyword == Using)
             {
-                if (failed_to_parse_using_directive(out var using_directive))
+                if (failed_to_parse_using_directive(t, out var using_directive))
                 {
                     parsed = false;
                     continue;
@@ -87,7 +87,7 @@ namespace Steadsoft.Novus.EnhancedParser.Classes
                 {
                     case Type:
                         {
-                            if (failed_to_parse_type_declaration(out var type_declaration))
+                            if (failed_to_parse_type_declaration(t, out var type_declaration))
                             {
                                 parsed = false;
                                 continue;
@@ -111,25 +111,6 @@ namespace Steadsoft.Novus.EnhancedParser.Classes
             }
 
             return parsed;
-        }
-
-        private bool failed_to_parse_using_directive(out using_directive? using_directive)
-        {
-            using_directive = null;
-            return worked;
-        }
-
-
-        private bool failed_to_parse_namespace_declaration(Token Token, out namespace_declaration? namespace_declaration)
-        {
-            namespace_declaration = new namespace_declaration(Token);
-            return worked;
-        }
-
-        private bool failed_to_parse_type_declaration(out type_declaration? type_declaration)
-        {
-            type_declaration = null;
-            return worked;
         }
     }
 }
