@@ -1,11 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
 	<LangVersion>10.0</LangVersion>
 	<WarningsAsErrors>CS1717,CA2245</WarningsAsErrors>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Interfaces\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Steadsoft.Novus.Scanner\Steadsoft.Novus.Scanner.csproj" />
+  </ItemGroup>
 
 </Project>
