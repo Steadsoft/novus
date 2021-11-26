@@ -12,7 +12,7 @@
         Period,
         Symbol,
         PointsTo,
-        Equals,
+        Equal,
         Equality,
         Greater,
         ShiftRight,

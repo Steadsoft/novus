@@ -21,6 +21,11 @@ namespace Steadsoft.Novus.EnhancedParser.Classes
 
     public interface namespace_or_type_name { }
 
+    public class qualified_typename
+    {
+        public List<identifier_type_argument_list> fullname { get; internal init; } = new();
+    }
+
     public class identifier_type_argument_list : namespace_or_type_name
     {
         public string identifier { get; internal set; } = null;
@@ -30,13 +35,12 @@ namespace Steadsoft.Novus.EnhancedParser.Classes
     public class qualified_alias_member : namespace_or_type_name
     {
         public string first_part { get; internal set; } = null;
-        public string second_part { get; internal set; } = null;
-        public type_argument_list type_argument_list { get; internal init; } = new();
+        public identifier_type_argument_list identifier_type_argument_list { get; internal set; } = new();
     }
 
     public class type_argument_list
     {
-
+        List<identifier_type_argument_list> args;
     }
 
     public class using_alias_directive : using_directive

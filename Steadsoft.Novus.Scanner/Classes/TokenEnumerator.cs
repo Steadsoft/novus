@@ -71,15 +71,15 @@ namespace Steadsoft.Novus.Scanner.Classes
         /// <summary>
         /// Indicates of the next tokens match the set of supplied token types.
         /// </summary>
-        /// <param name="TokenTypes">One or more token types in lexical order.</param>
+        /// <param name="Tokens">One or more token types in lexical order.</param>
         /// <returns></returns>
-        public bool NextTokensAre(params TokenType[] TokenTypes)
+        public bool NextTokensAre(params TokenType[] Tokens)
         {
-            var list = PeekNextTokens(TokenTypes.Length).ToArray();
+            var list = PeekNextTokens(Tokens.Length).ToArray();
 
-            for (int I = 0; I < TokenTypes.Length; I++)
+            for (int I = 0; I < Tokens.Length; I++)
             {
-                if (TokenTypes[I] != list[I].TokenType)
+                if (Tokens[I] != list[I].TokenType)
                     return false;
             }
 

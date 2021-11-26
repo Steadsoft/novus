@@ -9,6 +9,10 @@
         /// <summary>
         /// Plain text source code.
         /// </summary>
-        Text
+        Text,
+        /// <summary>
+        /// A URL of a page containing source.
+        /// </summary>
+        Web
     }
 }

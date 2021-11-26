@@ -14,11 +14,11 @@
         /// <summary>
         /// =
         /// </summary>
-        Equals = TokenType.Equals,
+        Equals = TokenType.Equal,
         /// <summary>
         /// ==
         /// </summary>
-        Equality = TokenType.Equals,
+        Equality = TokenType.Equal,
         /// <summary>
         /// >>
         /// </summary>
