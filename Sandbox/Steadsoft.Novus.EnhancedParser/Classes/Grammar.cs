@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Steadsoft.Novus.EnhancedParser.Classes
 {
-
     // see: https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/namespaces
 
     // non-terminals that are composed of several alternative sub non-termoianls
@@ -12,10 +11,10 @@ namespace Steadsoft.Novus.EnhancedParser.Classes
     // compilation_unit is an exception because it can never appears on the RHS of any production.
 
 
-    public class compilation_unit
+    public class compilation_unit : namespace_member_declaration
     {
-        public namespace_body namespace_body = new namespace_body();
-        public global_attributes global_attributes = default;
+        public namespace_body namespace_body { get; internal init;} = new namespace_body();
+        public global_attributes global_attributes { get; internal set; } = default;
     }
 
     public interface using_directive { }
@@ -24,15 +23,15 @@ namespace Steadsoft.Novus.EnhancedParser.Classes
 
     public class identifier_type_argument_list : namespace_or_type_name
     {
-        string identifier;
-        type_argument_list type_argument_list = new();
+        public string identifier { get; internal set; } = null;
+        public type_argument_list type_argument_list { get; internal init; } = new();
     }
 
     public class qualified_alias_member : namespace_or_type_name
     {
-        string first_part;
-        string second_part;
-        type_argument_list type_argument_list = new();
+        public string first_part { get; internal set; } = null;
+        public string second_part { get; internal set; } = null;
+        public type_argument_list type_argument_list { get; internal init; } = new();
     }
 
     public class type_argument_list
@@ -42,7 +41,7 @@ namespace Steadsoft.Novus.EnhancedParser.Classes
 
     public class using_alias_directive : using_directive
     {
-        string identifier;
+        public string identifier { get; internal set; } = null;
 
     }
 
@@ -62,14 +61,13 @@ namespace Steadsoft.Novus.EnhancedParser.Classes
 
     public class namespace_declaration : namespace_member_declaration
     {
-        public Token Token { get; private set; }
-        namespace_body namespace_body = new();
-        qualified_identifier name = new();
+        public Token Token { get; internal init; }
+        public namespace_body namespace_body { get; internal init; } = new();
+        public qualified_identifier name { get; internal init; } = new();
 
         public namespace_declaration(Token Token)
         {
             this.Token = Token; // used to record the line etc at which the code element began.
-            namespace_body.namespace_member_declarations.Add(new class_declaration()); // TODO remove, compile test only.
         }
 
         void AddMember(namespace_member_declaration Member)
@@ -79,9 +77,9 @@ namespace Steadsoft.Novus.EnhancedParser.Classes
     }
     public class namespace_body
     {
-        public List<extern_alias_directive> extern_alias_directives = new();
-        public List<using_directive> using_directives = new();
-        public List<namespace_member_declaration> namespace_member_declarations = new();
+        public List<extern_alias_directive> extern_alias_directives { get; internal init; } = new();
+        public List<using_directive> using_directives { get; internal init; } = new();
+        public List<namespace_member_declaration> namespace_member_declarations { get; internal init; } = new();
 
         public void Add(extern_alias_directive extern_alias_directive)
         {

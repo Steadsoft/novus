@@ -11,8 +11,8 @@ namespace Steadsoft.Novus.EnhancedParser.Classes
     {
         public static object Empty = new object();
 
-        public static bool failed = true;
-        public static bool worked = false;
+        public const bool failed = true;
+        public const bool worked = false;
 
         private Tokenizer<Keywords> tokenizer;
         private TokenEnumerator source;
@@ -83,7 +83,7 @@ namespace Steadsoft.Novus.EnhancedParser.Classes
                 {
                     case Type:
                         {
-                            if (failed_to_parse_type_declaration(t, out var type_declaration))
+                            if (failed_to_parse_type_declaration(t, compilation_unit, out var type_declaration))
                             {
                                 parsed = false;
                                 continue;
@@ -93,7 +93,7 @@ namespace Steadsoft.Novus.EnhancedParser.Classes
                         }
                     case Namespace:
                         {
-                            if (failed_to_parse_namespace_declaration(t, out var namespace_declaration))
+                            if (failed_to_parse_namespace_declaration(t, compilation_unit, out var namespace_declaration))
                             {
                                 parsed = false;
                                 continue;
