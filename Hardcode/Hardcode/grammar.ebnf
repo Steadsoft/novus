@@ -1,0 +1,82 @@
+﻿/* https://bnfplayground.pauliankline.com/ */
+
+<DCL> ::= " dcl " | " declare "
+<ARG> ::= " arg " | "argument "
+<PROC> ::= " proc " | " procedure "
+<FUNC> ::= " func " | " function "
+<BIN>  ::= " bin " | " binary "
+<DEC> ::= " dec " | "decimal "
+<STRING> ::= " string "
+<STATIC> ::= " static "
+<BASED> ::= " based "
+<CALL> ::= " call "
+<GOTO> ::= " goto " | " go to "
+<RETURN> ::= " return " 
+<RETURNTO> ::= " return to "
+<IF> ::= " if "
+<THEN> ::= " then "
+<ELSE> ::= " else "
+<FIXED> ::= " fixed "
+<FLOAT> ::= " float "
+<VAR> ::= " varying "
+<DEF> ::= " defined "
+<LOOP> ::= " loop "
+<WHILE> ::= " while "
+<UNTIL> ::= " until "
+<TO> ::= " to "
+<BY> ::= " by "
+<REPEAT> ::= " repeat "
+<POINTER> ::= " pointer "
+<compilation_unit> ::= <stmt>+
+<stmt> ::= <dcl_stmt> | <def_stmt>  
+<dcl_stmt> ::= <DCL> <identifier> <array_specifier>? <reqd_dcl_attribs> <optional_dcl_attribs>* ";"
+<arg_stmt> ::= <ARG> <identifier> <array_specifier>? <reqd_dcl_attribs> <optional_dcl_attribs>* ";"
+<identifier> ::= [a-z]+ " "
+
+/* <reference> ::= <identifier> (("." <identifier>)* | ("." <identifier> "(" <expression> ")")*) */
+
+<reference> ::= <locator_qualifier>? <basic_reference> <arglist>?
+<locator_qualifier> ::= <reference> "->" 
+<arglist> ::= "(" <expression> ("," <expression>)* ")"
+<basic_reference> ::= (<structure_qualification_list>)? <identifier>
+<structure_qualification> ::= <identifier> (<arglist>)* "."
+<structure_qualification_list> ::= <structure_qualification> (<structure_qualification>)*
+<subscript> ::= <expression>
+<unsubscripted_reference> ::= (<unsubscripted_reference> ".")? <identifier>
+
+<def_stmt> ::= ( <PROC> | <FUNC> ) <identifier> <arglist>? <reqd_dcl_attribs>? <block>
+/* <arglist> ::= "(" <identifier> ( "," <identifier>)* ")" */
+<array_specifier> ::= "(" <integers> ( "," <integers>)* ")"
+<integers> ::= [0-9]+  
+<reqd_dcl_attribs> ::= <numeric> | (<string> <VAR>?) | <POINTER>
+<optional_dcl_attribs> ::= <STATIC> | <based> | <defined>
+<defined> ::= (<DEF> ("(" <identifier> ")") )
+<based> ::= (<BASED> ("(" <identifier> ")")? )
+<numeric> ::= (<base> <scale>?) | (<scale> <base>?)
+<binary> ::= <BIN> (<FIXED> | <FLOAT>)?
+<decimal> ::= <DEC> (<FIXED> | <FLOAT>)?
+<base> ::= <BIN> | <DEC>
+<scale> ::= <FIXED> | <FLOAT>
+<string> ::= <STRING> "(" <integers> ")"
+<block> ::= "{" <arg_stmt>* <dcl_stmt>* <exe_stmt>* "}"
+<exe_stmt> ::= (<assignment> | <keyword_stmt>) ";"
+<assignment> ::= <reference> " = " <expression> 
+<keyword_stmt> ::= <call_stmt> | <goto_stmt> | <return_stmt> | <if_stmt> | <loop_stmt>
+
+/* executable statements */
+<call_stmt> ::= <CALL> <reference> <arglist>?
+<goto_stmt> ::= <GOTO> <reference> ( "(" (<integers> | <reference>) ")" )?
+<return_stmt> ::= <RETURN> | (<RETURN> "(" <expression> ")")
+<if_stmt> ::= <IF> <expression> <THEN> (<block> | <exe_stmt>) (<ELSE> (<block> | <exe_stmt>) )?
+<loop_stmt> ::= <LOOP> (<iterate>? | <repeat>?) ((<while>? <until>?) | (<until>? <while>?))? <block> 
+<while> ::= <WHILE> "(" <expression> ")"
+<until> ::= <UNTIL> "(" <expression> ")" 
+<iterate> ::= <reference> "=" <expression> <TO> <expression> (<BY> <expression>)?
+<repeat> ::= <reference> "=" <expression> <REPEAT> "(" <expression> ")"
+
+/* expressions */
+<expression> ::= <identifier> | <integers>
+
+
+
+
