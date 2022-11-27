@@ -7,4 +7,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Steadsoft.Novus.Scanner\Steadsoft.Novus.Scanner.csproj" />
+  </ItemGroup>
+
 </Project>
