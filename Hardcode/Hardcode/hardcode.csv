@@ -1,73 +1,73 @@
 ﻿// This is the token defintions for the the Novus language is based on C#
 
 INITIAL  ';'    AppendReturn     INITIAL     SemiColon
-INITIAL, '{',   AppendReturn,    INITIAL,    BraceOpen 
-INITIAL, '}',   AppendReturn,    INITIAL,    BraceClose 
-INITIAL, '[',   AppendReturn,    INITIAL,    BracketOpen 
-INITIAL, ']',   AppendReturn,    INITIAL,    BracketClose 
-INITIAL, '(',   AppendReturn,    INITIAL,    ParenOpen 
-INITIAL, ')',   AppendReturn,    INITIAL,    ParenClose 
-INITIAL, '\'',  AppendContinue,  APOSTROPHE, Undecided 
-INITIAL, '/',   AppendContinue,  SLASH,      Undecided 
-INITIAL, '-',   AppendContinue,  HYPHEN,     Undecided 
-INITIAL, '=',   AppendContinue,  EQUALS,     Undecided 
-INITIAL, '>',   AppendContinue,  GREATER,    Undecided 
-INITIAL, '<',   AppendContinue,  LESSER,     Undecided 
-INITIAL, '"',   AppendContinue,  QUOTATION,  Undecided 
-INITIAL, White, DiscardContinue, INITIAL,    Undecided 
-INITIAL, Alpha, AppendContinue,  IDENTIFIER, Undecided 
-INITIAL, Digit, AppendContinue,  NUMERIC,    Undecided 
-INITIAL, Punct, AppendReturn,    INITIAL,    Punctuator 
-INITIAL, Symbl, AppendReturn,    INITIAL,    Symbol 
+INITIAL  '{'    AppendReturn     INITIAL     BraceOpen 
+INITIAL  '}'    AppendReturn     INITIAL     BraceClose 
+INITIAL  '['    AppendReturn     INITIAL     BracketOpen 
+INITIAL  ']'    AppendReturn     INITIAL     BracketClose 
+INITIAL  '('    AppendReturn     INITIAL     ParenOpen 
+INITIAL  ')'    AppendReturn     INITIAL     ParenClose 
+INITIAL  '\''   AppendContinue   APOSTROPHE  Undecided 
+INITIAL  '/'    AppendContinue   SLASH       Undecided 
+INITIAL  '-'    AppendContinue   HYPHEN      Undecided 
+INITIAL  '='    AppendContinue   EQUALS      Undecided 
+INITIAL  '>'    AppendContinue   GREATER     Undecided 
+INITIAL  '<'    AppendContinue   LESSER      Undecided 
+INITIAL  '"'    AppendContinue   QUOTATION   Undecided 
+INITIAL  White  DiscardContinue  INITIAL     Undecided 
+INITIAL  Alpha  AppendContinue   IDENTIFIER  Undecided 
+INITIAL  Digit  AppendContinue   NUMERIC     Undecided 
+INITIAL  Punct  AppendReturn     INITIAL     Punctuator 
+INITIAL  Symbl  AppendReturn     INITIAL     Symbol 
 
-SLASH, '*',     AppendContinue,  SLASH_STAR,  Undecided
-SLASH, '/',     AppendContinue,  SLASH_SLASH, Undecided 
+SLASH  '*'      AppendContinue   SLASH_STAR   Undecided
+SLASH  '/'      AppendContinue   SLASH_SLASH  Undecided 
 
-SLASH_STAR, '*',  AppendContinue, SLASH_STAR_STAR, Undecided 
-SLASH_STAR, Any,  AppendContinue, SLASH_STAR, Undecided 
+SLASH_STAR  '*'   AppendContinue  SLASH_STAR_STAR  Undecided 
+SLASH_STAR  Any   AppendContinue  SLASH_STAR  Undecided 
 
-SLASH_SLASH, '\n',  AppendReturn, INITIAL, LineComment 
-SLASH_SLASH, Any,  AppendContinue, SLASH_SLASH, Undecided 
+SLASH_SLASH  '\n'   AppendReturn  INITIAL  LineComment 
+SLASH_SLASH  Any   AppendContinue  SLASH_SLASH  Undecided 
 
-SLASH_STAR_STAR, '/',  AppendReturn, INITIAL, BlockComment 
-SLASH_STAR_STAR, Any,  AppendContinue, SLASH_STAR_STAR, Undecided 
+SLASH_STAR_STAR  '/'   AppendReturn  INITIAL  BlockComment 
+SLASH_STAR_STAR  Any   AppendContinue  SLASH_STAR_STAR  Undecided 
 
-IDENTIFIER, '_',    AppendContinue, IDENTIFIER, Undecided 
-IDENTIFIER, Alpha,  AppendContinue, IDENTIFIER, Undecided 
-IDENTIFIER, Digit,  AppendContinue, IDENTIFIER, Undecided 
-IDENTIFIER, Any,    RewindReturn, INITIAL, Identifier 
+IDENTIFIER  '_'     AppendContinue  IDENTIFIER  Undecided 
+IDENTIFIER  Alpha   AppendContinue  IDENTIFIER  Undecided 
+IDENTIFIER  Digit   AppendContinue  IDENTIFIER  Undecided 
+IDENTIFIER  Any     RewindReturn  INITIAL  Identifier 
 
-NUMERIC, Digit,  AppendContinue, NUMERIC, Undecided 
-NUMERIC, ',',    AppendContinue, NUMERIC, Undecided
-NUMERIC, '.',    AppendContinue, DECIMAL, Undecided
-NUMERIC, Any,    RewindReturn, INITIAL, Numeric 
+NUMERIC  Digit   AppendContinue  NUMERIC  Undecided 
+NUMERIC  ','     AppendContinue  NUMERIC  Undecided
+NUMERIC  '.'     AppendContinue  DECIMAL  Undecided
+NUMERIC  Any     RewindReturn  INITIAL  Numeric 
 
-DECIMAL, Digit,  AppendContinue, DECIMAL, Undecided 
-DECIMAL, ',',    AppendContinue, DECIMAL, Undecided
-DECIMAL, Any,    RewindReturn, INITIAL, Decimal 
+DECIMAL  Digit   AppendContinue  DECIMAL  Undecided 
+DECIMAL  ','     AppendContinue  DECIMAL  Undecided
+DECIMAL  Any     RewindReturn  INITIAL  Decimal 
 
 
-HYPHEN, '>',  AppendReturn, INITIAL, PointsTo 
-HYPHEN, Any,  RewindReturn, INITIAL, Symbol 
+HYPHEN  '>'   AppendReturn  INITIAL  PointsTo 
+HYPHEN  Any   RewindReturn  INITIAL  Symbol 
 
-EQUALS, '=',  AppendReturn, INITIAL, Equality 
-EQUALS, '>',  AppendReturn, INITIAL, GoesTo
-EQUALS, Any,  RewindReturn, INITIAL, Equals 
+EQUALS  '='   AppendReturn  INITIAL  Equality 
+EQUALS  '>'   AppendReturn  INITIAL  GoesTo
+EQUALS  Any   RewindReturn  INITIAL  Equals 
 
-GREATER, '>',  AppendReturn, INITIAL, ShiftRight 
-GREATER, Any,  RewindReturn, INITIAL, Greater 
+GREATER  '>'   AppendReturn  INITIAL  ShiftRight 
+GREATER  Any   RewindReturn  INITIAL  Greater 
 
-LESSER, '<',  AppendReturn, INITIAL, ShiftLeft 
-LESSER, Any,  RewindReturn, INITIAL, Lesser 
+LESSER  '<'   AppendReturn  INITIAL  ShiftLeft 
+LESSER  Any   RewindReturn  INITIAL  Lesser 
 
-QUOTATION, '"',  AppendReturn, INITIAL, QString 
-QUOTATION, Any,  AppendContinue, QUOTATION, Undecided 
+QUOTATION  '"'   AppendReturn  INITIAL  QString 
+QUOTATION  Any   AppendContinue  QUOTATION  Undecided 
 
-APOSTROPHE, '\'',  AppendReturn, INITIAL, AString 
-APOSTROPHE, Any,  AppendContinue, APOSTROPHE, Undecided 
+APOSTROPHE  '\''   AppendReturn  INITIAL  AString 
+APOSTROPHE  Any   AppendContinue  APOSTROPHE  Undecided 
 
-HYPHEN, '>', AppendReturn, INITIAL, PointsTo
-HYPHEN, Any, AppendContinue, INITIAL, Minus
+HYPHEN  '>'  AppendReturn  INITIAL  PointsTo
+HYPHEN  Any  AppendContinue  INITIAL  Minus
 
 // Novus does not support operators that are both expressions and assignments combined.
 // This means there's no ++ or -- for example.
