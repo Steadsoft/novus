@@ -1,6 +1,6 @@
 ﻿// This is the token defintions for the the Novus language is based on C#
 
-INITIAL, ';',   AppendReturn,    INITIAL,    SemiColon
+INITIAL  ';'    AppendReturn     INITIAL     SemiColon
 INITIAL, '{',   AppendReturn,    INITIAL,    BraceOpen 
 INITIAL, '}',   AppendReturn,    INITIAL,    BraceClose 
 INITIAL, '[',   AppendReturn,    INITIAL,    BracketOpen 
@@ -16,7 +16,7 @@ INITIAL, '<',   AppendContinue,  LESSER,     Undecided
 INITIAL, '"',   AppendContinue,  QUOTATION,  Undecided 
 INITIAL, White, DiscardContinue, INITIAL,    Undecided 
 INITIAL, Alpha, AppendContinue,  IDENTIFIER, Undecided 
-INITIAL, Digit, AppendContinue,  INTEGER,    Undecided 
+INITIAL, Digit, AppendContinue,  NUMERIC,    Undecided 
 INITIAL, Punct, AppendReturn,    INITIAL,    Punctuator 
 INITIAL, Symbl, AppendReturn,    INITIAL,    Symbol 
 
@@ -37,8 +37,15 @@ IDENTIFIER, Alpha,  AppendContinue, IDENTIFIER, Undecided
 IDENTIFIER, Digit,  AppendContinue, IDENTIFIER, Undecided 
 IDENTIFIER, Any,    RewindReturn, INITIAL, Identifier 
 
-INTEGER, Digit,  AppendContinue, INTEGER, Undecided 
-INTEGER, Any,    RewindReturn, INITIAL, Integer 
+NUMERIC, Digit,  AppendContinue, NUMERIC, Undecided 
+NUMERIC, ',',    AppendContinue, NUMERIC, Undecided
+NUMERIC, '.',    AppendContinue, DECIMAL, Undecided
+NUMERIC, Any,    RewindReturn, INITIAL, Numeric 
+
+DECIMAL, Digit,  AppendContinue, DECIMAL, Undecided 
+DECIMAL, ',',    AppendContinue, DECIMAL, Undecided
+DECIMAL, Any,    RewindReturn, INITIAL, Decimal 
+
 
 HYPHEN, '>',  AppendReturn, INITIAL, PointsTo 
 HYPHEN, Any,  RewindReturn, INITIAL, Symbol 

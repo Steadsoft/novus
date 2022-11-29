@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using static Steadsoft.Novus.Scanner.Enums.TokenType;
 using Steadsoft.Novus.Scanner.Enums;
-
+using static System.Enum;
 namespace Steadsoft.Novus.Scanner.Classes
 {
     [DebuggerDisplay("{TokenType} {Lexeme} {Keyword}")]
@@ -28,15 +28,35 @@ namespace Steadsoft.Novus.Scanner.Classes
             Keywords keyword;
             Operators operater;
 
-            if (TokenType == Identifier && System.Enum.TryParse(Lexeme, true, out keyword))
+            //if (TokenType == Identifier && TryParse(Lexeme, true, out keyword))
+            if (TryMatchFullName<Keywords>(Lexeme, (int)Keywords.AbbreviationShift, out keyword))
+            {
                 Keyword = keyword;
+            }
             else
-                Keyword = System.Enum.Parse<Keywords>("0");
+                Keyword = Parse<Keywords>("0");
 
-            if (TokenType != Identifier && System.Enum.TryParse(TokenType.ToString(), true, out operater))
+            if (TokenType != Identifier && TryParse(TokenType.ToString(), true, out operater))
                 Operator = operater;
             else
-                Operator = System.Enum.Parse<Operators>("0");
+                Operator = Parse<Operators>("0");
         }
+
+        private static bool TryMatchFullName<T>(string spelling, int scaler, out T FullValue) where T : struct, Enum
+        {
+            if (System.Enum.TryParse<T>(spelling, true, out FullValue))
+            {
+                int numeric = Convert.ToInt16(FullValue);
+
+                if (Convert.ToInt16(FullValue) > scaler)
+                {
+                    Enum.TryParse((numeric - scaler).ToString(), out FullValue);
+                }
+
+                return true;
+            }
+            return false;
+        }
+
     }
 }
