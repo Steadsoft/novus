@@ -16,6 +16,8 @@
         White = APL_IBEAM + 4,
         Separ = APL_IBEAM + 5,
         Punct = APL_IBEAM + 6,
-        Symbl = APL_IBEAM + 7
+        Symbl = APL_IBEAM + 7,
+        Space = APL_IBEAM + 8,
+        Hex   = APL_IBEAM + 9,
     }
 }

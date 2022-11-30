@@ -1,4 +1,5 @@
 ﻿using Steadsoft.Novus.Scanner.Enums;
+using System.Runtime.CompilerServices;
 
 namespace Steadsoft.Novus.Scanner.Statics
 {
@@ -9,6 +10,12 @@ namespace Steadsoft.Novus.Scanner.Statics
             // For now we use the Unicode defintions for
             // the various charactrer classes but ideally
             // these should be defined as needed by the language.
+
+            if (C == ' ')
+                return LexicalClass.Space;
+
+            if (IsHexDigit(C))
+                return LexicalClass.Hex;
 
             if (char.IsLetter(C))
                 return LexicalClass.Alpha;
@@ -30,5 +37,14 @@ namespace Steadsoft.Novus.Scanner.Statics
 
             return LexicalClass.None;
         }
+
+        private static bool IsHexDigit(Char C)
+        {
+            if (C == 'a' | C == 'b' | C == 'c' | C == 'd' | C == 'e' || C == 'f' | C == 'A' | C == 'B' | C == 'C' | C == 'D' | C == 'E' || C == 'F')
+                return true;
+
+            return false;
+        }
+
     }
 }

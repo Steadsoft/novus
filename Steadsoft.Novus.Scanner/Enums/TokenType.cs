@@ -9,6 +9,7 @@
         BlockComment,
         Numeric,
         Decimal,
+        Hexadecimal,
         Punctuator,
         Symbol,
         PointsTo,

@@ -10,6 +10,9 @@ namespace Hardcode
     {
         static void Main(string[] args)
         {
+            double a = 12_345_678.11;
+            double b = 12_3_45__6_78.11;
+
             List<Token> tokes = new List<Token>();
 
             var source = SourceFile.CreateFromFile(@"..\..\..\tokens_test_01.hcl");

@@ -14,8 +14,11 @@ INITIAL  '='    AppendContinue   EQUALS      Undecided
 INITIAL  '>'    AppendContinue   GREATER     Undecided 
 INITIAL  '<'    AppendContinue   LESSER      Undecided 
 INITIAL  '"'    AppendContinue   QUOTATION   Undecided 
+INITIAL  Space  DiscardContinue  INITIAL     Undecided 
 INITIAL  White  DiscardContinue  INITIAL     Undecided 
+INITIAL  Hex    AppendContinue   HEXADECIMAL(0)  Undecided
 INITIAL  Alpha  AppendContinue   IDENTIFIER  Undecided 
+INITIAL  '_'    AppendContinue   IDENTIFIER  Undecided 
 INITIAL  Digit  AppendContinue   NUMERIC     Undecided 
 INITIAL  Punct  AppendReturn     INITIAL     Punctuator 
 INITIAL  Symbl  AppendReturn     INITIAL     Symbol 
@@ -34,17 +37,41 @@ SLASH_STAR_STAR  Any   AppendContinue  SLASH_STAR_STAR  Undecided
 
 IDENTIFIER  '_'     AppendContinue  IDENTIFIER  Undecided 
 IDENTIFIER  Alpha   AppendContinue  IDENTIFIER  Undecided 
+IDENTIFIER  Hex     AppendContinue  IDENTIFIER  Undecided 
 IDENTIFIER  Digit   AppendContinue  IDENTIFIER  Undecided 
-IDENTIFIER  Any     RewindReturn  INITIAL  Identifier 
+IDENTIFIER  Any     RewindReturn    INITIAL     Identifier 
 
+HEXADECIMAL(0)  Hex   AppendContinue  HEXADECIMAL(0) Undecided
+HEXADECIMAL(0)  Digit AppendContinue  HEXADECIMAL(0) Undecided 
+HEXADECIMAL(0)  '_'   DiscardContinue HEXADECIMAL(0) Undecided 
+HEXADECIMAL(0)  Space   DiscardContinue HEXADECIMAL(1) Undecided 
+HEXADECIMAL(0)  ':'   DiscardContinue HEXADECIMAL(2) Undecided 
+HEXADECIMAL(0)  Alpha AppendContinue  IDENTIFIER     Undecided 
+HEXADECIMAL(0)  Any   RewindReturn    INITIAL        Identifier 
+
+HEXADECIMAL(1)  Hex   AppendContinue  HEXADECIMAL(1) Undecided
+HEXADECIMAL(1)  Digit AppendContinue  HEXADECIMAL(1) Undecided
+HEXADECIMAL(1)  '_'   DiscardContinue HEXADECIMAL(1) Undecided 
+HEXADECIMAL(1)  Space   DiscardContinue HEXADECIMAL(1) Undecided 
+HEXADECIMAL(1)  ':'   DiscardContinue HEXADECIMAL(2) Undecided 
+HEXADECIMAL(1)  Any   RewindReturn    INITIAL        Numeric
+
+HEXADECIMAL(2)  'H'   DiscardReturn    INITIAL        Hexadecimal
+HEXADECIMAL(2)  'h'   DiscardReturn    INITIAL        Hexadecimal
+HEXADECIMAL(2)  Space DiscardContinue  HEXADECIMAL(2) Undecided
+HEXADECIMAL(2)  Any   RewindReturn    INITIAL        Undecided
+
+
+NUMERIC  Hex     AppendContinue  NUMERIC  Undecided 
 NUMERIC  Digit   AppendContinue  NUMERIC  Undecided 
-NUMERIC  ','     AppendContinue  NUMERIC  Undecided
+NUMERIC  Space   AppendContinue  NUMERIC  Undecided 
+NUMERIC  '_'     AppendContinue  NUMERIC  Undecided
 NUMERIC  '.'     AppendContinue  DECIMAL  Undecided
-NUMERIC  Any     RewindReturn  INITIAL  Numeric 
+NUMERIC  Any     RewindReturn    INITIAL  Numeric 
 
 DECIMAL  Digit   AppendContinue  DECIMAL  Undecided 
 DECIMAL  ','     AppendContinue  DECIMAL  Undecided
-DECIMAL  Any     RewindReturn  INITIAL  Decimal 
+DECIMAL  Any     RewindReturn    INITIAL  Decimal 
 
 
 HYPHEN  '>'   AppendReturn  INITIAL  PointsTo 

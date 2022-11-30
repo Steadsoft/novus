@@ -93,8 +93,13 @@ namespace Steadsoft.Novus.Scanner.Classes
 
                 var parts = text.Split(' ', '\t').Select(a => a.Trim()).Where(a => a.Length > 0).ToArray();
 
+                parts[0] = parts[0].Replace('(', '_').TrimEnd(')');
+
                 var curstate = (State)Enum.Parse(typeof(State), parts[0]);
                 var step = (Step)Enum.Parse(typeof(Step), parts[2]);
+
+                parts[3] = parts[3].Replace('(', '_').TrimEnd(')');
+
                 var newstate = (State)Enum.Parse(typeof(State), parts[3]);
                 var token = (TokenType)Enum.Parse(typeof(TokenType), parts[4]);
 

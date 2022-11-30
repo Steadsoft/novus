@@ -1,7 +1,14 @@
 proc aaa
 {
+
+   FAc6 8AB7:H;
+   FA06_8aB7 : H;
+   Fa06W8AB7:H;
+
    1234.56;
-   123,456,976.001;
+   123 456 976.001;
+   123.456:D;
+   a = 123:D;
 }
 
 procedure vbbb
@@ -14,7 +21,7 @@ abc = 2 ;
 
 LOOP
 {
-
+     a = 2 45 987.6 
 }
 
 loop until (a > 100)

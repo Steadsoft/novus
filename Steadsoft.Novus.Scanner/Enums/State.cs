@@ -39,6 +39,10 @@
         QUOTATION,
         APOSTROPHE,
         PREPROC,
-        PREPROC2
+        PREPROC2,
+        HEXADECIMAL_0,
+        HEXADECIMAL_1, 
+        HEXADECIMAL_2, 
+        HEXADECIMAL_3
     }
 }
