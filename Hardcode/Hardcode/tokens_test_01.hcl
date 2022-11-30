@@ -1,11 +1,13 @@
 proc aaa
 {
    1234.56;
+   123,456,976.001;
 }
 
 procedure vbbb
 {
-
+   call initialize (100 123.45 123,456.88 Counter (5 12 MN) ); // ( spacelist )
+   data = array (8) (4) (17) ; // possibility for subscripting arrays by distinct parenthesized subscripts, obligatory for arrays...
 }
 
 abc = 2 ;
@@ -38,7 +40,7 @@ func get_it(X)
 	dcl Y float(bin(256))
 	dcl Z fixed(dec(16))
 	dcl substring builtin;
-	dcl counter fixed(bin(32,4)) unsigned;
+	dcl counter fixed(bin(32 4)) unsigned;
 	dcl tabs bit(16);
 
 	counter = 11011.1101:b;
