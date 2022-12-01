@@ -5,10 +5,16 @@ proc aaa
    FA06_8aB7 : H;
    Fa06W8AB7:H;
 
+   fa56 77a3_33ba:H;
+
+   C234__B556:H;
+
    1234.56;
    123 456 976.001;
    123.456:D;
    a = 123:D;
+
+   var = I4_345_678;
 }
 
 procedure vbbb

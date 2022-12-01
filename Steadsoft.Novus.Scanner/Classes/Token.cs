@@ -14,6 +14,8 @@ namespace Steadsoft.Novus.Scanner.Classes
         public int ColNumber { get; private set; }
         public Keywords Keyword { get; private set; }
         public Operators Operator { get; private set; }
+        public bool IsInvalid { get; set; }
+        public string ErrorText { get;  set; }
         static Token()
         {
             keywords = System.Enum.GetNames(typeof(Keywords)).ToList().Select(k => k.ToLower()).ToList();
@@ -24,6 +26,8 @@ namespace Steadsoft.Novus.Scanner.Classes
             this.Lexeme = Lexeme;
             this.LineNumber = LineNumber;
             this.ColNumber = ColNumber;
+            this.IsInvalid = false;
+            this.ErrorText= string.Empty;
 
             Keywords keyword;
             Operators operater;
