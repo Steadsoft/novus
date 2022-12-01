@@ -21,7 +21,7 @@
         DELIMITER9,
         INITIAL,
         IDENTIFIER,
-        NUMERIC,
+        DIGIT_0,
         DECIMAL,
         SLASH,
         SLASH_SLASH,
@@ -40,9 +40,9 @@
         APOSTROPHE,
         PREPROC,
         PREPROC2,
-        HEXADECIMAL_0,
-        HEXADECIMAL_1, 
-        HEXADECIMAL_2, 
-        HEXADECIMAL_3
+        HEX_0,
+        HEX_1, 
+        HEX_2, 
+        HEX_3
     }
 }
