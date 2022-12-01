@@ -9,7 +9,7 @@ namespace Steadsoft.Novus.Scanner.Classes
     {
         private static List<string> keywords;
         public TokenType TokenType { get; private set; }
-        public string Lexeme { get; private set; }
+        public string Lexeme { get; set; }
         public int LineNumber { get; private set; }
         public int ColNumber { get; private set; }
         public Keywords Keyword { get; private set; }
@@ -33,7 +33,7 @@ namespace Steadsoft.Novus.Scanner.Classes
             Operators operater;
 
             //if (TokenType == Identifier && TryParse(Lexeme, true, out keyword))
-            if (TryMatchFullName<Keywords>(Lexeme, (int)Keywords.AbbreviationShift, out keyword))
+            if (TokenType == Identifier && TryMatchFullName<Keywords>(Lexeme, (int)Keywords.AbbreviationShift, out keyword))
             {
                 Keyword = keyword;
             }

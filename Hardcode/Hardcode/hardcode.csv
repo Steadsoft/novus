@@ -43,23 +43,17 @@ IDENTIFIER  Any     RewindReturn    INITIAL     Identifier
 
 HEXADECIMAL(0)  Hex   AppendContinue  HEXADECIMAL(0) Undecided
 HEXADECIMAL(0)  Digit AppendContinue  HEXADECIMAL(0) Undecided 
-HEXADECIMAL(0)  '_'   AppendContinue HEXADECIMAL(0) Undecided 
-HEXADECIMAL(0)  Space AppendContinue HEXADECIMAL(1) Undecided 
-HEXADECIMAL(0)  ':'   DiscardContinue HEXADECIMAL(2) Undecided 
+HEXADECIMAL(0)  '_'   AppendContinue  HEXADECIMAL(0) Undecided 
+HEXADECIMAL(0)  Space AppendContinue  HEXADECIMAL(0) Undecided 
+HEXADECIMAL(0)  ':'   AppendContinue  HEXADECIMAL(1) Undecided 
 HEXADECIMAL(0)  Alpha AppendContinue  IDENTIFIER     Undecided 
 HEXADECIMAL(0)  Any   RewindReturn    INITIAL        Identifier 
 
-HEXADECIMAL(1)  Hex   AppendContinue  HEXADECIMAL(1) Undecided
-HEXADECIMAL(1)  Digit AppendContinue  HEXADECIMAL(1) Undecided
-HEXADECIMAL(1)  '_'   AppendContinue HEXADECIMAL(1) Undecided 
-HEXADECIMAL(1)  Space AppendContinue HEXADECIMAL(1) Undecided 
-HEXADECIMAL(1)  ':'   DiscardContinue HEXADECIMAL(2) Undecided 
-HEXADECIMAL(1)  Any   RewindReturn    INITIAL        Numeric
 
-HEXADECIMAL(2)  'H'   DiscardReturn    INITIAL        Hexadecimal
-HEXADECIMAL(2)  'h'   DiscardReturn    INITIAL        Hexadecimal
-HEXADECIMAL(2)  Space DiscardContinue  HEXADECIMAL(2) Undecided
-HEXADECIMAL(2)  Any   RewindReturn    INITIAL        Undecided
+HEXADECIMAL(1)  'H'   AppendReturn    INITIAL        Hexadecimal
+HEXADECIMAL(1)  'h'   AppendReturn    INITIAL        Hexadecimal
+HEXADECIMAL(1)  Space AppendContinue  HEXADECIMAL(1) Undecided
+HEXADECIMAL(1)  Any   RewindReturn    INITIAL        Undecided
 
 
 NUMERIC  Hex     AppendContinue  NUMERIC  Undecided 

@@ -51,6 +51,27 @@ namespace Hardcode
                     token.ErrorText = "This literal must not contain repetitions of a separator character.";
                     token.IsInvalid = true;
                 }
+
+                return;
+            }
+
+            if (token.TokenType == TokenType.Numeric)
+            {
+                token.Lexeme = token.Lexeme.Trim();
+
+                if (token.Lexeme.Contains('_') && token.Lexeme.Contains(' '))
+                {
+                    token.ErrorText = "This literal must not contain more than one kind of separator character.";
+                    token.IsInvalid = true;
+                }
+
+                if (token.Lexeme.Contains("  ") || token.Lexeme.Contains("__"))
+                {
+                    token.ErrorText = "This literal must not contain repetitions of a separator character.";
+                    token.IsInvalid = true;
+                }
+
+                return;
             }
         }
     }
