@@ -56,7 +56,7 @@ HEXADECIMAL(1)  Space AppendContinue  HEXADECIMAL(1) Undecided
 HEXADECIMAL(1)  Any   RewindReturn    INITIAL        Undecided
 
 
-NUMERIC  Hex     AppendContinue  NUMERIC  Undecided 
+NUMERIC  Hex     AppendContinue  HEXADECIMAL(0)  Undecided 
 NUMERIC  Digit   AppendContinue  NUMERIC  Undecided 
 NUMERIC  Space   AppendContinue  NUMERIC  Undecided 
 NUMERIC  '_'     AppendContinue  NUMERIC  Undecided

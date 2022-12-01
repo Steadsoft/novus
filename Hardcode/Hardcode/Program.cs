@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Linq;
 using System.Net.Http.Headers;
+using Steadsoft.Novus.Scanner.Statics;
 
 namespace Hardcode
 {
@@ -69,6 +70,17 @@ namespace Hardcode
                 {
                     token.ErrorText = "This literal must not contain repetitions of a separator character.";
                     token.IsInvalid = true;
+                }
+
+                if (token.Lexeme.ContainsAny('a','b','c','d','e','f') || token.Lexeme.ContainsAny('A', 'B', 'C', 'D', 'E', 'F'))
+                {
+                    if (token.Lexeme.EndsWith(":h") || token.Lexeme.EndsWith(":H"))
+                        ;
+                    else
+                    {
+                        token.ErrorText = "A hexadecimal literal must end with the :h or :H type specifier.";
+                        token.IsInvalid = true;
+                    }
                 }
 
                 return;
