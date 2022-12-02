@@ -51,8 +51,8 @@ HEX(0)  ':'   AppendContinue  HEX(1)		Undecided
 HEX(0)  Alpha AppendContinue  IDENTIFIER    Undecided 
 HEX(0)  Any   RewindReturn    INITIAL		Identifier 
 
-HEX(1)  'H'   AppendReturn    INITIAL		Hexadecimal
-HEX(1)  'h'   AppendReturn    INITIAL       Hexadecimal
+HEX(1)  'H'   AppendReturn    INITIAL		Numeric
+HEX(1)  'h'   AppendReturn    INITIAL       Numeric
 HEX(1)  Space AppendContinue  HEX(1)        Undecided
 HEX(1)  Any   RewindReturn    INITIAL       Undecided
 
@@ -71,7 +71,7 @@ DIGIT(0)  Any     RewindReturn    INITIAL	Numeric
 DECPOINT  Digit   AppendContinue  DECPOINT  Undecided 
 DECPOINT  Hex     AppendContinue  DECPOINT  Undecided
 DECPOINT  ':'     AppendContinue  BASECOLON Undecided
-DECPOINT  Any     RewindReturn    INITIAL	Decimal 
+DECPOINT  Any     RewindReturn    INITIAL	Numeric 
 
 // The char was a colon
 
