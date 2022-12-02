@@ -18,5 +18,17 @@ namespace Steadsoft.Novus.Scanner.Statics
 
             return false;
         }
+
+        public static bool EndsWithAny(this string Text, params string[] endings)
+        {
+            foreach(string ending in endings)
+            {
+                if (Text.EndsWith(ending))
+                    return true;
+            }
+
+            return false;
+
+        }
     }
 }

@@ -209,6 +209,90 @@ namespace ScannerUnitTesting
 
         }
 
+        [TestMethod]
+        public void Test_NumericN()
+        {
+            var tokens = CreateEnumerator("F1CE.;");
+
+            var token = tokens.GetNextToken();
+            Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false);
+            Assert.IsTrue(token.Lexeme == "F1CE");
+
+            token = tokens.GetNextToken();
+            Assert.IsTrue(token.TokenType == TokenType.Punctuator);
+
+        }
+
+        [TestMethod]
+        public void Test_NumericO()
+        {
+            var tokens = CreateEnumerator("1FCE;");
+
+            var token = tokens.GetNextToken();
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == true);
+            Assert.IsTrue(token.Lexeme == "1FCE");
+
+            token = tokens.GetNextToken();
+            Assert.IsTrue(token.TokenType == TokenType.SemiColon);
+
+        }
+
+        [TestMethod]
+        public void Test_NumericP()
+        {
+            var tokens = CreateEnumerator("1FCE;");
+
+            var token = tokens.GetNextToken();
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == true);
+            Assert.IsTrue(token.Lexeme == "1FCE");
+
+            token = tokens.GetNextToken();
+            Assert.IsTrue(token.TokenType == TokenType.SemiColon);
+
+        }
+
+        [TestMethod]
+        public void Test_NumericQ()
+        {
+            var tokens = CreateEnumerator("1FCE.5FFB;");
+
+            var token = tokens.GetNextToken();
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == true);
+            Assert.IsTrue(token.Lexeme == "1FCE.5FFB");
+
+            token = tokens.GetNextToken();
+            Assert.IsTrue(token.TokenType == TokenType.SemiColon);
+
+        }
+
+        [TestMethod]
+        public void Test_NumericR()
+        {
+            var tokens = CreateEnumerator("1FCE.5FFB:H;");
+
+            var token = tokens.GetNextToken();
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid ==  false);
+            Assert.IsTrue(token.Lexeme == "1FCE.5FFB:H");
+
+            token = tokens.GetNextToken();
+            Assert.IsTrue(token.TokenType == TokenType.SemiColon);
+
+        }
+
+        [TestMethod]
+        public void Test_NumericS()
+        {
+            var tokens = CreateEnumerator("1FCE.5F.FB:H;");
+
+            var token = tokens.GetNextToken();
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == true);
+            Assert.IsTrue(token.Lexeme == "1FCE.5F");
+
+            token = tokens.GetNextToken();
+            Assert.IsTrue(token.TokenType == TokenType.Punctuator);
+
+        }
+
 
         private TokenEnumerator CreateEnumerator(string Text)
         {
@@ -226,13 +310,19 @@ namespace ScannerUnitTesting
 
                 if (token.Lexeme.Contains('_') && token.Lexeme.Contains(' '))
                 {
-                    token.ErrorText = "This literal must not contain more than one kind of separator character.";
+                    token.ErrorText = "A numeric literal must not contain more than one kind of separator character.";
                     token.IsInvalid = true;
                 }
 
                 if (token.Lexeme.Contains("  ") || token.Lexeme.Contains("__"))
                 {
-                    token.ErrorText = "This literal must not contain repetitions of a separator character.";
+                    token.ErrorText = "A numeric literal must not contain repetitions of a separator character.";
+                    token.IsInvalid = true;
+                }
+
+                if (token.Lexeme.Count(f => (f == '.')) > 1) // the FSM should prevent this, but we'll check this anyway.
+                {
+                    token.ErrorText = "A numeric literal must not contain more than one decimal point.";
                     token.IsInvalid = true;
                 }
 
@@ -270,6 +360,15 @@ namespace ScannerUnitTesting
                     if (token.Lexeme.ToUpper().All("_ 01".Contains) == false)
                     {
                         token.ErrorText = "This binary literal contains one or more invalid characters.";
+                        token.IsInvalid = true;
+                    }
+                }
+
+                if (token.Lexeme.ToUpper().EndsWithAny(":B",":O",":D",":H") == false)
+                {
+                    if (token.Lexeme.All(".0123456789".Contains) == false)
+                    {
+                        token.ErrorText = "This non-decimal literal does not end with a valid base indicator";
                         token.IsInvalid = true;
                     }
                 }
