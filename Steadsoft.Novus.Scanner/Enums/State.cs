@@ -22,7 +22,7 @@
         INITIAL,
         IDENTIFIER,
         DIGIT_0,
-        DECIMAL,
+        DECPOINT,
         SLASH,
         SLASH_SLASH,
         SLASH_STAR,
@@ -43,6 +43,7 @@
         HEX_0,
         HEX_1, 
         HEX_2, 
-        HEX_3
+        HEX_3,
+        BASECOLON
     }
 }
