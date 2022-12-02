@@ -13,8 +13,8 @@ namespace Steadsoft.Novus.Scanner.Classes
         private readonly TokenType[] Skips;
         private readonly Stack<Token> pushed = new();
         private readonly Stack<ParsingHint> hints = new();
-        private readonly Action<Token> augmentor;
-        public TokenEnumerator(Tokenizer<Keywords> Tokenizer, SourceFile SourceFile, Action<Token> Augmentor = null , params TokenType[] Skips)
+        private readonly Action<TokenEnumerator,Token> augmentor;
+        public TokenEnumerator(Tokenizer<Keywords> Tokenizer, SourceFile SourceFile, Action<TokenEnumerator,Token> Augmentor = null , params TokenType[] Skips)
         {
             tokenizer = Tokenizer;
             source = Tokenizer.Tokenize(SourceFile);
@@ -135,7 +135,7 @@ namespace Steadsoft.Novus.Scanner.Classes
         {
             var token = ReadNextToken();
 
-            augmentor(token);
+            augmentor(this,token);
 
             /* TODO We may need to review this because there may be cases where we return from here having pushed a simulated token and then the caller pops the hint, raising the question is that simulated token still meaningful, valid?
             */

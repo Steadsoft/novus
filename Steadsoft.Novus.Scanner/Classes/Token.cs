@@ -8,10 +8,10 @@ namespace Steadsoft.Novus.Scanner.Classes
     public class Token
     {
         private static List<string> keywords;
-        public TokenType TokenType { get; private set; }
+        public TokenType TokenType { get;  set; }
         public string Lexeme { get; set; }
-        public int LineNumber { get; private set; }
-        public int ColNumber { get; private set; }
+        public int LineNumber { get;  set; }
+        public int ColNumber { get;  set; }
         public Keywords Keyword { get; private set; }
         public Operators Operator { get; private set; }
         public bool IsInvalid { get; set; }

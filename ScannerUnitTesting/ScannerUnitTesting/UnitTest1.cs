@@ -293,6 +293,60 @@ namespace ScannerUnitTesting
 
         }
 
+        [TestMethod]
+        public void Test_NumericT()
+        {
+            var tokens = CreateEnumerator("0110 0011 0101 1100:B;");
+
+            var token = tokens.GetNextToken();
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
+            Assert.IsTrue(token.Lexeme == "0110001101011100:B");
+
+            token = tokens.GetNextToken();
+            Assert.IsTrue(token.TokenType == TokenType.SemiColon);
+
+        }
+
+        [TestMethod]
+        public void Test_NumericU()
+        {
+            var tokens = CreateEnumerator("dcb   bcd    bde;");
+
+            var token = tokens.GetNextToken(); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+
+            Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false && token.Lexeme == "dcb");
+
+            token = tokens.GetNextToken();
+
+            Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false && token.Lexeme == "bcd");
+
+            token = tokens.GetNextToken();
+
+            Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false && token.Lexeme == "bde");
+
+            token = tokens.GetNextToken();
+
+            Assert.IsTrue(token.TokenType == TokenType.SemiColon);
+
+        }
+
+        [TestMethod]
+        public void Test_NumericV()
+        {
+            var tokens = CreateEnumerator("dcb bcd bde:h;");
+
+            var token = tokens.GetNextToken(); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "dcbbcdbde:h");
+
+            token = tokens.GetNextToken();
+
+            Assert.IsTrue(token.TokenType == TokenType.SemiColon);
+
+        }
+
+
+
 
         private TokenEnumerator CreateEnumerator(string Text)
         {
@@ -301,8 +355,29 @@ namespace ScannerUnitTesting
             return new TokenEnumerator(tokenizer, source, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
         }
 
-        private static void ValidateToken(Token token)
+        private static void ValidateToken(TokenEnumerator tokens, Token token)
         {
+            if (token.TokenType == TokenType.Identifier && token.Lexeme.Contains(' '))
+            {
+                // The token structure allows spaces inside literals, therefore identifier recognition can 
+                // only terminate when some other terminator character is encountered. If the terminator
+                // does not indicate a numeric (i.e. hex) literal with trailing number base then the entire
+                // concatenation of identifiers is returned. We therefore split that into several new tokens and  
+                // push them onto the enumerator stack. The calling code has no idea and will simply see
+                // several distinct and valid identifiers tokens.
+
+                var idents = token.Lexeme.Split(' ',StringSplitOptions.RemoveEmptyEntries).Reverse(); // we're going to stack these so order is very important
+
+                foreach (var ident in idents)
+                {
+                    tokens.PushToken(new Token(TokenType.Identifier, ident, token.LineNumber,0));
+                }
+
+                var temp = tokens.GetNextToken();
+
+                token.Lexeme = temp.Lexeme;
+                token.TokenType = temp.TokenType;
+            }
 
             if (token.TokenType == TokenType.NumericLiteral)
             {
@@ -330,7 +405,7 @@ namespace ScannerUnitTesting
 
                 if (token.Lexeme.ToUpper().EndsWith(":H"))
                 {
-                    if (token.Lexeme.ToUpper().TrimEnd('H').TrimEnd(':').All(".0123456789ABCDEF".Contains) == false)
+                    if (StripBaseIndicator(token.Lexeme,'H').All(".0123456789ABCDEF".Contains) == false)
                     {
                         token.ErrorText = "This hexadecimal literal contains one or more invalid characters.";
                         token.IsInvalid = true;
@@ -339,7 +414,7 @@ namespace ScannerUnitTesting
 
                 if (token.Lexeme.ToUpper().EndsWith(":D"))
                 {
-                    if (token.Lexeme.Replace(" ","").Replace("_","").ToUpper().TrimEnd('D', ':').All(".0123456789".Contains) == false)
+                    if (StripBaseIndicator(token.Lexeme, 'D').All(".0123456789".Contains) == false)
                     {
                         token.ErrorText = "This decimal literal contains one or more invalid characters.";
                         token.IsInvalid = true;
@@ -348,7 +423,7 @@ namespace ScannerUnitTesting
 
                  if (token.Lexeme.ToUpper().EndsWith(":O"))
                 {
-                    if (token.Lexeme.ToUpper().All("_ 01234567".Contains) == false)
+                    if (StripBaseIndicator(token.Lexeme, 'O').All("_ 01234567".Contains) == false)
                     {
                         token.ErrorText = "This octal literal contains one or more invalid characters.";
                         token.IsInvalid = true;
@@ -357,7 +432,7 @@ namespace ScannerUnitTesting
 
                 if (token.Lexeme.ToUpper().EndsWith(":B"))
                 {
-                    if (token.Lexeme.ToUpper().All("_ 01".Contains) == false)
+                    if (StripBaseIndicator(token.Lexeme, 'B').All("_ 01".Contains) == false)
                     {
                         token.ErrorText = "This binary literal contains one or more invalid characters.";
                         token.IsInvalid = true;
@@ -375,6 +450,11 @@ namespace ScannerUnitTesting
 
 
                 return;
+
+                string StripBaseIndicator(string str, char basechar)
+                {
+                    return str.ToUpper().TrimEnd(basechar).TrimEnd(':');
+                }
             }
         }
 
