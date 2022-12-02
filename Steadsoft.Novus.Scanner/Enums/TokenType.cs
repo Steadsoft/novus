@@ -7,7 +7,7 @@
         Identifier,
         LineComment,
         BlockComment,
-        Numeric,
+        NumericLiteral,
         Punctuator,
         Symbol,
         PointsTo,

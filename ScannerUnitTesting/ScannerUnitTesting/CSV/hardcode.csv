@@ -51,8 +51,8 @@ HEX(0)  ':'   AppendContinue  HEX(1)		Undecided
 HEX(0)  Alpha AppendContinue  IDENTIFIER    Undecided 
 HEX(0)  Any   RewindReturn    INITIAL		Identifier 
 
-HEX(1)  'H'   AppendReturn    INITIAL		Numeric
-HEX(1)  'h'   AppendReturn    INITIAL       Numeric
+HEX(1)  'H'   AppendReturn    INITIAL		NumericLiteral
+HEX(1)  'h'   AppendReturn    INITIAL       NumericLiteral
 HEX(1)  Space AppendContinue  HEX(1)        Undecided
 HEX(1)  Any   RewindReturn    INITIAL       Undecided
 
@@ -64,25 +64,25 @@ DIGIT(0)  '_'     AppendContinue  DIGIT(0)  Undecided
 DIGIT(0)  '.'     AppendContinue  DECPOINT  Undecided
 DIGIT(0)  ':'     AppendContinue  BASECOLON Undecided
 DIGIT(0)  Hex     AppendContinue  DIGIT(0)  Undecided 
-DIGIT(0)  Any     RewindReturn    INITIAL	Numeric 
+DIGIT(0)  Any     RewindReturn    INITIAL	NumericLiteral 
 
 // The char was a decimal point
 
 DECPOINT  Digit   AppendContinue  DECPOINT  Undecided 
 DECPOINT  Hex     AppendContinue  DECPOINT  Undecided
 DECPOINT  ':'     AppendContinue  BASECOLON Undecided
-DECPOINT  Any     RewindReturn    INITIAL	Numeric 
+DECPOINT  Any     RewindReturn    INITIAL	NumericLiteral 
 
 // The char was a colon
 
-BASECOLON 'b' AppendReturn INITIAL Numeric
-BASECOLON 'B' AppendReturn INITIAL Numeric
-BASECOLON 'o' AppendReturn INITIAL Numeric
-BASECOLON 'O' AppendReturn INITIAL Numeric
-BASECOLON 'd' AppendReturn INITIAL Numeric
-BASECOLON 'D' AppendReturn INITIAL Numeric
-BASECOLON 'h' AppendReturn INITIAL Numeric
-BASECOLON 'H' AppendReturn INITIAL Numeric
+BASECOLON 'b' AppendReturn INITIAL NumericLiteral
+BASECOLON 'B' AppendReturn INITIAL NumericLiteral
+BASECOLON 'o' AppendReturn INITIAL NumericLiteral
+BASECOLON 'O' AppendReturn INITIAL NumericLiteral
+BASECOLON 'd' AppendReturn INITIAL NumericLiteral
+BASECOLON 'D' AppendReturn INITIAL NumericLiteral
+BASECOLON 'h' AppendReturn INITIAL NumericLiteral
+BASECOLON 'H' AppendReturn INITIAL NumericLiteral
 
 
 HYPHEN  '>'   AppendReturn  INITIAL  PointsTo 
