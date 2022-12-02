@@ -23,17 +23,17 @@ INITIAL  '_'    AppendContinue   IDENTIFIER  Undecided
 INITIAL  Punct  AppendReturn     INITIAL     Punctuator 
 INITIAL  Symbl  AppendReturn     INITIAL     Symbol 
 
-SLASH  '*'      AppendContinue   SLASH_STAR   Undecided
-SLASH  '/'      AppendContinue   SLASH_SLASH  Undecided 
+SLASH  '*'      AppendContinue   SLASH_STAR			Undecided
+SLASH  '/'      AppendContinue   SLASH_SLASH		Undecided 
 
-SLASH_STAR  '*'   AppendContinue  SLASH_STAR_STAR  Undecided 
-SLASH_STAR  Any   AppendContinue  SLASH_STAR  Undecided 
+SLASH_STAR  '*'   AppendContinue  SLASH_STAR_STAR	Undecided 
+SLASH_STAR  Any   AppendContinue  SLASH_STAR		Undecided 
 
-SLASH_SLASH  '\n'   AppendReturn  INITIAL  LineComment 
+SLASH_SLASH  '\n'   AppendReturn  INITIAL		LineComment 
 SLASH_SLASH  Any   AppendContinue  SLASH_SLASH  Undecided 
 
-SLASH_STAR_STAR  '/'   AppendReturn  INITIAL  BlockComment 
-SLASH_STAR_STAR  Any   AppendContinue  SLASH_STAR_STAR  Undecided 
+SLASH_STAR_STAR  '/'   AppendReturn		INITIAL			BlockComment 
+SLASH_STAR_STAR  Any   AppendContinue	SLASH_STAR_STAR Undecided 
 
 IDENTIFIER  '_'     AppendContinue  IDENTIFIER  Undecided 
 IDENTIFIER  Alpha   AppendContinue  IDENTIFIER  Undecided 
@@ -41,33 +41,48 @@ IDENTIFIER  Hex     AppendContinue  IDENTIFIER  Undecided
 IDENTIFIER  Digit   AppendContinue  IDENTIFIER  Undecided 
 IDENTIFIER  Any     RewindReturn    INITIAL     Identifier 
 
-HEX(0)  Hex   AppendContinue  HEX(0) Undecided
-HEX(0)  Digit AppendContinue  HEX(0) Undecided 
-HEX(0)  '_'   AppendContinue  HEX(0) Undecided 
-HEX(0)  Space AppendContinue  HEX(0) Undecided 
-HEX(0)  ':'   AppendContinue  HEX(1) Undecided 
-HEX(0)  Alpha AppendContinue  IDENTIFIER     Undecided 
-HEX(0)  Any   RewindReturn    INITIAL        Identifier 
+// The char was a hexadecimal letter.
 
+HEX(0)  Hex   AppendContinue  HEX(0)		Undecided
+HEX(0)  Digit AppendContinue  HEX(0)		Undecided 
+HEX(0)  '_'   AppendContinue  HEX(0)		Undecided 
+HEX(0)  Space AppendContinue  HEX(0)		Undecided 
+HEX(0)  ':'   AppendContinue  HEX(1)		Undecided 
+HEX(0)  Alpha AppendContinue  IDENTIFIER    Undecided 
+HEX(0)  Any   RewindReturn    INITIAL		Identifier 
 
+HEX(1)  'H'   AppendReturn    INITIAL		NumericLiteral
+HEX(1)  'h'   AppendReturn    INITIAL       NumericLiteral
+HEX(1)  Space AppendContinue  HEX(1)        Undecided
+HEX(1)  Any   RewindReturn    INITIAL       Undecided
 
-
-HEX(1)  'H'   AppendReturn    INITIAL        Hexadecimal
-HEX(1)  'h'   AppendReturn    INITIAL        Hexadecimal
-HEX(1)  Space AppendContinue  HEX(1)         Undecided
-HEX(1)  Any   RewindReturn    INITIAL        Undecided
-
+// The char was a decimal digit
 
 DIGIT(0)  Digit   AppendContinue  DIGIT(0)  Undecided 
 DIGIT(0)  Space   AppendContinue  DIGIT(0)  Undecided 
 DIGIT(0)  '_'     AppendContinue  DIGIT(0)  Undecided
-DIGIT(0)  '.'     AppendContinue  DECIMAL  Undecided
-DIGIT(0)  Hex     AppendContinue  HEX(0)    Undecided 
-DIGIT(0)  Any     RewindReturn    INITIAL  Numeric 
+DIGIT(0)  '.'     AppendContinue  DECPOINT  Undecided
+DIGIT(0)  ':'     AppendContinue  BASECOLON Undecided
+DIGIT(0)  Hex     AppendContinue  DIGIT(0)  Undecided 
+DIGIT(0)  Any     RewindReturn    INITIAL	NumericLiteral 
 
-DECIMAL  Digit   AppendContinue  DECIMAL  Undecided 
-DECIMAL  ':'     AppendContinue  HEX(1)   Undecided
-DECIMAL  Any     RewindReturn    INITIAL  Decimal 
+// The char was a decimal point
+
+DECPOINT  Digit   AppendContinue  DECPOINT  Undecided 
+DECPOINT  Hex     AppendContinue  DECPOINT  Undecided
+DECPOINT  ':'     AppendContinue  BASECOLON Undecided
+DECPOINT  Any     RewindReturn    INITIAL	NumericLiteral 
+
+// The char was a colon
+
+BASECOLON 'b' AppendReturn INITIAL NumericLiteral
+BASECOLON 'B' AppendReturn INITIAL NumericLiteral
+BASECOLON 'o' AppendReturn INITIAL NumericLiteral
+BASECOLON 'O' AppendReturn INITIAL NumericLiteral
+BASECOLON 'd' AppendReturn INITIAL NumericLiteral
+BASECOLON 'D' AppendReturn INITIAL NumericLiteral
+BASECOLON 'h' AppendReturn INITIAL NumericLiteral
+BASECOLON 'H' AppendReturn INITIAL NumericLiteral
 
 
 HYPHEN  '>'   AppendReturn  INITIAL  PointsTo 
@@ -83,14 +98,14 @@ GREATER  Any   RewindReturn  INITIAL  Greater
 LESSER  '<'   AppendReturn  INITIAL  ShiftLeft 
 LESSER  Any   RewindReturn  INITIAL  Lesser 
 
-QUOTATION  '"'   AppendReturn  INITIAL  QString 
-QUOTATION  Any   AppendContinue  QUOTATION  Undecided 
+QUOTATION  '"'   AppendReturn	INITIAL		QString 
+QUOTATION  Any   AppendContinue QUOTATION	Undecided 
 
-APOSTROPHE  '\''   AppendReturn  INITIAL  AString 
-APOSTROPHE  Any   AppendContinue  APOSTROPHE  Undecided 
+APOSTROPHE  '\''   AppendReturn		INITIAL		AString 
+APOSTROPHE  Any   AppendContinue	APOSTROPHE  Undecided 
 
-HYPHEN  '>'  AppendReturn  INITIAL  PointsTo
-HYPHEN  Any  AppendContinue  INITIAL  Minus
+HYPHEN  '>'  AppendReturn	INITIAL  PointsTo
+HYPHEN  Any  AppendContinue INITIAL  Minus
 
 // Novus does not support operators that are both expressions and assignments combined.
 // This means there's no ++ or -- for example.

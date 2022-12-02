@@ -20,7 +20,7 @@ namespace Hardcode
             var source = SourceFile.CreateFromFile(@"..\..\..\tokens_test_01.hcl");
 
             var tokenizer = new Tokenizer<Keywords>(@"..\..\..\hardcode.csv", TokenDefinition.Pathname, Assembly.GetExecutingAssembly()); // be able to supply a delegate that can sanity check tokens.
-            var tokens = new TokenEnumerator(tokenizer, source, TokenType.BlockComment, TokenType.LineComment);
+            var tokens = new TokenEnumerator(tokenizer, source, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
 
             var t = tokens.GetNextToken();
 
@@ -37,26 +37,10 @@ namespace Hardcode
             }
         }
 
-        public static void ValidateToken(Token token) 
-        { 
-            if (token.TokenType == TokenType.Hexadecimal)
-            {
-                if (token.Lexeme.Contains('_') && token.Lexeme.Contains(' '))
-                {
-                    token.ErrorText = "This literal must not contain more than one kind of separator character.";
-                    token.IsInvalid = true;
-                }
+        private static void ValidateToken(Token token)
+        {
 
-                if (token.Lexeme.Contains("  ") || token.Lexeme.Contains("__"))
-                {
-                    token.ErrorText = "This literal must not contain repetitions of a separator character.";
-                    token.IsInvalid = true;
-                }
-
-                return;
-            }
-
-            if (token.TokenType == TokenType.Numeric)
+            if (token.TokenType == TokenType.NumericLiteral)
             {
                 token.Lexeme = token.Lexeme.Trim();
 
@@ -72,16 +56,44 @@ namespace Hardcode
                     token.IsInvalid = true;
                 }
 
-                if (token.Lexeme.ContainsAny('a','b','c','d','e','f') || token.Lexeme.ContainsAny('A', 'B', 'C', 'D', 'E', 'F'))
+                token.Lexeme = token.Lexeme.Replace(" ", "").Replace("_", "");
+
+                if (token.Lexeme.ToUpper().EndsWith(":H"))
                 {
-                    if (token.Lexeme.EndsWith(":h") || token.Lexeme.EndsWith(":H"))
-                        ;
-                    else
+                    if (token.Lexeme.ToUpper().TrimEnd('H').TrimEnd(':').All(".0123456789ABCDEF".Contains) == false)
                     {
-                        token.ErrorText = "A hexadecimal literal must end with the :h or :H type specifier.";
+                        token.ErrorText = "This hexadecimal literal contains one or more invalid characters.";
                         token.IsInvalid = true;
                     }
                 }
+
+                if (token.Lexeme.ToUpper().EndsWith(":D"))
+                {
+                    if (token.Lexeme.Replace(" ", "").Replace("_", "").ToUpper().TrimEnd('D', ':').All(".0123456789".Contains) == false)
+                    {
+                        token.ErrorText = "This decimal literal contains one or more invalid characters.";
+                        token.IsInvalid = true;
+                    }
+                }
+
+                if (token.Lexeme.ToUpper().EndsWith(":O"))
+                {
+                    if (token.Lexeme.ToUpper().All("_ 01234567".Contains) == false)
+                    {
+                        token.ErrorText = "This octal literal contains one or more invalid characters.";
+                        token.IsInvalid = true;
+                    }
+                }
+
+                if (token.Lexeme.ToUpper().EndsWith(":B"))
+                {
+                    if (token.Lexeme.ToUpper().All("_ 01".Contains) == false)
+                    {
+                        token.ErrorText = "This binary literal contains one or more invalid characters.";
+                        token.IsInvalid = true;
+                    }
+                }
+
 
                 return;
             }
