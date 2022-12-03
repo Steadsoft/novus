@@ -388,6 +388,19 @@ namespace ScannerUnitTesting
 
         private static void ValidateToken(TokenEnumerator tokens, Token token)
         {
+            if (token.TokenType == TokenType.CR)
+            {
+                var next = tokens.PeekNextToken();
+
+                if (next.TokenType == TokenType.LF)
+                {
+                    var discard = tokens.GetNextToken(); // just duiscard this because we've simply hit a Windows CR/LF pair.
+
+                    token.Lexeme = "\r\n";
+                    token.TokenType = TokenType.NewLine;
+                }
+            }
+
             if (token.TokenType == TokenType.Identifier && token.Lexeme.Contains(' '))
             {
                 // The token structure allows spaces inside literals, therefore identifier recognition can 
@@ -397,11 +410,11 @@ namespace ScannerUnitTesting
                 // push them onto the enumerator stack. The calling code has no idea and will simply see
                 // several distinct and valid identifiers tokens.
 
-                var idents = token.Lexeme.Split(' ',StringSplitOptions.RemoveEmptyEntries).Reverse(); // we're going to stack these so order is very important
+                var idents = token.Lexeme.Split(' ', StringSplitOptions.RemoveEmptyEntries).Reverse(); // we're going to stack these so order is very important
 
                 foreach (var ident in idents)
                 {
-                    tokens.PushToken(new Token(TokenType.Identifier, ident, token.LineNumber,0));
+                    tokens.PushToken(new Token(TokenType.Identifier, ident, token.LineNumber, 0));
                 }
 
                 var temp = tokens.GetNextToken();
@@ -436,7 +449,7 @@ namespace ScannerUnitTesting
 
                 if (token.Lexeme.ToUpper().EndsWith(":H"))
                 {
-                    if (StripBaseIndicator(token.Lexeme,'H').All(".0123456789ABCDEF".Contains) == false)
+                    if (StripBaseIndicator(token.Lexeme, 'H').All(".0123456789ABCDEF".Contains) == false)
                     {
                         token.ErrorText = "This hexadecimal literal contains one or more invalid characters.";
                         token.IsInvalid = true;
@@ -452,7 +465,7 @@ namespace ScannerUnitTesting
                     }
                 }
 
-                 if (token.Lexeme.ToUpper().EndsWith(":O"))
+                if (token.Lexeme.ToUpper().EndsWith(":O"))
                 {
                     if (StripBaseIndicator(token.Lexeme, 'O').All("_ 01234567".Contains) == false)
                     {
@@ -470,7 +483,7 @@ namespace ScannerUnitTesting
                     }
                 }
 
-                if (token.Lexeme.ToUpper().EndsWithAny(":B",":O",":D",":H") == false)
+                if (token.Lexeme.ToUpper().EndsWithAny(":B", ":O", ":D", ":H") == false)
                 {
                     if (token.Lexeme.All(".0123456789".Contains) == false)
                     {

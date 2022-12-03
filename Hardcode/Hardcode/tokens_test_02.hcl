@@ -2,9 +2,9 @@ im_a_name;
 im_another ;
 so_am_i ; 
 
+/* Comments */
 
-
-proc aaa
+proc aaa  // another comment
 {
 
    FAc6 8AB7:H;
