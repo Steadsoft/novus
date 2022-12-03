@@ -1,4 +1,4 @@
-im_a_name;
+﻿im_a_name;
 im_another ;
 so_am_i ; 
 
@@ -6,6 +6,19 @@ so_am_i ;
 
 proc aaa  // another comment
 {
+
+   dcl ⅀ float decimal(16);
+   
+   ⅀ = adc(1) + adc(2) + adc(3);
+
+   if ⅀ > MAX
+      call log_excess_voltage_fault(⅀)
+   end
+
+   a = b ÷ c; // integer divide 
+    
+   A @> 2 // rotate the bits in A right by 2
+   B <@ 3 // rotate the bits in B left by 3
 
    FAc6 8AB7:H;
    FA06_8aB7 : H;

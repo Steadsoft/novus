@@ -31,6 +31,9 @@ namespace Hardcode
                 t = tokens.GetNextToken(true);
 
             }
+
+            var goods = tokes.Where(t => t.IsInvalid == false).ToList();
+            var fails = tokes.Where(t => t.IsInvalid ).ToList();
         }
 
         private static void ValidateToken(TokenEnumerator tokens, Token token)
@@ -78,18 +81,21 @@ namespace Hardcode
                 {
                     token.ErrorText = "A numeric literal must not contain more than one kind of separator character.";
                     token.IsInvalid = true;
+                    return;
                 }
 
                 if (token.Lexeme.Contains("  ") || token.Lexeme.Contains("__"))
                 {
                     token.ErrorText = "A numeric literal must not contain repetitions of a separator character.";
                     token.IsInvalid = true;
+                    return;
                 }
 
                 if (token.Lexeme.Count(f => (f == '.')) > 1) // the FSM should prevent this, but we'll check this anyway.
                 {
                     token.ErrorText = "A numeric literal must not contain more than one decimal point.";
                     token.IsInvalid = true;
+                    return;
                 }
 
                 token.Lexeme = token.Lexeme.Replace(" ", "").Replace("_", "");
@@ -100,6 +106,14 @@ namespace Hardcode
                     {
                         token.ErrorText = "This hexadecimal literal contains one or more invalid characters.";
                         token.IsInvalid = true;
+                        return;
+                    }
+
+                    if (token.Lexeme.Any("abcdef".Contains) && token.Lexeme.Any("ABCDEF".Contains))
+                    {
+                        token.ErrorText = "A hexadecimal literal must not contain both uppercase and lowercase letters.";
+                        token.IsInvalid = true;
+                        return;
                     }
                 }
 
@@ -109,24 +123,27 @@ namespace Hardcode
                     {
                         token.ErrorText = "This decimal literal contains one or more invalid characters.";
                         token.IsInvalid = true;
+                        return;
                     }
                 }
 
                 if (token.Lexeme.ToUpper().EndsWith(":O"))
                 {
-                    if (StripBaseIndicator(token.Lexeme, 'O').All("_ 01234567".Contains) == false)
+                    if (StripBaseIndicator(token.Lexeme, 'O').All(".01234567".Contains) == false)
                     {
                         token.ErrorText = "This octal literal contains one or more invalid characters.";
                         token.IsInvalid = true;
+                        return;
                     }
                 }
 
                 if (token.Lexeme.ToUpper().EndsWith(":B"))
                 {
-                    if (StripBaseIndicator(token.Lexeme, 'B').All("_ 01".Contains) == false)
+                    if (StripBaseIndicator(token.Lexeme, 'B').All(".01".Contains) == false)
                     {
                         token.ErrorText = "This binary literal contains one or more invalid characters.";
                         token.IsInvalid = true;
+                        return;
                     }
                 }
 
@@ -136,6 +153,7 @@ namespace Hardcode
                     {
                         token.ErrorText = "This non-decimal literal does not end with a valid base indicator";
                         token.IsInvalid = true;
+                        return;
                     }
                 }
 
