@@ -64,13 +64,21 @@ HEX(1)  Any   RewindReturn    INITIAL       Undecided
 DIGIT(0)  Digit   AppendContinue  DIGIT(0)  Undecided 
 DIGIT(0)  Space   AppendContinue  DIGIT(0)  Undecided 
 DIGIT(0)  '_'     AppendContinue  DIGIT(0)  Undecided
+DIGIT(0)  '-'     AppendContinue  DIGIT(0)  Undecided
+DIGIT(0)  '+'     AppendContinue  DIGIT(0)  Undecided
 DIGIT(0)  '.'     AppendContinue  DECPOINT  Undecided
+DIGIT(0)  'p'     AppendContinue  DIGIT(0)  Undecided
+DIGIT(0)  'P'     AppendContinue  DIGIT(0)  Undecided
 DIGIT(0)  ':'     AppendContinue  BASECOLON Undecided
 DIGIT(0)  Hex     AppendContinue  DIGIT(0)  Undecided 
 DIGIT(0)  Any     RewindReturn    INITIAL	NumericLiteral 
 
-// The char was a decimal point
+// The char was a decimal point, we likely don't need 'e' or 'E' because it happens to be a hex digit which we already accept.
 
+DECPOINT  '+'     AppendContinue  DECPOINT  Undecided
+DECPOINT  '-'     AppendContinue  DECPOINT  Undecided
+DECPOINT  'p'     AppendContinue  DECPOINT  Undecided
+DECPOINT  'P'     AppendContinue  DECPOINT  Undecided
 DECPOINT  Digit   AppendContinue  DECPOINT  Undecided 
 DECPOINT  Hex     AppendContinue  DECPOINT  Undecided
 DECPOINT  ':'     AppendContinue  BASECOLON Undecided

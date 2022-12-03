@@ -2,12 +2,15 @@ using Steadsoft.Novus.Scanner.Classes;
 using Steadsoft.Novus.Scanner.Enums;
 using Steadsoft.Novus.Scanner.Statics;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace ScannerUnitTesting
 {
     [TestClass]
     public class UnitTest1
     {
+        // SEE: https://efxa.org/2014/05/10/regular-expressions-for-matching-data-values-in-compiler-lexers/
+
         [TestMethod]
         public void Test_IdentifierA()
         {
@@ -376,7 +379,126 @@ namespace ScannerUnitTesting
 
         }
 
+        [TestMethod]
+        public void Test_NumericX()
+        {
+            var tokens = CreateEnumerator("5.3876e4;");
 
+            var token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "5.3876e4");
+
+            token = tokens.GetNextToken(true);
+
+            Assert.IsTrue(token.TokenType == TokenType.SemiColon);
+
+        }
+
+        [TestMethod]
+        public void Test_NumericX2()
+        {
+            var tokens = CreateEnumerator("5.3876e-4;");
+
+            var token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "5.3876e-4");
+
+            token = tokens.GetNextToken(true);
+
+            Assert.IsTrue(token.TokenType == TokenType.SemiColon);
+
+        }
+
+        [TestMethod]
+        public void Test_NumericX3()
+        {
+            var tokens = CreateEnumerator("5.3876e+4;");
+
+            var token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "5.3876e+4");
+
+            token = tokens.GetNextToken(true);
+
+            Assert.IsTrue(token.TokenType == TokenType.SemiColon);
+
+        }
+
+
+        [TestMethod]
+        public void Test_NumericY()
+        {
+            var tokens = CreateEnumerator("5.3876E4;");
+
+            var token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "5.3876E4");
+
+            token = tokens.GetNextToken(true);
+
+            Assert.IsTrue(token.TokenType == TokenType.SemiColon);
+
+        }
+
+        [TestMethod]
+        public void Test_NumericZ()
+        {
+            var tokens = CreateEnumerator("5.3876p4;");
+
+            var token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "5.3876p4");
+
+            token = tokens.GetNextToken(true);
+
+            Assert.IsTrue(token.TokenType == TokenType.SemiColon);
+
+        }
+
+        [TestMethod]
+        public void Test_NumericZ2()
+        {
+            var tokens = CreateEnumerator("5.3876p-4;");
+
+            var token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "5.3876p-4");
+
+            token = tokens.GetNextToken(true);
+
+            Assert.IsTrue(token.TokenType == TokenType.SemiColon);
+
+        }
+
+        [TestMethod]
+        public void Test_NumericZ3()
+        {
+            var tokens = CreateEnumerator("5.3876p+4;");
+
+            var token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "5.3876p+4");
+
+            token = tokens.GetNextToken(true);
+
+            Assert.IsTrue(token.TokenType == TokenType.SemiColon);
+
+        }
+
+        [TestMethod]
+        public void Test_NumericZ4()
+        {
+            var tokens = CreateEnumerator("5.3A0D6p+4;");
+
+            var token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "5.3A0D6p+4");
+
+            token = tokens.GetNextToken(true);
+
+            Assert.IsTrue(token.TokenType == TokenType.SemiColon);
+
+        }
 
 
         private TokenEnumerator CreateEnumerator(string Text)
@@ -388,6 +510,24 @@ namespace ScannerUnitTesting
 
         private static void ValidateToken(TokenEnumerator tokens, Token token)
         {
+            const char US = '_';
+            const char SP = ' ';
+            const char DOT = '.';
+            const string BHEX = ":H";
+            const string BOCT = ":O";
+            const string BDEC = ":D";
+            const string BBIN = ":B";
+            const string HEX_CHARS = ".0123456789ABCDEF";
+            const string DEC_CHARS = ".0123456789";
+            const string OCT_CHARS = ".01234567";
+            const string BIN_CHARS = ".01";
+            const string HEX_LETTERS_L = "abcdef";
+            const string HEX_LETTERS_U = "ABCDEF";
+
+            const string FLOAT_HEX_REGEX = @"([0-9a-fA-F]*\.[0-9a-fA-F]+|[0-9a-fA-F]+\.?)[Pp][-+]?[0-9]+[flFL]?";
+
+            Regex FloatHex = new Regex(FLOAT_HEX_REGEX);
+
             if (token.TokenType == TokenType.CR)
             {
                 var next = tokens.PeekNextToken();
@@ -427,68 +567,91 @@ namespace ScannerUnitTesting
             {
                 token.Lexeme = token.Lexeme.Trim();
 
-                if (token.Lexeme.Contains('_') && token.Lexeme.Contains(' '))
+                if (token.Lexeme.Contains(US) && token.Lexeme.Contains(SP))
                 {
                     token.ErrorText = "A numeric literal must not contain more than one kind of separator character.";
                     token.IsInvalid = true;
+                    return;
                 }
 
                 if (token.Lexeme.Contains("  ") || token.Lexeme.Contains("__"))
                 {
                     token.ErrorText = "A numeric literal must not contain repetitions of a separator character.";
                     token.IsInvalid = true;
+                    return;
                 }
 
-                if (token.Lexeme.Count(f => (f == '.')) > 1) // the FSM should prevent this, but we'll check this anyway.
+                if (token.Lexeme.Count(f => (f == DOT)) > 1) // the FSM should prevent this, but we'll check this anyway.
                 {
                     token.ErrorText = "A numeric literal must not contain more than one decimal point.";
                     token.IsInvalid = true;
+                    return;
                 }
 
                 token.Lexeme = token.Lexeme.Replace(" ", "").Replace("_", "");
 
-                if (token.Lexeme.ToUpper().EndsWith(":H"))
+                if (token.Lexeme.ToUpper().EndsWith(BHEX))
                 {
-                    if (StripBaseIndicator(token.Lexeme, 'H').All(".0123456789ABCDEF".Contains) == false)
+                    if (StripBaseIndicator(token.Lexeme, 'H').All(HEX_CHARS.Contains) == false)
                     {
                         token.ErrorText = "This hexadecimal literal contains one or more invalid characters.";
                         token.IsInvalid = true;
+                        return;
+                    }
+
+                    if (token.Lexeme.Any(HEX_LETTERS_L.Contains) && token.Lexeme.Any(HEX_LETTERS_U.Contains))
+                    {
+                        token.ErrorText = "A hexadecimal literal must not contain both uppercase and lowercase letters.";
+                        token.IsInvalid = true;
+                        return;
                     }
                 }
 
-                if (token.Lexeme.ToUpper().EndsWith(":D"))
+                if (token.Lexeme.ToUpper().EndsWith(BDEC))
                 {
-                    if (StripBaseIndicator(token.Lexeme, 'D').All(".0123456789".Contains) == false)
+                    if (StripBaseIndicator(token.Lexeme, 'D').All(DEC_CHARS.Contains) == false)
                     {
                         token.ErrorText = "This decimal literal contains one or more invalid characters.";
                         token.IsInvalid = true;
+                        return;
                     }
                 }
 
-                if (token.Lexeme.ToUpper().EndsWith(":O"))
+                if (token.Lexeme.ToUpper().EndsWith(BOCT))
                 {
-                    if (StripBaseIndicator(token.Lexeme, 'O').All("_ 01234567".Contains) == false)
+                    if (StripBaseIndicator(token.Lexeme, 'O').All(OCT_CHARS.Contains) == false)
                     {
                         token.ErrorText = "This octal literal contains one or more invalid characters.";
                         token.IsInvalid = true;
+                        return;
                     }
                 }
 
-                if (token.Lexeme.ToUpper().EndsWith(":B"))
+                if (token.Lexeme.ToUpper().EndsWith(BBIN))
                 {
-                    if (StripBaseIndicator(token.Lexeme, 'B').All("_ 01".Contains) == false)
+                    if (StripBaseIndicator(token.Lexeme, 'B').All(BIN_CHARS.Contains) == false)
                     {
                         token.ErrorText = "This binary literal contains one or more invalid characters.";
                         token.IsInvalid = true;
+                        return;
                     }
                 }
 
-                if (token.Lexeme.ToUpper().EndsWithAny(":B", ":O", ":D", ":H") == false)
+                if (token.Lexeme.ToUpper().EndsWithAny(BBIN, BOCT, BDEC, BHEX) == false)
                 {
-                    if (token.Lexeme.All(".0123456789".Contains) == false)
+                    double value;
+
+                    if (Double.TryParse(token.Lexeme, out value))
+                        return;
+
+                    if (FloatHex.IsMatch(token.Lexeme))
+                        return;
+
+                    if (token.Lexeme.All(DEC_CHARS.Contains) == false)
                     {
                         token.ErrorText = "This non-decimal literal does not end with a valid base indicator";
                         token.IsInvalid = true;
+                        return;
                     }
                 }
 
