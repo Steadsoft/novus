@@ -345,6 +345,37 @@ namespace ScannerUnitTesting
 
         }
 
+        [TestMethod]
+        public void Test_NumericW()
+        {
+            var tokens = CreateEnumerator("dcl a bin = dcb bcd bde:h;");
+
+            var token = tokens.GetNextToken(); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+
+            Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false && token.Lexeme == "dcl");
+
+            token = tokens.GetNextToken();
+
+            Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false && token.Lexeme == "a");
+
+            token = tokens.GetNextToken();
+
+            Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false && token.Lexeme == "bin");
+
+            token = tokens.GetNextToken();
+
+            Assert.IsTrue(token.TokenType == TokenType.Equals && token.IsInvalid == false && token.Lexeme == "=");
+
+            token = tokens.GetNextToken();
+
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "dcbbcdbde:h");
+
+            token = tokens.GetNextToken();
+
+            Assert.IsTrue(token.TokenType == TokenType.SemiColon);
+
+        }
+
 
 
 
