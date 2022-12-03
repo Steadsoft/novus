@@ -14,6 +14,9 @@ INITIAL  '='    AppendContinue   EQUALS      Undecided
 INITIAL  '>'    AppendContinue   GREATER     Undecided 
 INITIAL  '<'    AppendContinue   LESSER      Undecided 
 INITIAL  '"'    AppendContinue   QUOTATION   Undecided 
+INITIAL  NewLine AppendReturn    INITIAL     NewLine
+INITIAL  CR     AppendReturn     INITIAL     CR
+INITIAL  LF     AppendReturn     INITIAL     LF
 INITIAL  Space  DiscardContinue  INITIAL     Undecided 
 INITIAL  White  DiscardContinue  INITIAL     Undecided 
 INITIAL  Digit  AppendContinue   DIGIT(0)    Undecided 

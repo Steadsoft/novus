@@ -3,7 +3,7 @@ im_another ;
 so_am_i ; 
 
 
-/*
+
 proc aaa
 {
 
@@ -160,4 +160,3 @@ procedure loop_admin coroutine
 	  // do more stuff
    }
 }
-*/

@@ -19,5 +19,8 @@
         Symbl = APL_IBEAM + 7,
         Space = APL_IBEAM + 8,
         Hex   = APL_IBEAM + 9,
+        CR    = APL_IBEAM + 10,
+        LF    = APL_IBEAM + 11,
+        NewLine = APL_IBEAM + 12,
     }
 }

@@ -5,6 +5,12 @@ namespace Steadsoft.Novus.Scanner.Statics
 {
     public static class CharExtensions
     {
+        public const char LF = '\u000A';
+        public const char CR = '\u000D';
+        public const char NL = '\u0085';
+        public const char LS = '\u2028';
+        public const char PS = '\u2029';
+
         public static LexicalClass GetLexicalClass(this char C)
         {
             // For now we use the Unicode defintions for
@@ -22,6 +28,15 @@ namespace Steadsoft.Novus.Scanner.Statics
 
             if (char.IsDigit(C))
                 return LexicalClass.Digit;
+
+            if (C == CR)
+                return LexicalClass.CR;
+
+            if (C == LF)
+                return LexicalClass.LF;
+
+            if ( C == NL | C == LS | C == PS)
+                return LexicalClass.NewLine;
 
             if (char.IsWhiteSpace(C))
                 return LexicalClass.White;

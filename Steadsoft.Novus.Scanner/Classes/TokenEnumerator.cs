@@ -131,11 +131,12 @@ namespace Steadsoft.Novus.Scanner.Classes
         /// Consume and returns the next token.
         /// </summary>
         /// <returns></returns>
-        public Token GetNextToken()
+        public Token GetNextToken(bool Augment = false)
         {
             var token = ReadNextToken();
 
-            augmentor(this,token);
+            if (Augment)
+               augmentor(this,token);
 
             /* TODO We may need to review this because there may be cases where we return from here having pushed a simulated token and then the caller pops the hint, raising the question is that simulated token still meaningful, valid?
             */
