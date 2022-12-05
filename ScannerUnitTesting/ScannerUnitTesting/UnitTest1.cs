@@ -501,14 +501,14 @@ namespace ScannerUnitTesting
         }
 
 
-        private TokenEnumerator CreateEnumerator(string Text)
+        private TokenEnumerator<Keywords> CreateEnumerator(string Text)
         {
-            var source = SourceFile.CreateFromText(Text);
-            var tokenizer = new Tokenizer<Keywords>(@"..\..\..\CSV\hardcode.csv", TokenDefinition.Pathname, Assembly.GetExecutingAssembly()); // be able to supply a delegate that can sanity check tokens.
-            return new TokenEnumerator(tokenizer, source, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
+            var source = SourceCode.CreateFromString(Text);
+            //var tokenizer = new Tokenizer<Keywords>(@"..\..\..\CSV\hardcode.csv", TokenOrigin.File, Assembly.GetExecutingAssembly()); // be able to supply a delegate that can sanity check tokens.
+            return new TokenEnumerator<Keywords>(source, @"..\..\..\CSV\hardcode.csv", TokenOrigin.File, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
         }
 
-        private static void ValidateToken(TokenEnumerator tokens, Token token)
+        private static void ValidateToken(TokenEnumerator<Keywords> tokens, Token token)
         {
             const char US = '_';
             const char SP = ' ';
