@@ -8,7 +8,7 @@ using static Steadsoft.Novus.Scanner.Enums.TokenType;
 
 namespace Steadsoft.Novus.Scanner.Classes
 {
-    public class Entry
+    internal class Entry
     {
         public Step Step { get; set; }
         public State State { get; set; }

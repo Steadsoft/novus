@@ -6,7 +6,7 @@
     /// <typeparam name="T">Type of the 1st 'subscript'.</typeparam>
     /// <typeparam name="U">Type of the 2nd 'subscript'.</typeparam>
     /// <typeparam name="F">Type of objects stored in the table.</typeparam>
-    public class SparseTable<T, U, F> where F : Entry
+    internal class SparseTable<T, U, F> where F : Entry
     {
         // TODO This class has degenarted a bit and needs retidying...its a bit hacky...
 

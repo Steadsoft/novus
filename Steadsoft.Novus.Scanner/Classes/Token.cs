@@ -12,7 +12,7 @@ namespace Steadsoft.Novus.Scanner.Classes
         public string Lexeme { get; set; }
         public int LineNumber { get;  set; }
         public int ColNumber { get;  set; }
-        public Keywords Keyword { get; private set; }
+        public Keywords Keyword { get; set; }
         public Operators Operator { get; private set; }
         public bool IsInvalid { get; set; }
         public string ErrorText { get;  set; }

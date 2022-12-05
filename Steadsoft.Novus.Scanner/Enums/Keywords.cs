@@ -14,6 +14,7 @@
         Coroutine,
         Decimal,
         Declare,
+        End,
         Enum,
         Fixed,
         Float,
