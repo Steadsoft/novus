@@ -37,16 +37,15 @@ namespace Hardcode
 
             // Create a token enumator from the souce using defintions from a file.
 
-            var tokens = new TokenEnumerator<Keywords>(source, TokenDefinitionsFile, TokenOrigin.File, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
+            var token_enumerator = new TokenEnumerator<Keywords>(source, TokenDefinitionsFile, TokenOrigin.File, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
 
-
-            var t = tokens.GetNextToken(true);
+            var t = token_enumerator.GetNextToken(true);
 
             while (t.TokenType != TokenType.NoMoreTokens) 
             { 
                 tokes.Add(t);
 
-                t = tokens.GetNextToken(true);
+                t = token_enumerator.GetNextToken(true);
 
             }
 
