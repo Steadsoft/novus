@@ -33,10 +33,7 @@ namespace Hardcode
 
             var source = SourceFile.CreateFromFile(SourceFilePath);
 
-            var tokenizer = new Tokenizer<Keywords>(TokenDefinitionsPath, TokenOrigin.Pathname); // be able to supply a delegate that can sanity check tokens.
-
-            var tokens = new TokenEnumerator(tokenizer, source, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
-
+            var tokens = new TokenEnumerator(source, TokenDefinitionsPath, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
 
 
             var t = tokens.GetNextToken(true);

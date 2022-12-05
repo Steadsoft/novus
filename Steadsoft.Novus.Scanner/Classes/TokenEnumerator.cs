@@ -14,12 +14,11 @@ namespace Steadsoft.Novus.Scanner.Classes
         private readonly Stack<Token> pushed = new();
         private readonly Stack<ParsingHint> hints = new();
         private readonly Action<TokenEnumerator,Token> augmentor;
-        public TokenEnumerator(Tokenizer<Keywords> Tokenizer, SourceFile SourceFile, Action<TokenEnumerator,Token> Augmentor = null , params TokenType[] Skips)
+        public TokenEnumerator(SourceFile SourceFile, string TokenDefinitionsPath, Action<TokenEnumerator,Token> Augmentor = null , params TokenType[] Skips)
         {
-            tokenizer = Tokenizer;
-            source = Tokenizer.Tokenize(SourceFile);
+            tokenizer = new Tokenizer<Keywords>(TokenDefinitionsPath, TokenOrigin.Pathname); ;
+            source = tokenizer.Tokenize(SourceFile);
             enumerator = source.GetEnumerator();
-
 
             if (Augmentor != null)
                 augmentor = Augmentor;
