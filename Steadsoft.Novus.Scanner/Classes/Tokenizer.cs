@@ -28,7 +28,7 @@ namespace Steadsoft.Novus.Scanner.Classes
     {
         internal readonly SparseTable<State, char, Entry> Table;
         internal Entry[,] Map = new Entry[64, 64];
-        private SourceFile source;
+        private SourceCode source;
         private int I; // used to index character stream.
         /// <summary>
         /// Creates a new instance of a tokenizer and initialises its state machine
@@ -44,7 +44,7 @@ namespace Steadsoft.Novus.Scanner.Classes
 
             switch (TokenOrigin)
             {
-                case TokenOrigin.Pathname:
+                case TokenOrigin.File:
                     {
                         using (FileStream fs = File.OpenRead(TokenDefintions))
                         {
@@ -129,7 +129,7 @@ namespace Steadsoft.Novus.Scanner.Classes
                 }
             }
         }
-        public Tokenizer(SourceFile File)
+        public Tokenizer(SourceCode File)
         {
             source = File;
         }
@@ -146,7 +146,7 @@ namespace Steadsoft.Novus.Scanner.Classes
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
-        public IEnumerable<Token> Tokenize(SourceFile Source)
+        public IEnumerable<Token> Tokenize(SourceCode Source)
         {
             if (Source == null) throw new ArgumentNullException(nameof(Source));
 

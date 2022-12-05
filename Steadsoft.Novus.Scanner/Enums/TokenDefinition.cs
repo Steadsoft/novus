@@ -5,7 +5,7 @@
         /// <summary>
         /// A pathname of a token defintion file.
         /// </summary>
-        Pathname,
+        File,
         /// <summary>
         /// Resource name of an embedded token defintion file.
         /// </summary>

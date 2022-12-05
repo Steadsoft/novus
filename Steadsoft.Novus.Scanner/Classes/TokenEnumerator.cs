@@ -5,7 +5,7 @@ using static Steadsoft.Novus.Scanner.Enums.State;
 
 namespace Steadsoft.Novus.Scanner.Classes
 {
-    public class TokenEnumerator 
+    public class TokenEnumerator<T> 
     {
         private readonly IEnumerator<Token> enumerator;
         private readonly IEnumerable<Token> source;
@@ -13,10 +13,12 @@ namespace Steadsoft.Novus.Scanner.Classes
         private readonly TokenType[] Skips;
         private readonly Stack<Token> pushed = new();
         private readonly Stack<ParsingHint> hints = new();
-        private readonly Action<TokenEnumerator,Token> augmentor;
-        public TokenEnumerator(SourceFile SourceFile, string TokenDefinitionsPath, Action<TokenEnumerator,Token> Augmentor = null , params TokenType[] Skips)
+        private readonly Action<TokenEnumerator<T>,Token> augmentor;
+        
+        
+        public TokenEnumerator(SourceCode SourceFile, string TokenDefinitions, TokenOrigin Origin, Action<TokenEnumerator<T>,Token> Augmentor = null , params TokenType[] Skips)
         {
-            tokenizer = new Tokenizer<Keywords>(TokenDefinitionsPath, TokenOrigin.Pathname); ;
+            tokenizer = new Tokenizer<Keywords>(TokenDefinitions, Origin); ;
             source = tokenizer.Tokenize(SourceFile);
             enumerator = source.GetEnumerator();
 

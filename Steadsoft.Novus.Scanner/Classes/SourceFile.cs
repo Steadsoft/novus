@@ -5,19 +5,19 @@ namespace Steadsoft.Novus.Scanner.Classes
     /// <summary>
     /// Represents a source file as a collection of individual character items.
     /// </summary>
-    public class SourceFile
+    public class SourceCode
     {
         public List<Character> Chars { get; private set; }
         public int Lines { get; private set; }
-        public static SourceFile CreateFromText(string Text)
+        public static SourceCode CreateFromText(string Text)
         {
-            return new SourceFile(Text, SourceMode.Text);
+            return new SourceCode(Text, SourceMode.Text);
         }
-        public static SourceFile CreateFromFile(string Path)
+        public static SourceCode CreateFromFile(string Path)
         {
-            return new SourceFile(Path, SourceMode.File);
+            return new SourceCode(Path, SourceMode.File);
         }
-        private SourceFile(string Path, SourceMode Mode = SourceMode.File)
+        private SourceCode(string Path, SourceMode Mode = SourceMode.File)
         {
             int line = 1;
             int col = 1;

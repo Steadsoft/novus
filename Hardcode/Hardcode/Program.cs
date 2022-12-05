@@ -14,7 +14,7 @@ namespace Hardcode
     {
         static void Main(string[] args)
         {
-            string TokenDefinitionsPath = @"..\..\..\hardcode.csv";
+            string TokenDefinitionsFile = @"..\..\..\hardcode.csv";
             string SourceFilePath = @"..\..\..\tokens_test_02.hcl";
 
             double a = 12_345_678.11;
@@ -31,9 +31,13 @@ namespace Hardcode
 
             List<Token> tokes = new List<Token>();
 
-            var source = SourceFile.CreateFromFile(SourceFilePath);
+            // Create an input source from a source file.
 
-            var tokens = new TokenEnumerator(source, TokenDefinitionsPath, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
+            var source = SourceCode.CreateFromFile(SourceFilePath);
+
+            // Create a token enumator from the souce using defintions from a file.
+
+            var tokens = new TokenEnumerator<Keywords>(source, TokenDefinitionsFile, TokenOrigin.File, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
 
 
             var t = tokens.GetNextToken(true);
@@ -50,7 +54,7 @@ namespace Hardcode
             var fails = tokes.Where(t => t.IsInvalid ).ToList();
         }
 
-        private static void ValidateToken(TokenEnumerator tokens, Token token)
+        private static void ValidateToken(TokenEnumerator<Keywords> tokens, Token token)
         {
             const char US = '_';
             const char SP = ' ';
