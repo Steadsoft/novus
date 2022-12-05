@@ -129,12 +129,8 @@ namespace Steadsoft.Novus.Scanner.Classes
                 }
             }
         }
-        public Tokenizer(SourceCode File)
-        {
-            source = File;
-        }
 
-        public Character GetNextRawChar()
+        internal Character GetNextRawChar()
         {
             return source.Chars[++I];
         }
@@ -146,7 +142,7 @@ namespace Steadsoft.Novus.Scanner.Classes
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
-        public IEnumerable<Token> Tokenize(SourceCode Source)
+        internal IEnumerable<Token> Tokenize(SourceCode Source)
         {
             if (Source == null) throw new ArgumentNullException(nameof(Source));
 

@@ -9,7 +9,7 @@ namespace Steadsoft.Novus.Scanner.Classes
     {
         public List<Character> Chars { get; private set; }
         public int Lines { get; private set; }
-        public static SourceCode CreateFromText(string Text)
+        public static SourceCode CreateFromString(string Text)
         {
             return new SourceCode(Text, SourceMode.Text);
         }
