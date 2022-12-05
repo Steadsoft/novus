@@ -101,7 +101,7 @@ proc main
 
 }
 
-proc left(L) coroutine
+proc left(L) coroutine interrupt
 {
 
 	arg L;

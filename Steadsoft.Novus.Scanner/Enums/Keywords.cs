@@ -1,5 +1,8 @@
 ﻿namespace Steadsoft.Novus.Scanner.Enums
 {
+
+    // Consider moving these to a text file and then creating per-language variants...
+
     public enum Keywords
     {
         IsNotAKeyword = 0,
@@ -17,6 +20,7 @@
         Function,
         Goto,
         Internal,
+        Interrupt,
         Loop,
         Namespace,
         Out,
