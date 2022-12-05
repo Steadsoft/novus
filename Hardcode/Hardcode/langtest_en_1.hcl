@@ -16,4 +16,3 @@ function test binary(31)
    end
 
 end
-

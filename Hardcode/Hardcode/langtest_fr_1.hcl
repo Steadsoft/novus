@@ -16,4 +16,3 @@ fonction test binaire(31)
    fin
 
 fin
-
