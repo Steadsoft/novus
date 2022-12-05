@@ -15,11 +15,18 @@ namespace Steadsoft.Novus.Scanner.Classes
         private readonly Stack<ParsingHint> hints = new();
         private readonly Action<TokenEnumerator<T>,Token> augmentor;
         
-        
-        public TokenEnumerator(SourceCode SourceFile, string TokenDefinitions, TokenOrigin Origin, Action<TokenEnumerator<T>,Token> Augmentor = null , params TokenType[] Skips)
+        /// <summary>
+        /// Uses a source for the source code as well as a source of language token definitions to expose an enumerable sequence of tokens.
+        /// </summary>
+        /// <param name="SourceText">Source input text.</param>
+        /// <param name="TokenDefinitions">A CSV that defines states and tokens</param>
+        /// <param name="Origin">Indicates whether the CVS is a file or embedded resource.</param>
+        /// <param name="Augmentor">Optional function to validaate and/or enrich the token stream.</param>
+        /// <param name="Skips">Optional token types to skip, the caller will never see these tokens.</param>
+        public TokenEnumerator(SourceCode SourceText, string TokenDefinitions, TokenOrigin Origin, Action<TokenEnumerator<T>,Token> Augmentor = null , params TokenType[] Skips)
         {
             tokenizer = new Tokenizer<Keywords>(TokenDefinitions, Origin); ;
-            source = tokenizer.Tokenize(SourceFile);
+            source = tokenizer.Tokenize(SourceText);
             enumerator = source.GetEnumerator();
 
             if (Augmentor != null)
