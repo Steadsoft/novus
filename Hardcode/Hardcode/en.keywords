@@ -8,6 +8,7 @@
   "Coroutine": "coroutine",
   "Decimal": "decimal",
   "Declare": "declare",
+  "End": "end",
   "Enum": "enum",
   "Fixed": "fixed",
   "Float": "float",
