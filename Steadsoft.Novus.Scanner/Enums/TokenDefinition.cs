@@ -1,6 +1,6 @@
 ﻿namespace Steadsoft.Novus.Scanner.Enums
 {
-    public enum TokenDefinition
+    public enum TokenOrigin
     {
         /// <summary>
         /// A pathname of a token defintion file.

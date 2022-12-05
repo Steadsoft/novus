@@ -14,6 +14,9 @@ namespace Hardcode
     {
         static void Main(string[] args)
         {
+            string TokenDefinitionsPath = @"..\..\..\hardcode.csv";
+            string SourceFilePath = @"..\..\..\tokens_test_02.hcl";
+
             double a = 12_345_678.11;
             double b = 12_3_45__6_78.11;
             bool f = false;
@@ -28,10 +31,13 @@ namespace Hardcode
 
             List<Token> tokes = new List<Token>();
 
-            var source = SourceFile.CreateFromFile(@"..\..\..\tokens_test_02.hcl");
+            var source = SourceFile.CreateFromFile(SourceFilePath);
 
-            var tokenizer = new Tokenizer<Keywords>(@"..\..\..\hardcode.csv", TokenDefinition.Pathname, Assembly.GetExecutingAssembly()); // be able to supply a delegate that can sanity check tokens.
+            var tokenizer = new Tokenizer<Keywords>(TokenDefinitionsPath, TokenOrigin.Pathname); // be able to supply a delegate that can sanity check tokens.
+
             var tokens = new TokenEnumerator(tokenizer, source, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
+
+
 
             var t = tokens.GetNextToken(true);
 

@@ -34,19 +34,19 @@ namespace Steadsoft.Novus.Scanner.Classes
         /// Creates a new instance of a tokenizer and initialises its state machine
         /// from the CSV file that you supply.
         /// </summary>
-        /// <param name="TokenData"></param>
+        /// <param name="TokenDefintions"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public Tokenizer(string TokenData, TokenDefinition TokenSource, Assembly SourceAssembly = null)
+        public Tokenizer(string TokenDefintions, TokenOrigin TokenOrigin, Assembly SourceAssembly = null)
         {
-            if (string.IsNullOrWhiteSpace(TokenData)) throw new ArgumentNullException(nameof(TokenData));
+            if (string.IsNullOrWhiteSpace(TokenDefintions)) throw new ArgumentNullException(nameof(TokenDefintions));
 
             Table = new();
 
-            switch (TokenSource)
+            switch (TokenOrigin)
             {
-                case TokenDefinition.Pathname:
+                case TokenOrigin.Pathname:
                     {
-                        using (FileStream fs = File.OpenRead(TokenData))
+                        using (FileStream fs = File.OpenRead(TokenDefintions))
                         {
                             using (StreamReader sr = new(fs, Encoding.UTF8))
                             {
@@ -57,9 +57,9 @@ namespace Steadsoft.Novus.Scanner.Classes
                         }
                         break;
                     }
-                case TokenDefinition.Resource:
+                case TokenOrigin.Resource:
                     {
-                        Stream stream = SourceAssembly.GetManifestResourceStream($"Steadsoft.Novus.Parser.{TokenData}");
+                        Stream stream = SourceAssembly.GetManifestResourceStream($"Steadsoft.Novus.Parser.{TokenDefintions}");
                         using (StreamReader sr = new(stream))
                         {
                             PopulateTable(sr);
