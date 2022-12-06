@@ -16,8 +16,21 @@ namespace Hardcode
         static void Main(string[] args)
         {
             string TokenDefinitionsFile = @"..\..\..\hardcode.csv";
-            string SourceFile = @"..\..\..\langtest_en_1.hcl";
-            string LanguageDictionary = @"..\..\..\en.keywords";
+            string SourceFile = @"..\..\..\langtest_fr_1.hcl";
+            string LanguageDictionary = @"..\..\..\lingua.keywords";
+
+            Dictionary<string, string> E = new Dictionary<string, string> { { "ABC", "123" }, { "DEF", "456" } };
+            Dictionary<string, string> F = new Dictionary<string, string> { { "UVW", "321" }, { "XYZ", "654" } };
+
+            Dictionary<string, Dictionary<string, string>> all = new Dictionary<string, Dictionary<string, string>>();
+
+            all.Add("E", E);
+            all.Add("F", F);
+
+            var xxx = JsonSerializer.Serialize(all);
+
+
+
 
             double a = 12_345_678.11;
             double b = 12_3_45__6_78.11;
@@ -33,9 +46,9 @@ namespace Hardcode
 
             List<Token> tokes = new List<Token>();
 
-            Dictionary<string,string> token_dictionary = new Dictionary<string,string>();
+            Dictionary<string, Dictionary<string, string>> token_dictionary = new();
 
-            token_dictionary = JsonSerializer.Deserialize<Dictionary<string,string>>(File.ReadAllText(LanguageDictionary)).ToDictionary(x => x.Value, x=> x.Key);
+            token_dictionary = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(File.ReadAllText(LanguageDictionary)).ToDictionary(x => x.Key, x => x.Value.ToDictionary(x => x.Value, x => x.Key));
 
             // Create an input source from a source file.
 
@@ -78,14 +91,14 @@ namespace Hardcode
 
                 if (token.TokenType == TokenType.Identifier)
                 {
-                    if (token_dictionary.ContainsKey(token.Lexeme))
+                    if (token_dictionary["fr"].ContainsKey(token.Lexeme))
                     {
-                        token.Keyword = Enum.Parse<Keywords>(token_dictionary[token.Lexeme]);
+                        token.Keyword = Enum.Parse<Keywords>(token_dictionary["fr"][token.Lexeme]);
                         return;
                     }
                     else
                     {
-                        foreach (var kvp in token_dictionary)
+                        foreach (var kvp in token_dictionary["fr"])
                         {
                             if (kvp.Key.Contains(' ')) // multi word keywords must contain a space
                             {
