@@ -1,4 +1,5 @@
-﻿
+﻿#lingua(FR) 
+
 fonction test binaire(31)
 
    déclarer a chaîne

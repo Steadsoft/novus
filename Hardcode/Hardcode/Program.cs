@@ -17,7 +17,7 @@ namespace Hardcode
         {
             string TokenDefinitionsFile = @"..\..\..\hardcode.csv";
             string SourceFile = @"..\..\..\langtest_en_1.hcl";
-            string LanguageDictionary = @"..\..\..\fr.keywords";
+            string LanguageDictionary = @"..\..\..\en.keywords";
 
             double a = 12_345_678.11;
             double b = 12_3_45__6_78.11;

@@ -1,4 +1,5 @@
-﻿
+﻿#lingua(FR) 
+
 function test binary(31)
 
    declare a string
