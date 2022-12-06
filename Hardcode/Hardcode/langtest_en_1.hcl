@@ -1,4 +1,4 @@
-﻿#lingua(FR) 
+﻿#lingua(EN) 
 
 function test binary(31)
 

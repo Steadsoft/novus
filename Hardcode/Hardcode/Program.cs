@@ -16,7 +16,7 @@ namespace Hardcode
         static void Main(string[] args)
         {
             string TokenDefinitionsFile = @"..\..\..\hardcode.csv";
-            string SourceFile = @"..\..\..\langtest_fr_1.hcl";
+            string SourceFile = @"..\..\..\langtest_en_1.hcl";
             string LanguageDictionary = @"..\..\..\lingua.keywords";
 
             Dictionary<string, string> E = new Dictionary<string, string> { { "ABC", "123" }, { "DEF", "456" } };
@@ -56,7 +56,7 @@ namespace Hardcode
 
             // Create a token enumator from the souce using defintions from a file, skip comments as well.
 
-            var token_enumerator = new TokenEnumerator<Keywords>(input_source, "fr", TokenDefinitionsFile, TokenOrigin.File, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
+            var token_enumerator = new TokenEnumerator<Keywords>(input_source, "en", TokenDefinitionsFile, TokenOrigin.File, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
 
             var t = token_enumerator.GetNextToken(true);
 
