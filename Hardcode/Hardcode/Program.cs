@@ -56,7 +56,7 @@ namespace Hardcode
 
             // Create a token enumator from the souce using defintions from a file, skip comments as well.
 
-            var token_enumerator = new TokenEnumerator<Keywords>(input_source, TokenDefinitionsFile, TokenOrigin.File, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
+            var token_enumerator = new TokenEnumerator<Keywords>(input_source, "fr", TokenDefinitionsFile, TokenOrigin.File, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
 
             var t = token_enumerator.GetNextToken(true);
 
@@ -71,7 +71,7 @@ namespace Hardcode
             var goods = tokes.Where(t => t.IsInvalid == false).ToList();
             var fails = tokes.Where(t => t.IsInvalid ).ToList();
 
-            void ValidateToken(TokenEnumerator<Keywords> tokens, Token token)
+            void ValidateToken(TokenEnumerator<Keywords> tokens, string KeywordLanguage, Token token)
             {
                 const char US = '_';
                 const char SP = ' ';
@@ -91,14 +91,14 @@ namespace Hardcode
 
                 if (token.TokenType == TokenType.Identifier)
                 {
-                    if (token_dictionary["fr"].ContainsKey(token.Lexeme))
+                    if (token_dictionary[KeywordLanguage].ContainsKey(token.Lexeme))
                     {
-                        token.Keyword = Enum.Parse<Keywords>(token_dictionary["fr"][token.Lexeme]);
+                        token.Keyword = Enum.Parse<Keywords>(token_dictionary[KeywordLanguage][token.Lexeme]);
                         return;
                     }
                     else
                     {
-                        foreach (var kvp in token_dictionary["fr"])
+                        foreach (var kvp in token_dictionary[KeywordLanguage])
                         {
                             if (kvp.Key.Contains(' ')) // multi word keywords must contain a space
                             {
