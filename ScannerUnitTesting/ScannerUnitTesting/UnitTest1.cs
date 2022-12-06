@@ -539,7 +539,7 @@ namespace ScannerUnitTesting
             {
                 if (Dictionary.ContainsKey(token.Lexeme))
                 {
-                    token.KeywordList[0] = Enum.Parse<Keywords>(Dictionary[token.Lexeme]);
+                    token.KeywordList[0] = (Enum.Parse<Keywords>(Dictionary[token.Lexeme]),1);
                     token.ExactKeywordMatch = true;
                     return;
                 }
@@ -555,7 +555,7 @@ namespace ScannerUnitTesting
                             {
                                 if (token.Lexeme == parts[I])
                                 {
-                                    token.KeywordList[I] = Enum.Parse<Keywords>(Dictionary[kvp.Key]);
+                                    token.KeywordList[I] = (Enum.Parse<Keywords>(Dictionary[kvp.Key]),parts.Length);
                                 }
                             }
                         }
