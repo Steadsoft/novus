@@ -51,7 +51,7 @@ HEX(0)  Digit AppendContinue  HEX(0)		Undecided
 HEX(0)  '_'   AppendContinue  HEX(0)		Undecided 
 HEX(0)  Space AppendContinue  HEX(0)		Undecided 
 HEX(0)  ':'   AppendContinue  HEX(1)		Undecided 
-HEX(0)  Alpha AppendContinue  IDENTIFIER    Undecided 
+HEX(0)  Alpha AppendContinue  INITIAL       Identifier 
 HEX(0)  Any   RewindReturn    INITIAL		Identifier 
 
 HEX(1)  'H'   AppendReturn    INITIAL		NumericLiteral

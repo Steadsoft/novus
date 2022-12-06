@@ -1,4 +1,12 @@
-﻿#lingua(EN) 
+﻿
+def message struct order(auto) aligned
+    sequence bin(31)
+    tag      byte(2)
+end
+
+
+
+#lingua(EN) 
 
 function test binary(31)
 
@@ -9,7 +17,11 @@ function test binary(31)
       a = a + 1
    
    end
+   goto someplace
 
+   go to another
+
+   
    loop I = 1 to 100
 
       call reset_device(I)

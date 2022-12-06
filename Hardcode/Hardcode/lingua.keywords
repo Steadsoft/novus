@@ -10,6 +10,7 @@
     "Coroutine": "coroutine",
     "Decimal": "decimal",
     "Declare": "declare",
+    "Define": "define",
     "End": "end",
     "Enum": "enum",
     "Fixed": "fixed",
@@ -45,6 +46,7 @@
     "Bin": "bin",
     "Dcl": "dcl",
     "Dec": "dec",
+    "Def":  "def",
     "Func": "func",
     "Proc": "proc",
     "Struct": "struct"
@@ -61,6 +63,7 @@
     "Coroutine": "coroutine",
     "Decimal": "décimal",
     "Declare": "déclarer",
+    "Define": "define",
     "End": "fin",
     "Enum": "enum",
     "Fixed": "fixe",
@@ -96,6 +99,7 @@
     "Bin": "bin",
     "Dcl": "dcl",
     "Dec": "déc",
+    "Def": "def",
     "Func": "fonc",
     "Proc": "proc",
     "Struct": "struct"

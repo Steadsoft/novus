@@ -16,7 +16,7 @@ namespace Hardcode
         static void Main(string[] args)
         {
             string TokenDefinitionsFile = @"..\..\..\hardcode.csv";
-            string SourceFile = @"..\..\..\langtest_fr_1.hcl";
+            string SourceFile = @"..\..\..\langtest_en_1.hcl";
             string LanguageDictionary = @"..\..\..\lingua.keywords";
 
             Dictionary<string, string> E = new Dictionary<string, string> { { "ABC", "123" }, { "DEF", "456" } };
@@ -52,7 +52,7 @@ namespace Hardcode
 
             // Create a token enumator from the souce using defintions from a file, skip comments as well.
 
-            var token_enumerator = new TokenEnumerator<Keywords>(input_source, "fr", TokenDefinitionsFile, LanguageDictionary, TokenOrigin.File, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
+            var token_enumerator = new TokenEnumerator<Keywords>(input_source, "en", TokenDefinitionsFile, LanguageDictionary, TokenOrigin.File, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
 
             var t = token_enumerator.GetNextToken(true);
 
@@ -84,40 +84,10 @@ namespace Hardcode
                 const string HEX_LETTERS_U = "ABCDEF";
                 const string FLOAT_HEX_REGEX = @"([0-9a-fA-F]*\.[0-9a-fA-F]+|[0-9a-fA-F]+\.?)[Pp][-+]?[0-9]+[flFL]?";
 
-                // Recognizing keyowrds is tricky because in some language a "keyword" is actually several terms.
-                // If the lexeme exactkly match the spelling of a keyword, then it is that keyword.
-                // But if it matches only one of several terms, we store the corresponding keyword into the 
-                // array slot corresponding to which of the terms, it macthes.
-                // During parsing, if a several tokens match terms 0, 1, 2 in order and they each refer to same keyword, then we can be confident 
-                // those terms do correspond to that keyword.
+                Regex FloatHex = new Regex(FLOAT_HEX_REGEX);
 
-                if (token.TokenType == TokenType.Identifier)
-                {
-                    if (Dictionary.ContainsKey(token.Lexeme))
-                    {
-                        token.KeywordList[0] = (Enum.Parse<Keywords>(Dictionary[token.Lexeme]), 1);
-                        token.ExactKeywordMatch= true;
-                        return;
-                    }
-                    else
-                    {
-                        foreach (var kvp in Dictionary)
-                        {
-                            if (kvp.Key.Contains(' ')) // multi word keywords must contain a space
-                            {
-                                var parts = kvp.Key.Split(' ');
-
-                                for (int I = 0; I < parts.Length; I++)
-                                {
-                                    if (token.Lexeme == parts[I])
-                                    {
-                                        token.KeywordList[I] = (Enum.Parse<Keywords>(Dictionary[kvp.Key]),parts.Length);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                // If we see a CR token followed by an LF token, then replace the two tokens 
+                // with a single NewLine token.
 
                 if (token.TokenType == TokenType.CR)
                 {
@@ -130,7 +100,22 @@ namespace Hardcode
                         token.Lexeme = "\r\n";
                         token.TokenType = TokenType.NewLine;
                     }
+
+                    return;
                 }
+
+                // Strip any leading/trailing spaces from identifier tokens.
+                // These can sometimes appear due to the way we tolerate spaces
+                // inside numeric literals.
+
+                if (token.TokenType == TokenType.Identifier)
+                {
+                    token.Lexeme = token.Lexeme.TrimStart().TrimEnd();
+                }
+
+                // If we have an identifier with embedded spaces, we must split this up into
+                // multiple distinct identifiers. This can happen if we see identifiers that 
+                // start with hex chars but turn out to not be hex literals after all.
 
                 if (token.TokenType == TokenType.Identifier && token.Lexeme.Contains(' '))
                 {
@@ -153,6 +138,43 @@ namespace Hardcode
                     token.Lexeme = temp.Lexeme;
                     token.TokenType = temp.TokenType;
                 }
+
+                // Recognizing keyowrds is tricky because in some language a "keyword" is actually several terms.
+                // If the lexeme exactkly match the spelling of a keyword, then it is that keyword.
+                // But if it matches only one of several terms, we store the corresponding keyword into the 
+                // array slot corresponding to which of the terms, it macthes.
+                // During parsing, if a several tokens match terms 0, 1, 2 in order and they each refer to same keyword, then we can be confident 
+                // those terms do correspond to that keyword.
+
+                if (token.TokenType == TokenType.Identifier)
+                {
+                    if (Dictionary.ContainsKey(token.Lexeme))
+                    {
+                        token.KeywordList[0] = (Enum.Parse<Keywords>(Dictionary[token.Lexeme]), 1);
+                        token.ExactKeywordMatch = true;
+                        return;
+                    }
+                    else
+                    {
+                        foreach (var kvp in Dictionary)
+                        {
+                            if (kvp.Key.Contains(' ')) // multi word keywords must contain a space
+                            {
+                                var parts = kvp.Key.Split(' ');
+
+                                for (int I = 0; I < parts.Length; I++)
+                                {
+                                    if (token.Lexeme == parts[I])
+                                    {
+                                        token.KeywordList[I] = (Enum.Parse<Keywords>(Dictionary[kvp.Key]), parts.Length);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Validate numeric literals
 
                 if (token.TokenType == TokenType.NumericLiteral)
                 {
@@ -230,6 +252,15 @@ namespace Hardcode
 
                     if (token.Lexeme.ToUpper().EndsWithAny(BBIN, BOCT, BDEC, BHEX) == false)
                     {
+                        double value;
+
+                        if (Double.TryParse(token.Lexeme, out value))
+                            return;
+
+                        if (FloatHex.IsMatch(token.Lexeme))
+                            return;
+
+
                         if (token.Lexeme.All(DEC_CHARS.Contains) == false)
                         {
                             token.ErrorText = "This non-decimal literal does not end with a valid base indicator";
