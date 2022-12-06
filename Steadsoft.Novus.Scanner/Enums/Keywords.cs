@@ -22,6 +22,7 @@
         Goto,
         Internal,
         Interrupt,
+        Language,
         Loop,
         Namespace,
         Out,

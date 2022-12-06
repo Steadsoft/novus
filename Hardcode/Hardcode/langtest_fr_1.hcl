@@ -4,7 +4,7 @@ fonction test binaire(31)
 
    déclarer a chaîne
 
-   pendant que true
+   tandis que true
 
       a = a + 1
 

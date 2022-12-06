@@ -505,10 +505,10 @@ namespace ScannerUnitTesting
         {
             var source = SourceCode.CreateFromString(Text);
             //var tokenizer = new Tokenizer<Keywords>(@"..\..\..\CSV\hardcode.csv", TokenOrigin.File, Assembly.GetExecutingAssembly()); // be able to supply a delegate that can sanity check tokens.
-            return new TokenEnumerator<Keywords>(source, @"..\..\..\CSV\hardcode.csv", TokenOrigin.File, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
+            return new TokenEnumerator<Keywords>(source, "en", @"..\..\..\CSV\hardcode.csv", @"..\..\..\Inputs\lingua.keywords", TokenOrigin.File, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
         }
 
-        private static void ValidateToken(TokenEnumerator<Keywords> tokens, Token token)
+        void ValidateToken(TokenEnumerator<Keywords> tokens, string KeywordLanguage, Dictionary<string, string> Dictionary, Token token)
         {
             const char US = '_';
             const char SP = ' ';
@@ -523,10 +523,45 @@ namespace ScannerUnitTesting
             const string BIN_CHARS = ".01";
             const string HEX_LETTERS_L = "abcdef";
             const string HEX_LETTERS_U = "ABCDEF";
-
             const string FLOAT_HEX_REGEX = @"([0-9a-fA-F]*\.[0-9a-fA-F]+|[0-9a-fA-F]+\.?)[Pp][-+]?[0-9]+[flFL]?";
 
             Regex FloatHex = new Regex(FLOAT_HEX_REGEX);
+
+
+            // Recognizing keyowrds is tricky because in some language a "keyword" is actually several terms.
+            // If the lexeme exactkly match the spelling of a keyword, then it is that keyword.
+            // But if it matches only one of several terms, we store the corresponding keyword into the 
+            // array slot corresponding to which of the terms, it macthes.
+            // During parsing, if a several tokens match terms 0, 1, 2 in order and they each refer to same keyword, then we can be confident 
+            // those terms do correspond to that keyword.
+
+            if (token.TokenType == TokenType.Identifier)
+            {
+                if (Dictionary.ContainsKey(token.Lexeme))
+                {
+                    token.KeywordList[0] = Enum.Parse<Keywords>(Dictionary[token.Lexeme]);
+                    token.ExactKeywordMatch = true;
+                    return;
+                }
+                else
+                {
+                    foreach (var kvp in Dictionary)
+                    {
+                        if (kvp.Key.Contains(' ')) // multi word keywords must contain a space
+                        {
+                            var parts = kvp.Key.Split(' ');
+
+                            for (int I = 0; I < parts.Length; I++)
+                            {
+                                if (token.Lexeme == parts[I])
+                                {
+                                    token.KeywordList[I] = Enum.Parse<Keywords>(Dictionary[kvp.Key]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             if (token.TokenType == TokenType.CR)
             {
@@ -646,6 +681,7 @@ namespace ScannerUnitTesting
 
                     if (FloatHex.IsMatch(token.Lexeme))
                         return;
+
 
                     if (token.Lexeme.All(DEC_CHARS.Contains) == false)
                     {

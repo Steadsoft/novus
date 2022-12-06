@@ -2,6 +2,7 @@
 using System.Text;
 using static Steadsoft.Novus.Scanner.Enums.TokenType;
 using static Steadsoft.Novus.Scanner.Enums.State;
+using System.Text.Json;
 
 namespace Steadsoft.Novus.Scanner.Classes
 {
@@ -13,8 +14,10 @@ namespace Steadsoft.Novus.Scanner.Classes
         private readonly TokenType[] Skips;
         private readonly Stack<Token> pushed = new();
         private readonly Stack<ParsingHint> hints = new();
-        private readonly Action<TokenEnumerator<T>,string,Token> augmentor;
+        private readonly Action<TokenEnumerator<T>,string, Dictionary<string, string>,Token> augmentor;
         private readonly string lang_code;
+        private readonly Dictionary<string, Dictionary<string, string>> language_dictionary = new();
+
         /// <summary>
         /// Uses a source for the source code as well as a source of language token definitions to expose an enumerable sequence of tokens.
         /// </summary>
@@ -23,12 +26,14 @@ namespace Steadsoft.Novus.Scanner.Classes
         /// <param name="Origin">Indicates whether the CVS is a file or embedded resource.</param>
         /// <param name="Augmentor">Optional function to validaate and/or enrich the token stream.</param>
         /// <param name="Skips">Optional token types to skip, the caller will never see these tokens.</param>
-        public TokenEnumerator(SourceCode SourceText, string KeywordsLanguageCode, string TokenDefinitions, TokenOrigin Origin, Action<TokenEnumerator<T>,string,Token> Augmentor = null , params TokenType[] Skips)
+        public TokenEnumerator(SourceCode SourceText, string KeywordsLanguageCode, string TokenDefinitions, string LanguageDictionary, TokenOrigin Origin, Action<TokenEnumerator<T>,string, Dictionary<string, string>,Token> Augmentor = null , params TokenType[] Skips)
         {
             tokenizer = new Tokenizer<Keywords>(TokenDefinitions, Origin); ;
             source = tokenizer.Tokenize(SourceText);
             enumerator = source.GetEnumerator();
             lang_code = KeywordsLanguageCode;
+            language_dictionary = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(File.ReadAllText(LanguageDictionary)).ToDictionary(x => x.Key, x => x.Value.ToDictionary(x => x.Value, x => x.Key));
+
 
             if (Augmentor != null)
                 augmentor = Augmentor;
@@ -72,17 +77,17 @@ namespace Steadsoft.Novus.Scanner.Classes
         /// <param name="Keyword">The token type of the expected next token.</param>
         /// <param name="Token">If successful, the next token.</param>
         /// <exception cref="InternalErrorException"></exception>
-        public void VerifyExpectedToken(Keywords Keyword, out Token Token)
-        {
-            var token = GetNextToken();
+        //public void VerifyExpectedToken(Keywords Keyword, out Token Token)
+        //{
+        //    var token = GetNextToken();
 
-            if (token.Keyword != Keyword)
-                throw new InternalErrorException($"Expected token (keyword) '{Keyword}' has not been pushed by caller!");
+        //    if (token.KeywordList != Keyword)
+        //        throw new InternalErrorException($"Expected token (keyword) '{Keyword}' has not been pushed by caller!");
 
-            Token = token;
+        //    Token = token;
 
-            return;
-        }
+        //    return;
+        //}
 
 
         /// <summary>
@@ -145,7 +150,7 @@ namespace Steadsoft.Novus.Scanner.Classes
             var token = ReadNextToken();
 
             if (Augment)
-               augmentor(this, lang_code, token);
+               augmentor(this, lang_code, language_dictionary[lang_code], token);
 
             /* TODO We may need to review this because there may be cases where we return from here having pushed a simulated token and then the caller pops the hint, raising the question is that simulated token still meaningful, valid?
             */

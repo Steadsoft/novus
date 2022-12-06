@@ -16,7 +16,7 @@ namespace Hardcode
         static void Main(string[] args)
         {
             string TokenDefinitionsFile = @"..\..\..\hardcode.csv";
-            string SourceFile = @"..\..\..\langtest_en_1.hcl";
+            string SourceFile = @"..\..\..\langtest_fr_1.hcl";
             string LanguageDictionary = @"..\..\..\lingua.keywords";
 
             Dictionary<string, string> E = new Dictionary<string, string> { { "ABC", "123" }, { "DEF", "456" } };
@@ -46,17 +46,13 @@ namespace Hardcode
 
             List<Token> tokes = new List<Token>();
 
-            Dictionary<string, Dictionary<string, string>> token_dictionary = new();
-
-            token_dictionary = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(File.ReadAllText(LanguageDictionary)).ToDictionary(x => x.Key, x => x.Value.ToDictionary(x => x.Value, x => x.Key));
-
             // Create an input source from a source file.
 
             var input_source = SourceCode.CreateFromFile(SourceFile);
 
             // Create a token enumator from the souce using defintions from a file, skip comments as well.
 
-            var token_enumerator = new TokenEnumerator<Keywords>(input_source, "en", TokenDefinitionsFile, TokenOrigin.File, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
+            var token_enumerator = new TokenEnumerator<Keywords>(input_source, "fr", TokenDefinitionsFile, LanguageDictionary, TokenOrigin.File, ValidateToken, TokenType.BlockComment, TokenType.LineComment);
 
             var t = token_enumerator.GetNextToken(true);
 
@@ -71,7 +67,7 @@ namespace Hardcode
             var goods = tokes.Where(t => t.IsInvalid == false).ToList();
             var fails = tokes.Where(t => t.IsInvalid ).ToList();
 
-            void ValidateToken(TokenEnumerator<Keywords> tokens, string KeywordLanguage, Token token)
+            void ValidateToken(TokenEnumerator<Keywords> tokens, string KeywordLanguage, Dictionary<string, string> Dictionary, Token token)
             {
                 const char US = '_';
                 const char SP = ' ';
@@ -88,36 +84,34 @@ namespace Hardcode
                 const string HEX_LETTERS_U = "ABCDEF";
                 const string FLOAT_HEX_REGEX = @"([0-9a-fA-F]*\.[0-9a-fA-F]+|[0-9a-fA-F]+\.?)[Pp][-+]?[0-9]+[flFL]?";
 
+                // Recognizing keyowrds is tricky because in some language a "keyword" is actually several terms.
+                // If the lexeme exactkly match the spelling of a keyword, then it is that keyword.
+                // But if it matches only one of several terms, we store the corresponding keyword into the 
+                // array slot corresponding to which of the terms, it macthes.
+                // During parsing, if a several tokens match terms 0, 1, 2 in order and they each refer to same keyword, then we can be confident 
+                // those terms do correspond to that keyword.
 
                 if (token.TokenType == TokenType.Identifier)
                 {
-                    if (token_dictionary[KeywordLanguage].ContainsKey(token.Lexeme))
+                    if (Dictionary.ContainsKey(token.Lexeme))
                     {
-                        token.Keyword = Enum.Parse<Keywords>(token_dictionary[KeywordLanguage][token.Lexeme]);
+                        token.KeywordList[0] = Enum.Parse<Keywords>(Dictionary[token.Lexeme]);
+                        token.ExactKeywordMatch= true;
                         return;
                     }
                     else
                     {
-                        foreach (var kvp in token_dictionary[KeywordLanguage])
+                        foreach (var kvp in Dictionary)
                         {
                             if (kvp.Key.Contains(' ')) // multi word keywords must contain a space
                             {
-                                if (kvp.Key.StartsWith(token.Lexeme))
+                                var parts = kvp.Key.Split(' ');
+
+                                for (int I = 0; I < parts.Length; I++)
                                 {
-                                    var follower = tokens.PeekNextToken();
-
-                                    if (follower.TokenType == TokenType.Identifier && kvp.Key.EndsWith(follower.Lexeme))
+                                    if (token.Lexeme == parts[I])
                                     {
-                                        // OK we have a keyword that has two terms and the two tokens match these.
-                                        // We create a new token and discard the two original one.
-
-                                        var discard = tokens.GetNextToken(); // discard the just peeked token.
-
-                                        // modify the original token
-
-                                        token.Keyword = Enum.Parse<Keywords>(kvp.Value);
-                                        token.Lexeme = token.Lexeme + " " + follower.Lexeme;
-                                        return;
+                                        token.KeywordList[I] = Enum.Parse<Keywords>(Dictionary[kvp.Key]);
                                     }
                                 }
                             }
