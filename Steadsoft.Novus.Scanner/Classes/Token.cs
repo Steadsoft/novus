@@ -12,7 +12,7 @@ namespace Steadsoft.Novus.Scanner.Classes
         public string Lexeme { get; set; }
         public int LineNumber { get;  set; }
         public int ColNumber { get;  set; }
-        public Keywords[] KeywordList { get; set; }
+        public (Keywords,int)[] KeywordList { get; set; }
         public Operators Operator { get; private set; }
         public bool IsInvalid { get; set; }
         public string ErrorText { get;  set; }
@@ -25,7 +25,7 @@ namespace Steadsoft.Novus.Scanner.Classes
 
                 foreach (var keyword in KeywordList)
                 {
-                    if (keyword != Keywords.IsNotAKeyword)
+                    if (keyword.Item1 != Keywords.IsNotAKeyword)
                     text = text + keyword.ToString() + "-";
                 }
 
@@ -45,7 +45,7 @@ namespace Steadsoft.Novus.Scanner.Classes
             this.IsInvalid = false;
             this.ErrorText= string.Empty;
             this.ExactKeywordMatch = false;
-            this.KeywordList = new Keywords[6];
+            this.KeywordList = new (Keywords,int)[6];
 
             Keywords keyword;
             Operators operater;
