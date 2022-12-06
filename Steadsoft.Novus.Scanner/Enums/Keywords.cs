@@ -6,6 +6,7 @@
     public enum Keywords
     {
         IsNotAKeyword = 0,
+        Aligned,
         Argument,
         Binary,
         Builtin,
@@ -26,7 +27,10 @@
         Language,
         Loop,
         Namespace,
+        Offset,
         Out,
+        Pad,
+        Pointer,
         Private,
         Procedure,
         Public,
@@ -40,6 +44,7 @@
         Structure,
         To,
         Type,
+        Unaigned,
         Until,
         Using,
         While,
@@ -52,6 +57,7 @@
         Def = Define + AbbreviationShift,
         Func = Function + AbbreviationShift,
         Proc = Procedure + AbbreviationShift,
+        Ptr = Pointer+ AbbreviationShift,
         Struct = Structure + AbbreviationShift,
         AbbreviationShift = 1000
  }
