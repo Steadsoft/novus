@@ -2,11 +2,16 @@
 def message struct order(auto) aligned
     sequence bin(31)
     tag      byte(2)
+
+    // Note all members that are padding/ignored must have same name 
+
+    XXXX     byte (5) padding
+    XXXX     byte (3) ignored // ignore the 3 byte checksum
 end
 
 
 
-#lingua(EN) 
+#env lingua(fr) 
 
 function test binary(31)
 
