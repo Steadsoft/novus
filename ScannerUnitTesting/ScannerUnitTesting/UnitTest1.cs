@@ -9,13 +9,14 @@ namespace ScannerUnitTesting
     [TestClass]
     public class UnitTest1
     {
+        Token token;
         // SEE: https://efxa.org/2014/05/10/regular-expressions-for-matching-data-values-in-compiler-lexers/
 
         [TestMethod]
         public void Test_IdentifierA()
         {
             var tokens = CreateEnumerator("im_a_name;");
-            var token = tokens.GetNextToken();
+            token = tokens.GetNextToken();
             Assert.IsTrue(token.TokenType == TokenType.Identifier);
             token = tokens.GetNextToken();
             Assert.IsTrue(token.TokenType == TokenType.SemiColon);
@@ -27,7 +28,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("im_a_name; ");
 
-            var token = tokens.GetNextToken();
+            token = tokens.GetNextToken();
             Assert.IsTrue(token.TokenType == TokenType.Identifier);
             token = tokens.GetNextToken();
             Assert.IsTrue(token.TokenType == TokenType.SemiColon);
@@ -38,7 +39,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("im_a_name ;");
 
-            var token = tokens.GetNextToken();
+            token = tokens.GetNextToken();
             Assert.IsTrue(token.TokenType == TokenType.Identifier);
             token = tokens.GetNextToken();
             Assert.IsTrue(token.TokenType == TokenType.SemiColon);
@@ -50,7 +51,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("01234546789;");
 
-            var token = tokens.GetNextToken();
+            token = tokens.GetNextToken();
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral);
             token = tokens.GetNextToken();
             Assert.IsTrue(token.TokenType == TokenType.SemiColon);
@@ -62,7 +63,9 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("01234 546789;");
 
-            var token = tokens.GetNextToken(true);
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
+            token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
             token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.SemiColon);
@@ -74,7 +77,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("01234_546789;");
 
-            var token = tokens.GetNextToken(true);
+            token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
             token = tokens.GetNextToken(    true);
             Assert.IsTrue(token.TokenType == TokenType.SemiColon);
@@ -86,8 +89,10 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("01234_ 546789;");
 
-            var token = tokens.GetNextToken(true);
-            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == true);
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
             token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.SemiColon);
 
@@ -98,7 +103,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("1:D;");
 
-            var token = tokens.GetNextToken(true);
+            token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
             token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.SemiColon);
@@ -110,7 +115,11 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("1 22 333:D;");
 
-            var token = tokens.GetNextToken(true);
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
+            token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
             token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.SemiColon);
@@ -122,7 +131,11 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("1 22 333:d;");
 
-            var token = tokens.GetNextToken(true);
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
+            token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
             token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.SemiColon);
@@ -134,7 +147,11 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("1 22 333:b;");
 
-            var token = tokens.GetNextToken(true);
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
+            token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == true);
             token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.SemiColon);
@@ -146,10 +163,10 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("1 22.333:d;");
 
-            var token = tokens.GetNextToken(true);
+            token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
-            Assert.IsTrue(token.Lexeme == "122.333:d");
-
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
             token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.SemiColon);
 
@@ -161,10 +178,10 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("1 2F.333:h;");
 
-            var token = tokens.GetNextToken(true);
+            token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
-            Assert.IsTrue(token.Lexeme == "12F.333:h");
-
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
             token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.SemiColon);
 
@@ -175,12 +192,21 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("FACE;");
 
-            var token = tokens.GetNextToken(true);
-            Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false);
-            Assert.IsTrue(token.Lexeme == "FACE");
+            try
+            {
+                token = tokens.GetNextToken(true);
+                Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false);
+                Assert.IsTrue(token.Lexeme == "FACE");
 
-            token = tokens.GetNextToken(true);
-            Assert.IsTrue(token.TokenType == TokenType.SemiColon);
+                token = tokens.GetNextToken(true);
+                Assert.IsTrue(token.TokenType == TokenType.SemiColon);
+            }
+            catch (Exception ex) 
+            {
+                ;
+            }
+
+
 
         }
 
@@ -189,7 +215,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("F1CE;");
 
-            var token = tokens.GetNextToken(true);
+            token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false);
             Assert.IsTrue(token.Lexeme == "F1CE");
 
@@ -203,7 +229,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("XYZW:H;");
 
-            var token = tokens.GetNextToken(true);
+            token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false);
             Assert.IsTrue(token.Lexeme == "XYZW");
 
@@ -217,7 +243,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("F1CE.;");
 
-            var token = tokens.GetNextToken(true);
+            token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false);
             Assert.IsTrue(token.Lexeme == "F1CE");
 
@@ -231,7 +257,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("1FCE;");
 
-            var token = tokens.GetNextToken(true);
+            token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == true);
             Assert.IsTrue(token.Lexeme == "1FCE");
 
@@ -245,7 +271,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("1FCE;");
 
-            var token = tokens.GetNextToken(true);
+            token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == true);
             Assert.IsTrue(token.Lexeme == "1FCE");
 
@@ -259,7 +285,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("1FCE.5FFB;");
 
-            var token = tokens.GetNextToken(true);
+            token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == true);
             Assert.IsTrue(token.Lexeme == "1FCE.5FFB");
 
@@ -273,7 +299,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("1FCE.5FFB:H;");
 
-            var token = tokens.GetNextToken(true);
+            token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid ==  false);
             Assert.IsTrue(token.Lexeme == "1FCE.5FFB:H");
 
@@ -287,7 +313,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("1FCE.5F.FB:H;");
 
-            var token = tokens.GetNextToken(true);
+            token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == true);
             Assert.IsTrue(token.Lexeme == "1FCE.5F");
 
@@ -301,9 +327,14 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("0110 0011 0101 1100:B;");
 
-            var token = tokens.GetNextToken(true);
+            token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
-            Assert.IsTrue(token.Lexeme == "0110001101011100:B");
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false);
 
             token = tokens.GetNextToken(true);
             Assert.IsTrue(token.TokenType == TokenType.SemiColon);
@@ -315,7 +346,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("dcb   bcd    bde;");
 
-            var token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+            token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
 
             Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false && token.Lexeme == "dcb");
 
@@ -338,9 +369,16 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("dcb bcd bde:h;");
 
-            var token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
-
-            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "dcbbcdbde:h");
+            token = tokens.GetNextToken(true); 
+            Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false && token.Lexeme == "dcb");
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false && token.Lexeme == "bcd");
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false && token.Lexeme == "bde");
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.Punctuator && token.IsInvalid == false);
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false && token.Lexeme == "h");
 
             token = tokens.GetNextToken(true);
 
@@ -353,7 +391,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("dcl a bin = dcb bcd bde:h;");
 
-            var token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+            token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
 
             Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false && token.Lexeme == "dcl");
 
@@ -370,8 +408,15 @@ namespace ScannerUnitTesting
             Assert.IsTrue(token.TokenType == TokenType.Equals && token.IsInvalid == false && token.Lexeme == "=");
 
             token = tokens.GetNextToken(true);
-
-            Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "dcbbcdbde:h");
+            Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false && token.Lexeme == "dcb");
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false && token.Lexeme == "bcd");
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false && token.Lexeme == "bde");
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.Punctuator && token.IsInvalid == false);
+            token = tokens.GetNextToken(true);
+            Assert.IsTrue(token.TokenType == TokenType.Identifier && token.IsInvalid == false && token.Lexeme == "h");
 
             token = tokens.GetNextToken(true);
 
@@ -384,7 +429,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("5.3876e4;");
 
-            var token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+            token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
 
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "5.3876e4");
 
@@ -399,7 +444,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("5.3876e-4;");
 
-            var token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+            token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
 
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "5.3876e-4");
 
@@ -414,7 +459,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("5.3876e+4;");
 
-            var token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+            token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
 
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "5.3876e+4");
 
@@ -430,7 +475,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("5.3876E4;");
 
-            var token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+            token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
 
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "5.3876E4");
 
@@ -445,7 +490,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("5.3876p4;");
 
-            var token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+            token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
 
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "5.3876p4");
 
@@ -460,7 +505,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("5.3876p-4;");
 
-            var token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+            token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
 
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "5.3876p-4");
 
@@ -475,7 +520,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("5.3876p+4;");
 
-            var token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+            token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
 
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "5.3876p+4");
 
@@ -490,7 +535,7 @@ namespace ScannerUnitTesting
         {
             var tokens = CreateEnumerator("5.3A0D6p+4;");
 
-            var token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
+            token = tokens.GetNextToken(true); // would ordinarily be an illegally formed identifier with spaces inside, but the augmentor fixes that.
 
             Assert.IsTrue(token.TokenType == TokenType.NumericLiteral && token.IsInvalid == false && token.Lexeme == "5.3A0D6p+4");
 

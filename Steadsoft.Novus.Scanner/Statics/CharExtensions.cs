@@ -20,9 +20,6 @@ namespace Steadsoft.Novus.Scanner.Statics
             if (C == ' ')
                 return LexicalClass.Space;
 
-            if (IsHexDigit(C))
-                return LexicalClass.Hex;
-
             if (char.IsLetter(C))
                 return LexicalClass.Alpha;
 

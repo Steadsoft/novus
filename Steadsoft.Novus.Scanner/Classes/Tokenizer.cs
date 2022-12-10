@@ -161,7 +161,6 @@ namespace Steadsoft.Novus.Scanner.Classes
                 var character = source.Chars[I];
                 var charclass = character.Char.GetLexicalClass();
 
-
                 bool found = Table.TryGet(state, character.Char, out tuple) ? true : Table.TryGet(state, charclass, out tuple) ? true : Table.TryGet(state, Any, out tuple);
 
                 if (found == false)

@@ -3,6 +3,16 @@ im_another ;
 so_am_i ; 
 
 
+// Make "heap" a type
+
+dcl packet_heap area(4096);
+
+dcl p pointer;
+
+allocate p in packet_heap;
+
+
+
 /*
 proc aaa
 {
