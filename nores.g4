@@ -7,10 +7,11 @@ prog: statement*
 statement
     :   assign_stmt 
     |   keyword_stmt 
+    |   SEMICOLON
     ;
 
 assign_stmt
-    :   reference EQUALS expression NEWLINE
+    :   reference EQUALS expression SEMICOLON
     ;
 
 reference
@@ -77,25 +78,26 @@ keyword_stmt
     ;
 
 call_stmt
-    :   CALL reference '(' ')' NEWLINE
+    :   CALL reference '(' ')' SEMICOLON
     ;
 
 goto_stmt
-    :   GOTO IDENTIFIER NEWLINE
+    :   GOTO IDENTIFIER SEMICOLON
     ;
 
 procedure_stmt
-    :   (PROCEDURE | PROC) identifier ('(' ')')? '{' prog '}' NEWLINE
+    :   (PROCEDURE | PROC) identifier ('(' ')')? '{' prog '}' 
     ;
 
 WS:         (' ')+ -> skip ;
-NEWLINE:    [\r\n]+ ;
+NEWLINE:    [\r\n]+ -> skip ;
+TAB:        ('\t')+ -> skip ;
 INT:        [0-9]+ ; 
 CALL:       'call' ; 
 GOTO:       'goto' ;
 PROCEDURE:  'procedure' ;
 PROC:       'proc' ;
-IDENTIFIER: [a-zA-Z]+ ;
+IDENTIFIER: [a-zA-Z_]+ ;
 ARROW:      '->' ;
 DOT:        '.' ;
 COMMA:      ',' ;
@@ -106,4 +108,5 @@ TIMES:      '*' ;
 DIVIDE:     '/' ;
 PLUS:       '+' ;
 MINUS:      '-' ;
+SEMICOLON:  ';' ;
 
