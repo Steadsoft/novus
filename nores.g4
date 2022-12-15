@@ -47,13 +47,90 @@ subscript_commalist
     :   subscript (COMMA subscript)*
     ;
 
+expression
+    :   expression_9 | expression '|:' expression_9
+    ;
 
+expression_9
+    :   expression_8 | expression_9 '&:' expression_8
+    ;
+
+expression_8
+    :   expression_7 | expression_8 ('|' | '~') expression_7
+    ;
+
+expression_7
+    :   expression_6 | expression_7 '&' expression_6
+    ;
+
+expression_6
+    :   expression_5 | expression_6 comparison_operator expression_5
+    ;
+
+expression_5
+    :   expression_4 | expression_5 '||' expression_4
+    ;
+
+expression_4
+    :   expression_3 | expression_4 (PLUS | MINUS) expression_3
+    ;
+
+expression_3
+    :   expression_2 | expression_3 (TIMES | DIVIDE) expression_2
+    ;
+
+expression_2
+    :   primitive_expression | prefix_expression | parenthesized_expression | expression_1
+    ;
+
+expression_1
+    :   (primitive_expression | parenthesized_expression) POWER expression_2
+    ;
+
+prefix_expression
+    :   prefix_operator expression_2
+    ;
+
+parenthesized_expression
+    :   '(' expression ')'
+    ;
+
+primitive_expression
+    :   reference
+    |   constant
+    // | enquiry
+    ;
+
+constant
+    :   INT
+    ;
+
+prefix_operator
+    :   '+'
+    |   '-'
+    |   '~'
+    ;
+
+comparison_operator
+    :   '>'
+    |   '>='
+    |   '='
+    |   '<'
+    |   '<='
+    |   '~>'
+    |   '~='
+    |   '~<'
+    ;
+
+
+/*
 expression
     :   expression (TIMES | DIVIDE) expression
     |   expression (PLUS | MINUS) expression
     |   INT
     |   LPAR expression RPAR
     ;
+*/
 
 identifier
     :   keyword
@@ -69,12 +146,14 @@ keyword
     | GOTO
     | PROCEDURE
     | PROC
+    | END
     ;
 
 keyword_stmt
     :   call_stmt 
     |   goto_stmt
     |   procedure_stmt
+    |   end_stmt
     ;
 
 call_stmt
@@ -85,8 +164,12 @@ goto_stmt
     :   GOTO IDENTIFIER SEMICOLON
     ;
 
+end_stmt
+    :   END SEMICOLON
+    ;
+
 procedure_stmt
-    :   (PROCEDURE | PROC) identifier ('(' ')')? '{' prog '}' 
+    :   (PROCEDURE | PROC) identifier ('(' ')')?  prog end_stmt
     ;
 
 WS:         (' ')+ -> skip ;
@@ -97,6 +180,8 @@ CALL:       'call' ;
 GOTO:       'goto' ;
 PROCEDURE:  'procedure' ;
 PROC:       'proc' ;
+END:        'end' ;
+
 IDENTIFIER: [a-zA-Z_]+ ;
 ARROW:      '->' ;
 DOT:        '.' ;
@@ -109,4 +194,4 @@ DIVIDE:     '/' ;
 PLUS:       '+' ;
 MINUS:      '-' ;
 SEMICOLON:  ';' ;
-
+POWER:      '**' ;
