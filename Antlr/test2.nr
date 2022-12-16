@@ -1,6 +1,4 @@
-
-proc revalidate() 
-
-	;
-
+if a=b then
+   goto x;
 end;
+

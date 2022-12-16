@@ -24,6 +24,16 @@ if if = then then
    dcl realm binary;
    call reboot(0);
    go to end;
+else
+   return (123);
+   if = 44;
+   end = then + else;
 end;
 
+
+proc reboot()
+
+
+
+end;
 

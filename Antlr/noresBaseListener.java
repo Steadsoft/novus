@@ -527,6 +527,18 @@ public class noresBaseListener implements noresListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitThen_clause(noresParser.Then_clauseContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterElse_clause(noresParser.Else_clauseContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitElse_clause(noresParser.Else_clauseContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

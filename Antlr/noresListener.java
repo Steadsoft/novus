@@ -436,4 +436,14 @@ public interface noresListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitThen_clause(noresParser.Then_clauseContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link noresParser#else_clause}.
+	 * @param ctx the parse tree
+	 */
+	void enterElse_clause(noresParser.Else_clauseContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link noresParser#else_clause}.
+	 * @param ctx the parse tree
+	 */
+	void exitElse_clause(noresParser.Else_clauseContext ctx);
 }
