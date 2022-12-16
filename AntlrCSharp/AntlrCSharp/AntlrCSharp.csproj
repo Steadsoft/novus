@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="BasicNoresVisitor.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\Antlr\noresBaseListener.cs" Link="noresBaseListener.cs" />
+    <Compile Include="..\..\Antlr\noresLexer.cs" Link="noresLexer.cs" />
+    <Compile Include="..\..\Antlr\noresListener.cs" Link="noresListener.cs" />
+    <Compile Include="..\..\Antlr\noresParser.cs" Link="noresParser.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.11.1" />
+  </ItemGroup>
+
+</Project>
