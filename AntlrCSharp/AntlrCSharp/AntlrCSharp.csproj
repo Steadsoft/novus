@@ -19,6 +19,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\..\Antlr\nores.g4" Link="nores.g4" />
+    <None Include="..\..\Antlr\test1.nr" Link="test1.nr" />
+    <None Include="..\..\Antlr\test2.nr" Link="test2.nr" />
+    <None Include="..\..\Antlr\test_3.nr" Link="test_3.nr" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.11.1" />
   </ItemGroup>
 

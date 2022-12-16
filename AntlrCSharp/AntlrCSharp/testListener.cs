@@ -15,5 +15,10 @@ namespace AntlrCSharp
         {
             base.EnterBasic_reference(context);
         }
+
+        public override void EnterPreprocessor_stmt([NotNull] noresParser.Preprocessor_stmtContext context)
+        {
+            base.EnterPreprocessor_stmt(context);
+        }
     }
 }

@@ -11,10 +11,16 @@ namespace AntlrCSharp
 
         static void Main(string[] args)
         {
-            TextReader source = File.OpenText(@"..\..\..\..\..\Antlr\test1.nr");
+            //
+            //TextReader source = File.OpenText(@"..\..\..\..\..\Antlr\test1.nr");
+
+            TextReader source = File.OpenText(@"..\..\..\..\..\Antlr\test_3.nr");
 
             AntlrInputStream inputStream = new AntlrInputStream(source);
             noresLexer noresLexer = new noresLexer(inputStream);
+
+            noresLexer.langcode = "en"; // set as needed.
+
             CommonTokenStream commonTokenStream = new CommonTokenStream(noresLexer);
             noresParser noresParser = new noresParser(commonTokenStream);
 
@@ -27,15 +33,8 @@ namespace AntlrCSharp
             ParseTreeWalker walker = new ParseTreeWalker();
 
             walker.Walk(listener, tree);
-            
 
             Console.WriteLine(tree.ToStringTree());
         }
-
-    }
-
-    public class SourceReader : TextReader
-    {
-
     }
 }
