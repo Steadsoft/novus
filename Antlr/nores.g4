@@ -165,6 +165,7 @@ keyword
     | RETURN
     | IF
     | THEN
+    | ELSE
     | GO
     | TO
     ;
@@ -173,7 +174,7 @@ keyword_stmt
     :   call_stmt 
     |   goto_stmt
     |   procedure_stmt
-    |   end_stmt
+    // |   end_stmt
     |   declare_stmt
     |   return_stmt
     |   if_stmt
@@ -212,7 +213,7 @@ defined
     ;
 
 procedure_stmt
-    :   PROCEDURE identifier ('(' ')')?  prog end_stmt
+    :   PROCEDURE identifier ('(' ')')?  prog end_stmt 
     ;
 
 return_stmt
@@ -220,11 +221,15 @@ return_stmt
     ;
 
 if_stmt
-    :   then_clause (assign_stmt | keyword_stmt)+ END SEMICOLON
+    :   then_clause (assign_stmt | keyword_stmt)+ else_clause? end_stmt 
     ;
 
 then_clause
     :   IF expression THEN
+    ;
+
+else_clause
+    :   ELSE (assign_stmt | keyword_stmt)+
     ;
 
 COMMENT:    '/*' .*? '*/' -> channel(2) ;
@@ -270,6 +275,7 @@ EXTERNAL:       ('external');
 RETURN:         ('return');
 IF:             ('if');
 THEN:           ('then');
+ELSE:           ('else');
 
 IDENTIFIER: [a-zA-Z_]+ ;
 ARROW:      '->' ;
