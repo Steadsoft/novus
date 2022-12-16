@@ -60,6 +60,18 @@ public partial class noresBaseListener : InoresListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitStatement([NotNull] noresParser.StatementContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="noresParser.preprocessor_stmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterPreprocessor_stmt([NotNull] noresParser.Preprocessor_stmtContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="noresParser.preprocessor_stmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitPreprocessor_stmt([NotNull] noresParser.Preprocessor_stmtContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="noresParser.assign_stmt"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
@@ -432,6 +444,66 @@ public partial class noresBaseListener : InoresListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitEnd_stmt([NotNull] noresParser.End_stmtContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="noresParser.declare_stmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterDeclare_stmt([NotNull] noresParser.Declare_stmtContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="noresParser.declare_stmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitDeclare_stmt([NotNull] noresParser.Declare_stmtContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="noresParser.attribute"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterAttribute([NotNull] noresParser.AttributeContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="noresParser.attribute"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitAttribute([NotNull] noresParser.AttributeContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="noresParser.data_attribute"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterData_attribute([NotNull] noresParser.Data_attributeContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="noresParser.data_attribute"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitData_attribute([NotNull] noresParser.Data_attributeContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="noresParser.based"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterBased([NotNull] noresParser.BasedContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="noresParser.based"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitBased([NotNull] noresParser.BasedContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="noresParser.defined"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterDefined([NotNull] noresParser.DefinedContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="noresParser.defined"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitDefined([NotNull] noresParser.DefinedContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="noresParser.procedure_stmt"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
@@ -443,6 +515,42 @@ public partial class noresBaseListener : InoresListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitProcedure_stmt([NotNull] noresParser.Procedure_stmtContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="noresParser.return_stmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterReturn_stmt([NotNull] noresParser.Return_stmtContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="noresParser.return_stmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitReturn_stmt([NotNull] noresParser.Return_stmtContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="noresParser.if_stmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterIf_stmt([NotNull] noresParser.If_stmtContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="noresParser.if_stmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitIf_stmt([NotNull] noresParser.If_stmtContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="noresParser.then_clause"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterThen_clause([NotNull] noresParser.Then_clauseContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="noresParser.then_clause"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitThen_clause([NotNull] noresParser.Then_clauseContext context) { }
 
 	/// <inheritdoc/>
 	/// <remarks>The default implementation does nothing.</remarks>

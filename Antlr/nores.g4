@@ -1,13 +1,27 @@
+/*
+    This grammar is based on the PL/I grammar (in particular the grammar defined in ANSI X3.74-1987)
+    It has no reserved words, any keyword may be used as an identifier without any ambiguit arising.
+    It suppors multiple kewyord languages.
+    We can add more keywords over time and never break backward compatibility with existing code
+    which migt contain identifiers that are the same as these new keywords.
+*/
+
 grammar nores;
 
+@lexer::members {public String langcode = "en";}
 
 prog: statement*  
     ;
 
 statement
-    :   assign_stmt 
+    :   preprocessor_stmt
+    |   assign_stmt 
     |   keyword_stmt 
     |   SEMICOLON
+    ;
+
+preprocessor_stmt
+    :   '%' 'include' identifier SEMICOLON
     ;
 
 assign_stmt
@@ -147,6 +161,12 @@ keyword
     | PROCEDURE
     | PROC
     | END
+    | DECLARE
+    | RETURN
+    | IF
+    | THEN
+    | GO
+    | TO
     ;
 
 keyword_stmt
@@ -154,33 +174,102 @@ keyword_stmt
     |   goto_stmt
     |   procedure_stmt
     |   end_stmt
+    |   declare_stmt
+    |   return_stmt
+    |   if_stmt
     ;
 
 call_stmt
-    :   CALL reference '(' ')' SEMICOLON
+    :   CALL reference SEMICOLON
     ;
 
 goto_stmt
-    :   GOTO IDENTIFIER SEMICOLON
+    :   (GOTO | GO TO) reference SEMICOLON
     ;
 
 end_stmt
     :   END SEMICOLON
     ;
 
-procedure_stmt
-    :   (PROCEDURE | PROC) identifier ('(' ')')?  prog end_stmt
+declare_stmt
+    :   DECLARE identifier attribute* SEMICOLON 
     ;
 
+attribute
+    :   (data_attribute | AUTOMATIC | BUILTIN | STATIC | VARIABLE | based | defined) 
+    ;
+
+data_attribute
+    :   (BINARY | DECIMAL)
+    ;
+
+based
+    :   BASED ('(' reference ')')?
+    ;
+
+defined
+    :   DEFINED ('(' reference ')')?
+    ;
+
+procedure_stmt
+    :   PROCEDURE identifier ('(' ')')?  prog end_stmt
+    ;
+
+return_stmt
+    :   RETURN ('(' expression ')')? SEMICOLON
+    ;
+
+if_stmt
+    :   then_clause (assign_stmt | keyword_stmt)+ END SEMICOLON
+    ;
+
+then_clause
+    :   IF expression THEN
+    ;
+
+COMMENT:    '/*' .*? '*/' -> channel(2) ;
 WS:         (' ')+ -> skip ;
 NEWLINE:    [\r\n]+ -> skip ;
 TAB:        ('\t')+ -> skip ;
 INT:        [0-9]+ ; 
-CALL:       'call' ; 
-GOTO:       'goto' ;
-PROCEDURE:  'procedure' ;
-PROC:       'proc' ;
-END:        'end' ;
+
+
+GOTO:       
+    {langcode=="en"}? 'goto' |
+    {langcode=="fr"}? 'aller' 
+    ;
+GO:             
+    {langcode=="en"}? 'go' |
+    {langcode=="fr"}? 'aller' 
+    ;
+TO:             
+    {langcode=="en"}? 'to' |
+    {langcode=="fr"}? 'à' 
+    ;
+
+
+
+CALL:           ('call') ; 
+//GOTO:           ('goto') ;
+//GO:             ('go');
+//TO:             ('to');
+PROCEDURE:      ('procedure' | 'proc') ;
+PROC:           'proc' ;
+END:            'end' ;
+DECLARE:        ('declare' | 'dcl') ;
+BINARY:         ('binary' | 'bin') ;
+DECIMAL:        ('decimal' | 'dec') ;
+AUTOMATIC:      ('automatic' | 'auto') ;
+BUILTIN:        ('builtin');
+STATIC:         ('static');
+VARIABLE:       ('variable');
+BASED:          ('based');
+DEFINED:        ('defined');
+INTERNAL:       ('internal');
+EXTERNAL:       ('external');
+RETURN:         ('return');
+IF:             ('if');
+THEN:           ('then');
 
 IDENTIFIER: [a-zA-Z_]+ ;
 ARROW:      '->' ;

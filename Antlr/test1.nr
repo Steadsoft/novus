@@ -1,4 +1,6 @@
 
+% include MYFILE;
+
 call = 1234;
 
 goto done;

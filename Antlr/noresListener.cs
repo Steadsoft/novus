@@ -51,6 +51,16 @@ public interface InoresListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitStatement([NotNull] noresParser.StatementContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="noresParser.preprocessor_stmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterPreprocessor_stmt([NotNull] noresParser.Preprocessor_stmtContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="noresParser.preprocessor_stmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitPreprocessor_stmt([NotNull] noresParser.Preprocessor_stmtContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="noresParser.assign_stmt"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -361,6 +371,56 @@ public interface InoresListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitEnd_stmt([NotNull] noresParser.End_stmtContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="noresParser.declare_stmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterDeclare_stmt([NotNull] noresParser.Declare_stmtContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="noresParser.declare_stmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitDeclare_stmt([NotNull] noresParser.Declare_stmtContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="noresParser.attribute"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterAttribute([NotNull] noresParser.AttributeContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="noresParser.attribute"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitAttribute([NotNull] noresParser.AttributeContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="noresParser.data_attribute"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterData_attribute([NotNull] noresParser.Data_attributeContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="noresParser.data_attribute"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitData_attribute([NotNull] noresParser.Data_attributeContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="noresParser.based"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterBased([NotNull] noresParser.BasedContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="noresParser.based"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitBased([NotNull] noresParser.BasedContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="noresParser.defined"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterDefined([NotNull] noresParser.DefinedContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="noresParser.defined"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitDefined([NotNull] noresParser.DefinedContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="noresParser.procedure_stmt"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -370,4 +430,34 @@ public interface InoresListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitProcedure_stmt([NotNull] noresParser.Procedure_stmtContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="noresParser.return_stmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterReturn_stmt([NotNull] noresParser.Return_stmtContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="noresParser.return_stmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitReturn_stmt([NotNull] noresParser.Return_stmtContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="noresParser.if_stmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterIf_stmt([NotNull] noresParser.If_stmtContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="noresParser.if_stmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitIf_stmt([NotNull] noresParser.If_stmtContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="noresParser.then_clause"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterThen_clause([NotNull] noresParser.Then_clauseContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="noresParser.then_clause"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitThen_clause([NotNull] noresParser.Then_clauseContext context);
 }

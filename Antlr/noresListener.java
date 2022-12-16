@@ -27,6 +27,16 @@ public interface noresListener extends ParseTreeListener {
 	 */
 	void exitStatement(noresParser.StatementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link noresParser#preprocessor_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterPreprocessor_stmt(noresParser.Preprocessor_stmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link noresParser#preprocessor_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitPreprocessor_stmt(noresParser.Preprocessor_stmtContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link noresParser#assign_stmt}.
 	 * @param ctx the parse tree
 	 */
@@ -337,6 +347,56 @@ public interface noresListener extends ParseTreeListener {
 	 */
 	void exitEnd_stmt(noresParser.End_stmtContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link noresParser#declare_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterDeclare_stmt(noresParser.Declare_stmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link noresParser#declare_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitDeclare_stmt(noresParser.Declare_stmtContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link noresParser#attribute}.
+	 * @param ctx the parse tree
+	 */
+	void enterAttribute(noresParser.AttributeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link noresParser#attribute}.
+	 * @param ctx the parse tree
+	 */
+	void exitAttribute(noresParser.AttributeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link noresParser#data_attribute}.
+	 * @param ctx the parse tree
+	 */
+	void enterData_attribute(noresParser.Data_attributeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link noresParser#data_attribute}.
+	 * @param ctx the parse tree
+	 */
+	void exitData_attribute(noresParser.Data_attributeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link noresParser#based}.
+	 * @param ctx the parse tree
+	 */
+	void enterBased(noresParser.BasedContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link noresParser#based}.
+	 * @param ctx the parse tree
+	 */
+	void exitBased(noresParser.BasedContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link noresParser#defined}.
+	 * @param ctx the parse tree
+	 */
+	void enterDefined(noresParser.DefinedContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link noresParser#defined}.
+	 * @param ctx the parse tree
+	 */
+	void exitDefined(noresParser.DefinedContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link noresParser#procedure_stmt}.
 	 * @param ctx the parse tree
 	 */
@@ -346,4 +406,34 @@ public interface noresListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitProcedure_stmt(noresParser.Procedure_stmtContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link noresParser#return_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterReturn_stmt(noresParser.Return_stmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link noresParser#return_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitReturn_stmt(noresParser.Return_stmtContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link noresParser#if_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterIf_stmt(noresParser.If_stmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link noresParser#if_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitIf_stmt(noresParser.If_stmtContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link noresParser#then_clause}.
+	 * @param ctx the parse tree
+	 */
+	void enterThen_clause(noresParser.Then_clauseContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link noresParser#then_clause}.
+	 * @param ctx the parse tree
+	 */
+	void exitThen_clause(noresParser.Then_clauseContext ctx);
 }
