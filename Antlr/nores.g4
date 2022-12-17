@@ -19,8 +19,12 @@ procedure_stmt
     ;
 
 statement
-    :   nonexecutable_stmt* executable_stmt* 
+    :   nonexecutable_stmt* executable_stmt*
     |   SEMICOLON
+    ;
+
+label_stmt
+    :   identifier COLON
     ;
 
 nonexecutable_stmt
@@ -29,12 +33,12 @@ nonexecutable_stmt
     ;
 
 executable_stmt
-    :   assign_stmt 
-    |   call_stmt 
-    |   goto_stmt
+    :   label_stmt* assign_stmt 
+    |   label_stmt* call_stmt 
+    |   label_stmt* goto_stmt
     |   procedure_stmt
-    |   return_stmt
-    |   if_stmt
+    |   label_stmt* return_stmt
+    |   label_stmt* if_stmt
     ;
 
 preprocessor_stmt
