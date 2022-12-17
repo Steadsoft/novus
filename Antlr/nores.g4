@@ -10,14 +10,31 @@ grammar nores;
 
 @lexer::members {public String langcode = "en";}
 
-prog: statement*  
+translation_unit
+    : procedure_stmt  
+    ;
+
+procedure_stmt
+    :   PROCEDURE identifier entry_information statement end_stmt 
     ;
 
 statement
-    :   preprocessor_stmt
-    |   assign_stmt 
-    |   keyword_stmt 
+    :   nonexecutable_stmt* executable_stmt* 
     |   SEMICOLON
+    ;
+
+nonexecutable_stmt
+    :   preprocessor_stmt
+    |   declare_stmt
+    ;
+
+executable_stmt
+    :   assign_stmt 
+    |   call_stmt 
+    |   goto_stmt
+    |   procedure_stmt
+    |   return_stmt
+    |   if_stmt
     ;
 
 preprocessor_stmt
@@ -183,15 +200,6 @@ keyword
     | COROUTINE
     ;
 
-keyword_stmt
-    :   call_stmt 
-    |   goto_stmt
-    |   procedure_stmt
-    // |   end_stmt
-    |   declare_stmt
-    |   return_stmt
-    |   if_stmt
-    ;
 
 call_stmt
     :   CALL reference SEMICOLON
@@ -235,7 +243,7 @@ attribute
     ;
 
 data_attribute
-    :   ((BINARY (precision)?) | (DECIMAL (precision)?) | POINTER | BIT | CHARACTER | (STRING max_length) | ENTRY | FIXED | FLOAT | OFFSET | VARYING | COROUTINE | COFUNCTION)
+    :   ((BINARY (precision)?) | (DECIMAL (precision)?) | POINTER | (BIT max_length) | CHARACTER | (STRING max_length) | ENTRY | FIXED | FLOAT | OFFSET | VARYING | COROUTINE | COFUNCTION)
     ;
 
 precision
@@ -262,9 +270,6 @@ defined
     :   DEFINED ('(' reference ')')?
     ;
 
-procedure_stmt
-    :   PROCEDURE identifier entry_information prog end_stmt 
-    ;
 
 entry_information
     :   parameter_name_commalist?  ((returns_descriptor? coprocedure_specifier?) | (coprocedure_specifier? returns_descriptor?))
@@ -287,7 +292,7 @@ return_stmt
     ;
 
 if_stmt
-    :   then_clause (assign_stmt | keyword_stmt)+ else_clause? end_stmt 
+    :   then_clause (assign_stmt | executable_stmt)+ else_clause? end_stmt 
     ;
 
 then_clause
@@ -295,7 +300,7 @@ then_clause
     ;
 
 else_clause
-    :   ELSE (assign_stmt | keyword_stmt)+
+    :   ELSE (assign_stmt | executable_stmt)+
     ;
 
 COMMENT:    '/*' .*? '*/' -> channel(2) ;
