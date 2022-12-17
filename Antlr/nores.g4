@@ -39,7 +39,10 @@ executable_stmt
     |   procedure_stmt
     |   label_stmt* return_stmt
     |   label_stmt* if_stmt
+    |   label_stmt* loop_stmt
     ;
+
+
 
 preprocessor_stmt
     :   '%' 'include' identifier SEMICOLON
@@ -202,6 +205,7 @@ keyword
     | VARYING
     | COFUNCTION
     | COROUTINE
+    | LOOP
     ;
 
 
@@ -307,6 +311,21 @@ else_clause
     :   ELSE (assign_stmt | executable_stmt)+
     ;
 
+loop_stmt
+    :   LOOP (assign_stmt  | executable_stmt)+ end_stmt
+    |   LOOP while_option until_option? (assign_stmt  | executable_stmt)+ end_stmt
+    |   LOOP until_option while_option? (assign_stmt  | executable_stmt)+ end_stmt
+    ;
+
+while_option
+    :   WHILE LPAR expression RPAR
+    ;
+
+until_option
+    :   UNTIL LPAR expression RPAR
+    ;
+
+
 COMMENT:    '/*' .*? '*/' -> channel(2) ;
 WS:         (' ')+ -> skip ;
 NEWLINE:    [\r\n]+ -> skip ;
@@ -363,7 +382,10 @@ OFFSET:         ('offset' | 'ofx');
 STRING:         ('string');
 VARYING:        ('varying' | 'var');
 COROUTINE:      ('coroutine' | 'cor');
-COFUNCTION:      ('cofunction' | 'cof');
+COFUNCTION:     ('cofunction' | 'cof');
+LOOP:           ('loop');
+WHILE:          ('while');
+UNTIL:          ('until');
 
 IDENTIFIER: [a-zA-Z_]+ ;
 ARROW:      '->' ;
