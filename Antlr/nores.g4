@@ -177,6 +177,10 @@ keyword
     | FIXED
     | FLOAT
     | OFFSET
+    | STRING
+    | VARYING
+    | COFUNCTION
+    | COROUTINE
     ;
 
 keyword_stmt
@@ -202,7 +206,28 @@ end_stmt
     ;
 
 declare_stmt
-    :   (DECLARE | ARGUMENT) identifier attribute* SEMICOLON 
+    :   (DECLARE | ARGUMENT) identifier dimension_suffix? attribute* SEMICOLON 
+    ;
+
+dimension_suffix
+    :   LPAR bound_pair_commalist RPAR
+    ;
+
+bound_pair
+    :   (lower_bound COLON)? upper_bound
+    |  TIMES
+    ;
+
+bound_pair_commalist
+    :   bound_pair (COMMA bound_pair)*
+    ;
+
+lower_bound
+    :   expression
+    ;
+
+upper_bound
+    :   expression
     ;
 
 attribute
@@ -210,7 +235,7 @@ attribute
     ;
 
 data_attribute
-    :   ((BINARY (precision)?) | (DECIMAL (precision)?) | POINTER | BIT | CHARACTER | ENTRY | FIXED | FLOAT | OFFSET)
+    :   ((BINARY (precision)?) | (DECIMAL (precision)?) | POINTER | BIT | CHARACTER | (STRING max_length) | ENTRY | FIXED | FLOAT | OFFSET | VARYING | COROUTINE | COFUNCTION)
     ;
 
 precision
@@ -225,6 +250,10 @@ scale_factor
     :   (INT | identifier)
     ;
 
+max_length
+    :   LPAR (INT | identifier) RPAR
+    ;
+
 based
     :   BASED ('(' reference ')')?
     ;
@@ -234,11 +263,15 @@ defined
     ;
 
 procedure_stmt
-    :   PROCEDURE identifier entry_information  prog end_stmt 
+    :   PROCEDURE identifier entry_information prog end_stmt 
     ;
 
 entry_information
-    :   parameter_name_commalist? returns_descriptor? 
+    :   parameter_name_commalist?  ((returns_descriptor? coprocedure_specifier?) | (coprocedure_specifier? returns_descriptor?))
+    ;
+
+coprocedure_specifier
+    :   (COROUTINE | COFUNCTION)
     ;
 
 parameter_name_commalist
@@ -318,6 +351,10 @@ ENTRY:          ('entry');
 FIXED:          ('fixed');
 FLOAT:          ('float');   
 OFFSET:         ('offset' | 'ofx');
+STRING:         ('string');
+VARYING:        ('varying' | 'var');
+COROUTINE:      ('coroutine' | 'cor');
+COFUNCTION:      ('cofunction' | 'cof');
 
 IDENTIFIER: [a-zA-Z_]+ ;
 ARROW:      '->' ;
@@ -332,3 +369,4 @@ PLUS:       '+' ;
 MINUS:      '-' ;
 SEMICOLON:  ';' ;
 POWER:      '**' ;
+COLON:      ':';
