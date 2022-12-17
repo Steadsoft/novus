@@ -168,6 +168,15 @@ keyword
     | ELSE
     | GO
     | TO
+    | RETURNS
+    | ARGUMENT
+    | POINTER
+    | BIT
+    | CHARACTER
+    | ENTRY
+    | FIXED
+    | FLOAT
+    | OFFSET
     ;
 
 keyword_stmt
@@ -193,7 +202,7 @@ end_stmt
     ;
 
 declare_stmt
-    :   DECLARE identifier attribute* SEMICOLON 
+    :   (DECLARE | ARGUMENT) identifier attribute* SEMICOLON 
     ;
 
 attribute
@@ -201,7 +210,19 @@ attribute
     ;
 
 data_attribute
-    :   (BINARY | DECIMAL)
+    :   ((BINARY (precision)?) | (DECIMAL (precision)?) | POINTER | BIT | CHARACTER | ENTRY | FIXED | FLOAT | OFFSET)
+    ;
+
+precision
+    :   LPAR number_of_digits (COMMA scale_factor)? RPAR
+    ;
+
+number_of_digits
+    :   (INT | identifier)
+    ;
+
+scale_factor
+    :   (INT | identifier)
     ;
 
 based
@@ -213,7 +234,19 @@ defined
     ;
 
 procedure_stmt
-    :   PROCEDURE identifier ('(' ')')?  prog end_stmt 
+    :   PROCEDURE identifier entry_information  prog end_stmt 
+    ;
+
+entry_information
+    :   parameter_name_commalist? returns_descriptor? 
+    ;
+
+parameter_name_commalist
+    :   '(' identifier (',' identifier)* ')'
+    ;
+
+returns_descriptor 
+    :   RETURNS data_attribute
     ;
 
 return_stmt
@@ -276,6 +309,15 @@ RETURN:         ('return');
 IF:             ('if');
 THEN:           ('then');
 ELSE:           ('else');
+RETURNS:        ('returns');
+ARGUMENT:       ('argument' | 'arg');
+POINTER:        ('pointer' | 'ptr');
+BIT:            ('bit');
+CHARACTER:      ('character' | 'char');
+ENTRY:          ('entry');
+FIXED:          ('fixed');
+FLOAT:          ('float');   
+OFFSET:         ('offset' | 'ofx');
 
 IDENTIFIER: [a-zA-Z_]+ ;
 ARROW:      '->' ;
