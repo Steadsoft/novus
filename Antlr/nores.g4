@@ -192,6 +192,7 @@ keyword
     | IF
     | THEN
     | ELSE
+    | ELIF
     | GO
     | TO
     | RETURNS
@@ -327,6 +328,7 @@ return_stmt
 
 if_stmt
     :   then_clause (assign_stmt | executable_stmt)+ else_clause? end_stmt 
+    |   then_clause (assign_stmt | executable_stmt)+ elif_clause+ end_stmt 
     ;
 
 then_clause
@@ -336,6 +338,11 @@ then_clause
 else_clause
     :   ELSE (assign_stmt | executable_stmt)+
     ;
+
+elif_clause
+    :   ELIF expression THEN (assign_stmt | executable_stmt)+ else_clause?
+    ;
+
 
 loop_stmt
     :   LOOP (assign_stmt  | executable_stmt)+ end_stmt                                 # BASIC_LOOP
@@ -401,6 +408,7 @@ RETURN:         ('return');
 IF:             ('if');
 THEN:           ('then');
 ELSE:           ('else');
+ELIF:           ('elif');
 RETURNS:        ('returns');
 ARGUMENT:       ('argument' | 'arg');
 POINTER:        ('pointer' | 'ptr');
