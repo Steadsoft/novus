@@ -11,14 +11,14 @@ grammar nores;
 @lexer::members {public String langcode = "en";}
 
 translation_unit
-    : procedure_stmt  
+    : preprocessor_stmt? procedure_stmt
     ;
 
 procedure_stmt
-    :   PROCEDURE identifier entry_information statement end_stmt 
+    :   PROCEDURE identifier entry_information stmt_block end_stmt 
     ;
 
-statement
+stmt_block
     :   nonexecutable_stmt* executable_stmt*
     |   SEMICOLON
     ;
@@ -28,24 +28,25 @@ label_stmt
     ;
 
 nonexecutable_stmt
-    :   preprocessor_stmt
-    |   declare_stmt
+    :   preprocessor_stmt                   # PRE
+    |   declare_stmt                        # DCL
+    |   define_stmt                         # DEF
     ;
 
 executable_stmt
-    :   label_stmt* assign_stmt 
-    |   label_stmt* call_stmt 
-    |   label_stmt* goto_stmt
-    |   procedure_stmt
-    |   label_stmt* return_stmt
-    |   label_stmt* if_stmt
-    |   label_stmt* loop_stmt
+    :   label_stmt* assign_stmt             # ASSIGN
+    |   label_stmt* call_stmt               # CALL
+    |   label_stmt* goto_stmt               # GOTO
+    |   procedure_stmt                      # PROC
+    |   label_stmt* return_stmt             # RET
+    |   label_stmt* if_stmt                 # IF
+    |   label_stmt* loop_stmt               # LOOP
     ;
 
 
 
 preprocessor_stmt
-    :   '%' 'include' identifier SEMICOLON
+    :   '%' 'include' QUOTE identifier '.inc' QUOTE SEMICOLON
     ;
 
 assign_stmt
@@ -53,8 +54,8 @@ assign_stmt
     ;
 
 reference
-    :   reference ARROW basic_reference arguments_list?
-    |   basic_reference arguments_list?
+    :   reference ARROW basic_reference arguments_list?     # PTR_REF
+    |   basic_reference arguments_list?                     # BASIC_REF
     ;
 
 arguments
@@ -171,8 +172,8 @@ expression
 */
 
 identifier
-    :   keyword
-    |   IDENTIFIER
+    :   keyword                 # KEYWD
+    |   IDENTIFIER              # identifier_IDENTIFIER
     ;
 
 /***********************************/
@@ -180,12 +181,13 @@ identifier
 /***********************************/
 
 keyword
-    : CALL
-    | GOTO
+    : CALL                 
+    | GOTO                  
     | PROCEDURE
     | PROC
     | END
     | DECLARE
+    | DEFINE
     | RETURN
     | IF
     | THEN
@@ -206,6 +208,8 @@ keyword
     | COFUNCTION
     | COROUTINE
     | LOOP
+    | BUILTIN
+    | INTRINSIC
     ;
 
 
@@ -222,7 +226,11 @@ end_stmt
     ;
 
 declare_stmt
-    :   (DECLARE | ARGUMENT) identifier dimension_suffix? attribute* SEMICOLON 
+    :   (DECLARE | ARGUMENT) identifier type_info SEMICOLON 
+    ;
+
+type_info
+    : dimension_suffix? attribute*
     ;
 
 dimension_suffix
@@ -238,6 +246,9 @@ bound_pair_commalist
     :   bound_pair (COMMA bound_pair)*
     ;
 
+// See page 208 Subset G standard.
+// Lower bound must be <= upper (but this is not a grammar issue, just a note for us)
+
 lower_bound
     :   expression
     ;
@@ -251,7 +262,22 @@ attribute
     ;
 
 data_attribute
-    :   ((BINARY (precision)?) | (DECIMAL (precision)?) | POINTER | (BIT max_length) | CHARACTER | (STRING max_length) | ENTRY | FIXED | FLOAT | OFFSET | VARYING | COROUTINE | COFUNCTION)
+    : (BINARY (precision)?)                 # BIN
+    | (DECIMAL (precision)?)                # DEC
+    | POINTER                               # PTR
+    | (BIT max_length)                      # BIT
+    | CHARACTER                             # CHAR
+    | (STRING max_length)                   # STR
+    | ENTRY                                 # ENT
+    | FIXED                                 # FIX
+    | FLOAT                                 # FLT
+    | OFFSET                                # OFF
+    | VARYING                               # VNG
+    | COROUTINE                             # COR
+    | COFUNCTION                            # COF
+    | BUILTIN                               # BLTN
+    | INTRINSIC                             # INTR
+    | identifier                            # IDENT // a user defined type would match here. 
     ;
 
 precision
@@ -292,7 +318,7 @@ parameter_name_commalist
     ;
 
 returns_descriptor 
-    :   RETURNS data_attribute
+    :   RETURNS data_attribute // consider using keyword 'is' instead and forcing it to be right after the params...
     ;
 
 return_stmt
@@ -312,9 +338,9 @@ else_clause
     ;
 
 loop_stmt
-    :   LOOP (assign_stmt  | executable_stmt)+ end_stmt
-    |   LOOP while_option until_option? (assign_stmt  | executable_stmt)+ end_stmt
-    |   LOOP until_option while_option? (assign_stmt  | executable_stmt)+ end_stmt
+    :   LOOP (assign_stmt  | executable_stmt)+ end_stmt                                 # BASIC_LOOP
+    |   LOOP while_option until_option? (assign_stmt  | executable_stmt)+ end_stmt      # WHILE_UNTIL
+    |   LOOP until_option while_option? (assign_stmt  | executable_stmt)+ end_stmt      # UNTIL_WHILE
     ;
 
 while_option
@@ -325,6 +351,9 @@ until_option
     :   UNTIL LPAR expression RPAR
     ;
 
+define_stmt  // defines a type, like a structure
+    :   DEFINE identifier (identifier type_info) (COMMA identifier type_info)*  (COMMA)? end_stmt
+    ;
 
 COMMENT:    '/*' .*? '*/' -> channel(2) ;
 WS:         (' ')+ -> skip ;
@@ -356,10 +385,12 @@ PROCEDURE:      ('procedure' | 'proc') ;
 PROC:           'proc' ;
 END:            'end' ;
 DECLARE:        ('declare' | 'dcl') ;
+DEFINE:         ('define' | 'def');
 BINARY:         ('binary' | 'bin') ;
 DECIMAL:        ('decimal' | 'dec') ;
 AUTOMATIC:      ('automatic' | 'auto') ;
 BUILTIN:        ('builtin');
+INTRINSIC:      ('intrinsic');
 STATIC:         ('static');
 VARIABLE:       ('variable');
 BASED:          ('based');
@@ -401,3 +432,5 @@ MINUS:      '-' ;
 SEMICOLON:  ';' ;
 POWER:      '**' ;
 COLON:      ':';
+DQUOTE:     '"';
+QUOTE:      '\'';
