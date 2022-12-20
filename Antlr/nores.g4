@@ -331,8 +331,8 @@ return_stmt
     ;
 
 if_stmt
-    :   then_clause (assign_stmt terminator | executable_stmt terminator)+ else_clause? end_stmt 
-    |   then_clause (assign_stmt terminator | executable_stmt terminator)+ elif_clause+ end_stmt 
+    :   then_clause (executable_stmt terminator)+ else_clause? end_stmt 
+    |   then_clause (executable_stmt terminator)+ elif_clause+ end_stmt 
     ;
 
 then_clause
@@ -340,18 +340,18 @@ then_clause
     ;
 
 else_clause
-    :   ELSE (assign_stmt terminator | executable_stmt terminator)+
+    :   ELSE (executable_stmt terminator)+
     ;
 
 elif_clause
-    :   ELIF expression THEN (assign_stmt terminator | executable_stmt terminator)+ else_clause?
+    :   ELIF expression THEN (executable_stmt terminator)+ else_clause?
     ;
 
 
 loop_stmt
-    :   LOOP (assign_stmt  terminator | executable_stmt terminator)+ end_stmt                                # BASIC_LOOP
-    |   LOOP while_option until_option? (assign_stmt terminator | executable_stmt terminator)+ end_stmt      # WHILE_UNTIL
-    |   LOOP until_option while_option? (assign_stmt terminator | executable_stmt terminator)+ end_stmt      # UNTIL_WHILE
+    :   LOOP (executable_stmt terminator)+ end_stmt                                 # BASIC_LOOP
+    |   LOOP while_option until_option? (executable_stmt terminator)+ end_stmt      # WHILE_UNTIL
+    |   LOOP until_option while_option? (executable_stmt terminator)+ end_stmt      # UNTIL_WHILE
     ;
 
 while_option
