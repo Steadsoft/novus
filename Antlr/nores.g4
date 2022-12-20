@@ -19,8 +19,12 @@ procedure_stmt
     ;
 
 stmt_block
-    :   nonexecutable_stmt* executable_stmt*
-    |   SEMICOLON
+    :   (nonexecutable_stmt terminator)* (executable_stmt terminator)*
+     |   terminator
+    ;
+
+terminator
+    :   SEMICOLON
     ;
 
 label_stmt
@@ -46,11 +50,11 @@ executable_stmt
 
 
 preprocessor_stmt
-    :   '%' 'include' QUOTE identifier '.inc' QUOTE SEMICOLON
+    :   '%' 'include' QUOTE identifier '.inc' QUOTE 
     ;
 
 assign_stmt
-    :   reference EQUALS expression SEMICOLON
+    :   reference EQUALS expression //SEMICOLON
     ;
 
 reference
@@ -215,19 +219,19 @@ keyword
 
 
 call_stmt
-    :   CALL reference SEMICOLON
+    :   CALL reference 
     ;
 
 goto_stmt
-    :   (GOTO | GO TO) reference SEMICOLON
+    :   (GOTO | GO TO) reference 
     ;
 
 end_stmt
-    :   END SEMICOLON
+    :   END 
     ;
 
 declare_stmt
-    :   (DECLARE | ARGUMENT) identifier type_info SEMICOLON 
+    :   (DECLARE | ARGUMENT) identifier type_info 
     ;
 
 type_info
@@ -323,12 +327,12 @@ returns_descriptor
     ;
 
 return_stmt
-    :   RETURN ('(' expression ')')? SEMICOLON
+    :   RETURN ('(' expression ')')? 
     ;
 
 if_stmt
-    :   then_clause (assign_stmt | executable_stmt)+ else_clause? end_stmt 
-    |   then_clause (assign_stmt | executable_stmt)+ elif_clause+ end_stmt 
+    :   then_clause (assign_stmt terminator | executable_stmt terminator)+ else_clause? end_stmt 
+    |   then_clause (assign_stmt terminator | executable_stmt terminator)+ elif_clause+ end_stmt 
     ;
 
 then_clause
@@ -336,18 +340,18 @@ then_clause
     ;
 
 else_clause
-    :   ELSE (assign_stmt | executable_stmt)+
+    :   ELSE (assign_stmt terminator | executable_stmt terminator)+
     ;
 
 elif_clause
-    :   ELIF expression THEN (assign_stmt | executable_stmt)+ else_clause?
+    :   ELIF expression THEN (assign_stmt terminator | executable_stmt terminator)+ else_clause?
     ;
 
 
 loop_stmt
-    :   LOOP (assign_stmt  | executable_stmt)+ end_stmt                                 # BASIC_LOOP
-    |   LOOP while_option until_option? (assign_stmt  | executable_stmt)+ end_stmt      # WHILE_UNTIL
-    |   LOOP until_option while_option? (assign_stmt  | executable_stmt)+ end_stmt      # UNTIL_WHILE
+    :   LOOP (assign_stmt  terminator | executable_stmt terminator)+ end_stmt                                # BASIC_LOOP
+    |   LOOP while_option until_option? (assign_stmt terminator | executable_stmt terminator)+ end_stmt      # WHILE_UNTIL
+    |   LOOP until_option while_option? (assign_stmt terminator | executable_stmt terminator)+ end_stmt      # UNTIL_WHILE
     ;
 
 while_option
@@ -359,7 +363,7 @@ until_option
     ;
 
 define_stmt  // defines a type, like a structure
-    :   DEFINE identifier (identifier type_info) (COMMA identifier type_info)*  (COMMA)? end_stmt
+    :   DEFINE identifier (identifier type_info) (COMMA identifier type_info)*  (COMMA)? END
     ;
 
 COMMENT:    '/*' (COMMENT|.)*? '*/' -> channel(2) ;
@@ -386,12 +390,12 @@ TO:
 
 
 CALL:           ('call') ; 
-//GOTO:           ('goto') ;
-//GO:             ('go');
-//TO:             ('to');
+//GOTO:         ('goto') ;
+//GO:           ('go');
+//TO:           ('to');
 PROCEDURE:      ('procedure' | 'proc') ;
-PROC:           'proc' ;
-END:            'end' ;
+PROC:           ('proc') ;
+END:            ('end') ;
 DECLARE:        ('declare' | 'dcl') ;
 DEFINE:         ('define' | 'def');
 BINARY:         ('binary' | 'bin') ;
