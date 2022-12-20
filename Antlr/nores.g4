@@ -362,7 +362,8 @@ define_stmt  // defines a type, like a structure
     :   DEFINE identifier (identifier type_info) (COMMA identifier type_info)*  (COMMA)? end_stmt
     ;
 
-COMMENT:    '/*' .*? '*/' -> channel(2) ;
+COMMENT:    '/*' (COMMENT|.)*? '*/' -> channel(2) ;
+LINE_COMMENT  : '//' .*? '\n' -> channel(HIDDEN) ;
 WS:         (' ')+ -> skip ;
 NEWLINE:    [\r\n]+ -> skip ;
 TAB:        ('\t')+ -> skip ;
