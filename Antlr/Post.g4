@@ -1,4 +1,5 @@
 /*
+    Named for convenince as a simple term, the grammar is named after Emil Leon Post.
     This grammar is based on the PL/I grammar (in particular the grammar defined in ANSI X3.74-1987)
     It has no reserved words, any keyword may be used as an identifier without any ambiguit arising.
     It suppors multiple kewyord languages.
@@ -6,7 +7,7 @@
     which migt contain identifiers that are the same as these new keywords.
 */
 
-grammar nores;
+grammar Post;
 
 @lexer::members {public String langcode = "en";}
 
