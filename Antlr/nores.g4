@@ -287,15 +287,15 @@ precision
     ;
 
 number_of_digits
-    :   (DEC | identifier)
+    :   (decimal_literal | identifier)
     ;
 
 scale_factor
-    :   (DEC | identifier)
+    :   (decimal_literal | identifier)
     ;
 
 max_length
-    :   LPAR (DEC | identifier) RPAR
+    :   LPAR (decimal_literal | identifier) RPAR
     ;
 
 based
@@ -391,19 +391,19 @@ numeric_literal
     ;
 
 hexadecimal_literal
-    :   (HEX) 
+    :   (HEXADECIMAL_PATTERN) 
     ;
 
 octal_literal
-    :   (OCT)
+    :   (OCTAL_PATTERN)
     ;
 
 decimal_literal
-    :   (DEC) 
+    :   (DECIMAL_PATTERN) 
     ;
 
 binary_literal
-    :   (BIN)
+    :   (BINARY_PATTERN)
     ;
 
 BYTE_ORDER_MARK: '\u00EF' '\u00BB' '\u00BF';
@@ -415,6 +415,7 @@ PROCEDURE:      ('procedure' | 'proc') ;
 PROC:           ('proc') ;
 END:            ('end') ;
 DECLARE:        ('declare' | 'dcl') ;
+ARGUMENT:       ('argument' | 'arg');
 DEFINE:         ('define' | 'def');
 BINARY:         ('binary' | 'bin') ;
 DECIMAL:        ('decimal' | 'dec') ;
@@ -433,7 +434,6 @@ THEN:           ('then');
 ELSE:           ('else');
 ELIF:           ('elif');
 RETURNS:        ('returns');
-ARGUMENT:       ('argument' | 'arg');
 POINTER:        ('pointer' | 'ptr');
 BIT:            ('bit');
 CHARACTER:      ('character' | 'char');
@@ -457,11 +457,18 @@ FRAC_D: ('.' [0-9]+) ;
 FRAC_O: ('.' [0-7]+) ;
 FRAC_H: ('.' [0-9a-fA-F]+) ;
 
-BIN:    ([0-1] (' '[0-1])*)+ FRAC_B? BASE_B;
-OCT:    ([0-7] (' '[0-7])*)+ FRAC_O? BASE_O;
-HEX:    ([0-9a-fA-F] (' '[0-9a-fA-F])*)+ FRAC_H? BASE_H ;   
-DEC:    ([0-9] (' '[0-9])*)+ FRAC_D? BASE_D?; 
-IDENTIFIER: [a-zA-Z_]+ ;
+IDENTIFIER:             [a-zA-Z_]+ ;
+BINARY_PATTERN:         (BIN (LSEP BIN)*)+ FRAC_B? BASE_B;
+OCTAL_PATTERN:          (OCT (LSEP OCT)*)+ FRAC_O? BASE_O;
+HEXADECIMAL_PATTERN:    (HEX (LSEP HEX)*)+ FRAC_H? BASE_H ;   
+DECIMAL_PATTERN:        (DEC (LSEP DEC)*)+ FRAC_D? BASE_D?; 
+LSEP:                   (' ' | '_');
+
+BIN:                    [0-1] ;
+OCT:                    [0-7] ;
+DEC:                    [0-9] ;
+HEX:                    [0-9a-fA-F] ;
+
 ARROW:      '->' ;
 DOT:        '.' ;
 COMMA:      ',' ;

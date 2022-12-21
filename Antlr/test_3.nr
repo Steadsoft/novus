@@ -1,39 +1,107 @@
-counter = 100;
-
-/* declare some variables named the same as keywords */
-
-dcl dcl dec based(counter);  /* dcl is a keyword ! */
-
-dcl counter binary;
-
-declare goto binary; /* goto is a keyword ! */
+﻿/*  % include 'ABC.inc' ; */
+	
+procedure main(x)
 
 
 
-goto call; /* call is a keyword ! */
+	// dcl Popcount intrinsic; // pos
+
+	def mystruct  /* stuff like static and so on illegal for struct members */
+		range bin(15),
+		fixed string(32),  /* trailing comma optional. */
+	end;
+
+	dcl counter(1:10,1:10,1:10) binary;
+	dcl range fixed float dec (12,4);
+	dcl volume fixed dec (if,then);
+	dcl name string(256) varying;
+	dcl mask(32) bit(8);
+
+	 dcl stuff mystruct; 
+
+	/* declare some variables named the same as keywords */
+
+	dcl dcl dec based(counter);  /* dcl is a keyword ! */
+
+    dcl realm binary;
+
+	declare goto binary; /* goto is a keyword ! */
+
+	if count > 100 then
+	   call do_something();
+	elif count < 0 then
+	   call do_something_else();
+	   call do_whatever();
+	elif count > max then
+	   call where_done();
+	   if we_are_still_here then
+	      return;
+	   elif we_did_not_crash then
+	      call crash();
+	   else
+	      call stop(); 
+	   end;
+	else
+	   return;
+	end;
 
 
+	call reset;
 
-call declare(); /* declare is a keyword */
+retry :
 
-call declare (1,2,3);
+	counter = 100;
 
-return (123);
+	goto call; /* call is a keyword ! */
 
-if if = then then
-   dcl realm binary;
-   call reboot(0);
-   go to end;
-else
-   return (123);
-   if = 44;
-   end = then + else;
+	loop
+		call sleep;
+	end;
+
+	loop until (a > b)
+		call sleep;
+	end;
+
+	loop while (a > b)
+		call sleep;
+	end;
+
+	loop while (a > b) until (eof)
+		call sleep;
+	end;
+
+	call declare(); /* declare is a keyword */
+
+	call declare (1,2,3);
+
+	return (123);
+
+	if rate = 100:b then
+	   call reboot(0);
+	   go to end;
+	else
+	   depth = 44;
+	   end = then + else;
+	   return (123);
+	end;
+
+	if count > 100 then
+	   call do_something();
+	elif count < 0 then
+	   call do_something_else();
+	elif count > max then
+	   call where_done();
+	end;
+
+	proc reboot(a,b,c) coroutine returns string(32) 
+
+		arg a(*,*) binary;
+		argument b decimal;
+
+	end;
+
 end;
 
+/* ignore %include 'BCD.inc'; */
 
-proc reboot()
-
-
-
-end;
 
