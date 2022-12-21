@@ -11,7 +11,7 @@ grammar nores;
 @lexer::members {public String langcode = "en";}
 
 translation_unit
-    : preprocessor_stmt? procedure_stmt
+    : BYTE_ORDER_MARK? preprocessor_stmt? procedure_stmt
     ;
 
 procedure_stmt
@@ -139,14 +139,12 @@ parenthesized_expression
     ;
 
 primitive_expression
-    :   reference
-    |   constant
+    :   numeric_literal
+    |   reference
+    //|   constant
     // | enquiry
     ;
 
-constant
-    :   INT
-    ;
 
 prefix_operator
     :   '+'
@@ -170,7 +168,6 @@ comparison_operator
 expression
     :   expression (TIMES | DIVIDE) expression
     |   expression (PLUS | MINUS) expression
-    |   INT
     |   LPAR expression RPAR
     ;
 */
@@ -290,15 +287,15 @@ precision
     ;
 
 number_of_digits
-    :   (INT | identifier)
+    :   (DEC | identifier)
     ;
 
 scale_factor
-    :   (INT | identifier)
+    :   (DEC | identifier)
     ;
 
 max_length
-    :   LPAR (INT | identifier) RPAR
+    :   LPAR (DEC | identifier) RPAR
     ;
 
 based
@@ -371,7 +368,6 @@ LINE_COMMENT  : '//' .*? '\n' -> channel(HIDDEN) ;
 WS:         (' ')+ -> skip ;
 NEWLINE:    [\r\n]+ -> skip ;
 TAB:        ('\t')+ -> skip ;
-INT:        [0-9]+ ; 
 
 
 GOTO:       
@@ -387,8 +383,30 @@ TO:
     {langcode=="fr"}? 'à' 
     ;
 
+numeric_literal
+    :   binary_literal
+    |   octal_literal
+    |   hexadecimal_literal
+    |   decimal_literal
+    ;
 
+hexadecimal_literal
+    :   (HEX) 
+    ;
 
+octal_literal
+    :   (OCT)
+    ;
+
+decimal_literal
+    :   (DEC) 
+    ;
+
+binary_literal
+    :   (BIN)
+    ;
+
+BYTE_ORDER_MARK: '\u00EF' '\u00BB' '\u00BF';
 CALL:           ('call') ; 
 //GOTO:         ('goto') ;
 //GO:           ('go');
@@ -430,7 +448,14 @@ COFUNCTION:     ('cofunction' | 'cof');
 LOOP:           ('loop');
 WHILE:          ('while');
 UNTIL:          ('until');
-
+BASE_B: (':b' | ':B') ;
+BASE_O: (':o' | ':O') ;
+BASE_D: (':d' | ':D') ;
+BASE_H: (':h' | ':H') ; 
+BIN:            ([0-1]|' ')+ BASE_B;
+OCT:            ([0-7]|' ')+ BASE_O;
+HEX:            ([0-9a-fA-F]|' ')+ BASE_H ;   
+DEC:            ([0-9]|' ')+ BASE_D?; 
 IDENTIFIER: [a-zA-Z_]+ ;
 ARROW:      '->' ;
 DOT:        '.' ;
@@ -447,3 +472,59 @@ POWER:      '**' ;
 COLON:      ':';
 DQUOTE:     '"';
 QUOTE:      '\'';
+
+/* Fixed the numeric literals:
+
+// DELETE THIS CONTENT IF YOU PUT COMBINED GRAMMAR IN Parser TAB
+lexer grammar ExprLexer;
+
+BIN:    ([0-1]|' ')+ BASE_B;
+OCT:    ([0-7]|' ')+ BASE_O;
+HEX:    ([0-9a-f]|' ')+ BASE_H ;   
+DEC:    ([0-9]|' ')+ BASE_D?; 
+
+DOT:    '.';
+NL:     '\n' ;
+DOT:    '.';
+NL:     '\n' ;
+
+BASE_B: (':b' | ':B') ;
+BASE_O: (':o' | ':O') ;
+BASE_D: (':d' | ':D') ;
+BASE_H: (':h' | ':H') ; 
+
+parser grammar ExprParser;
+options { tokenVocab=ExprLexer; }
+
+program
+    : (literal NL)* EOF
+    ;
+
+literal
+    : bin 
+    | oct 
+    | dec 
+    | hex 
+    ;
+
+bin : (BIN) ;
+
+oct : (OCT) ;
+
+dec : (DEC) ;
+
+hex : (HEX) ;
+
+With tests:
+
+123 665
+1123 5543:o
+f56:h
+1101:b
+239 445 333 44344 85:d
+1011 1100 1010 0001:b
+
+tested in: http://lab.antlr.org/
+    
+
+*/
