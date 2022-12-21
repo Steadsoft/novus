@@ -407,6 +407,8 @@ binary_literal
     ;
 
 BYTE_ORDER_MARK: '\u00EF' '\u00BB' '\u00BF';
+
+
 CALL:           ('call') ; 
 //GOTO:         ('goto') ;
 //GO:           ('go');
@@ -458,10 +460,10 @@ FRAC_O: ('.' [0-7]+) ;
 FRAC_H: ('.' [0-9a-fA-F]+) ;
 
 IDENTIFIER:             [a-zA-Z_]+ ;
-BINARY_PATTERN:         (BIN (LSEP BIN)*)+ FRAC_B? BASE_B;
-OCTAL_PATTERN:          (OCT (LSEP OCT)*)+ FRAC_O? BASE_O;
+BINARY_PATTERN:         (BIN (LSEP BIN)*)+ FRAC_B? BASE_B ;
+OCTAL_PATTERN:          (OCT (LSEP OCT)*)+ FRAC_O? BASE_O ;
 HEXADECIMAL_PATTERN:    (HEX (LSEP HEX)*)+ FRAC_H? BASE_H ;   
-DECIMAL_PATTERN:        (DEC (LSEP DEC)*)+ FRAC_D? BASE_D?; 
+DECIMAL_PATTERN:        (DEC (LSEP DEC)*)+ FRAC_D? BASE_D? ; 
 LSEP:                   (' ' | '_');
 
 BIN:                    [0-1] ;
