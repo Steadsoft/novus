@@ -35,39 +35,41 @@ translation_unit:
 procedure_stmt:
 	PROCEDURE identifier entry_information stmt_block end_stmt;
 
-stmt_block: (nonexecutable_stmt terminator)* (
-		executable_stmt terminator
-	)*
+stmt_block
+    : (nonexecutable_stmt terminator)* (executable_stmt terminator)*
 	| terminator;
 
 terminator: SEMICOLON;
 
-label_stmt: identifier COLON;
+label_stmt: LBRACE identifier RBRACE;
 
 nonexecutable_stmt:
 	preprocessor_stmt	# PRE
 	| declare_stmt		# DCL
 	| define_stmt		# DEF;
-
+ 
 executable_stmt:
-	label_stmt* assign_stmt		# ASSIGN
-	| label_stmt* call_stmt		# CALL
-	| label_stmt* goto_stmt		# GOTO
+	  label_stmt? assign_stmt	# ASSIGN
+	| label_stmt? call_stmt		# CALL
+	| label_stmt? goto_stmt		# GOTO
 	| procedure_stmt			# PROC
-	| label_stmt* return_stmt	# RET
-	| label_stmt* if_stmt		# IF
-	| label_stmt* loop_stmt		# LOOP;
+	| label_stmt? return_stmt	# RET
+	| label_stmt? if_stmt		# IF
+	| label_stmt? loop_stmt		# LOOP
+	| label_stmt? endloop_stmt  # LEAVE
+	| label_stmt? reloop_stmt   # AGAIN 
+	;
+
 
 preprocessor_stmt: '%' 'include' QUOTE identifier '.inc' QUOTE;
 
-assign_stmt:
-	reference EQUALS expression ; //SEMICOLON
+assign_stmt: reference EQUALS expression; //SEMICOLON
 
 reference:
 	reference ARROW basic_reference arguments_list?	# PTR_REF
 	| basic_reference arguments_list?				# BASIC_REF;
 
-arguments: LPAR subscript_commalist? RPAR;
+arguments: LPAR subscript_commalist+ RPAR;
 
 arguments_list: arguments+;
 
@@ -131,14 +133,7 @@ comparison_operator:
 	| '~='
 	| '~<';
 
-/*
- expression
- : expression (TIMES | DIVIDE) expression
- | expression (PLUS | MINUS) expression
- |
- LPAR expression RPAR
- ;
- */
+shift_operator: '>>' | '<<' | '>>>' | '<<<';
 
 identifier:
 	keyword			# KEYWD
@@ -177,14 +172,22 @@ keyword:
 	| COFUNCTION
 	| COROUTINE
 	| LOOP
+	| WHILE
+	| UNTIL
 	| BUILTIN
-	| INTRINSIC;
+	| INTRINSIC
+	| ENDLOOP
+	| RELOOP ;
 
 call_stmt: CALL reference;
 
 goto_stmt: (GOTO | GO TO) reference;
 
 end_stmt: END;
+
+endloop_stmt: ENDLOOP IDENTIFIER? ;
+
+reloop_stmt: RELOOP IDENTIFIER? ;
 
 declare_stmt: (DECLARE | ARGUMENT) identifier type_info;
 
@@ -228,7 +231,7 @@ data_attribute: (BINARY (precision)?)	# BIN
 	| COFUNCTION						# COF
 	| BUILTIN							# BLTN
 	| INTRINSIC							# INTR
-	| identifier						# IDENT ; // a user defined type would match here. 
+	| identifier						# IDENT; // a user defined type would match here. 
 
 precision: LPAR number_of_digits (COMMA scale_factor)? RPAR;
 
@@ -253,8 +256,8 @@ coprocedure_specifier: (COROUTINE | COFUNCTION);
 parameter_name_commalist: '(' identifier (',' identifier)* ')';
 
 returns_descriptor:
-	RETURNS data_attribute
-		; // consider using keyword 'is' instead and forcing it to be right after the params...
+	RETURNS data_attribute;
+	// consider using keyword 'is' instead and forcing it to be right after the params...
 
 return_stmt: RETURN ('(' expression ')')?;
 
@@ -270,11 +273,11 @@ elif_clause:
 	ELIF expression THEN (executable_stmt terminator)+ else_clause?;
 
 loop_stmt:
-	LOOP (executable_stmt terminator)+ end_stmt # BASIC_LOOP
-	| LOOP while_option until_option? (
+	LOOP  (executable_stmt terminator)+ end_stmt # BASIC_LOOP
+	| LOOP  while_option until_option? (
 		executable_stmt terminator
 	)+ end_stmt # WHILE_UNTIL
-	| LOOP until_option while_option? (
+	| LOOP  until_option while_option? (
 		executable_stmt terminator
 	)+ end_stmt # UNTIL_WHILE;
 
@@ -282,7 +285,7 @@ while_option: WHILE LPAR expression RPAR;
 
 until_option: UNTIL LPAR expression RPAR;
 
-define_stmt : // defines a type, like a structure
+define_stmt: // defines a type, like a structure
 	DEFINE identifier (identifier type_info) (
 		COMMA identifier type_info
 	)* (COMMA)? END;
@@ -365,6 +368,8 @@ COFUNCTION: ('cofunction' | 'cof');
 LOOP: ('loop');
 WHILE: ('while');
 UNTIL: ('until');
+ENDLOOP: ('endloop');
+RELOOP: ('reloop');
 BASE_B: (':b' | ':B');
 BASE_O: (':o' | ':O');
 BASE_D: (':d' | ':D');
@@ -391,6 +396,10 @@ DOT: '.';
 COMMA: ',';
 LPAR: '(';
 RPAR: ')';
+LBRACK: '[';
+RBRACK: ']';
+LBRACE: '{';
+RBRACE: '}';
 EQUALS: '=';
 TIMES: '*';
 DIVIDE: '/';
